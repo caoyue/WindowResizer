@@ -2,10 +2,13 @@
 using System.Windows.Forms;
 using WindowResizer.Properties;
 
-namespace WindowResizer {
-    public class TrayContext : ApplicationContext {
+namespace WindowResizer
+{
+    public class TrayContext : ApplicationContext
+    {
         private readonly NotifyIcon _trayIcon;
         private readonly KeyboardHook _hook = new KeyboardHook();
+        private readonly Config config = ConfigLoader.Load();
 
         public TrayContext() {
             try {
@@ -32,12 +35,13 @@ namespace WindowResizer {
         }
 
         private void RegisterHotkey() {
+            _hook.RegisterHotKey(config.GetModifierKeys(), config.GetKey());
             _hook.KeyPressed += OnKeyPressed;
-            _hook.RegisterHotKey(ModifierKeys.Control | ModifierKeys.Alt, Keys.K);
         }
 
         void OnKeyPressed(object sender, KeyPressedEventArgs e) {
-            WindowControl.MoveWindow();
+            var handle = WindowControl.GetForegroundHandle();
+            WindowControl.MoveWindow(handle, config.Left, config.Top, config.Width, config.Height);
         }
     }
 }

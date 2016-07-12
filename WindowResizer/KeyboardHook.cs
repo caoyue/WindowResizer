@@ -2,15 +2,18 @@
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace WindowResizer {
-    public sealed class KeyboardHook : IDisposable {
+namespace WindowResizer
+{
+    public sealed class KeyboardHook : IDisposable
+    {
         [DllImport("user32.dll")]
         private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
 
         [DllImport("user32.dll")]
         private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
-        private class Window : NativeWindow, IDisposable {
+        private class Window : NativeWindow, IDisposable
+        {
             private static int WM_HOTKEY = 0x0312;
 
             public Window() {
@@ -72,7 +75,8 @@ namespace WindowResizer {
         #endregion
     }
 
-    public class KeyPressedEventArgs : EventArgs {
+    public class KeyPressedEventArgs : EventArgs
+    {
         internal KeyPressedEventArgs(ModifierKeys modifier, Keys key) {
             Modifier = modifier;
             Key = key;
@@ -85,9 +89,10 @@ namespace WindowResizer {
 
 
     [Flags]
-    public enum ModifierKeys : uint {
+    public enum ModifierKeys : uint
+    {
         Alt = 1,
-        Control = 2,
+        Ctrl = 2,
         Shift = 4,
         Win = 8
     }
