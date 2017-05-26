@@ -20,38 +20,59 @@ namespace WindowResizer
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern int GetWindowThreadProcessId(IntPtr handle, out uint processId);
 
-        public static IntPtr GetForegroundHandle() {
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr FindWindow(string strClassName, string strWindowName);
+
+        [DllImport("user32.dll")]
+        public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
+
+        public static IntPtr GetForegroundHandle()
+        {
             return GetForegroundWindow();
         }
 
-        public static string GetActiveWindowTitle(IntPtr handle) {
+        public static string GetActiveWindowTitle(IntPtr handle)
+        {
             const int nChars = 256;
             var buff = new StringBuilder(nChars);
             return GetWindowText(handle, buff, nChars) > 0 ? buff.ToString() : null;
         }
 
-        public static void MoveWindow(IntPtr handle, int left, int top, int width, int height) {
+        public static void MoveWindow(IntPtr handle, Rect rect)
+        {
             if (handle == IntPtr.Zero) return;
 
-            if (left == -1 || top == -1) {
-                // compatible with multi screens
-                var scr = Screen.FromHandle(handle).Bounds;
-                left = (scr.Width - width) / 2;
-                top = (scr.Height - height) / 2;
-            }
-            SetWindowPos(handle, 0, left, top, width, height, 0x0200);
+            SetWindowPos(handle, 0, rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top, 0x0200);
         }
 
-        public static string GetProcessPath(IntPtr handle) {
-            try {
+        public static string GetProcessPath(IntPtr handle)
+        {
+            try
+            {
                 uint pid;
                 GetWindowThreadProcessId(handle, out pid);
                 var proc = Process.GetProcessById((int)pid);
                 return proc.MainModule.FileName;
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 return string.Empty;
             }
         }
+
+        public static Rect GetRect(IntPtr handle)
+        {
+            var rect = new Rect();
+            GetWindowRect(handle, ref rect);
+            return rect;
+        }
+    }
+
+    public struct Rect
+    {
+        public int Left { get; set; }
+        public int Top { get; set; }
+        public int Right { get; set; }
+        public int Bottom { get; set; }
     }
 }
