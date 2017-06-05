@@ -1,0 +1,20 @@
+version: '0.2.{build}'
+os: Visual Studio 2017
+configuration: Release
+platform: x64
+assembly_info:
+  patch: true
+  file: AssemblyInfo.*
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
+before_build:
+- ps: nuget restore
+build:
+  project: WindowResizer.sln
+after_build:
+- 7z a window_resizer_%APPVEYOR_BUILD_VERSION%.zip %APPVEYOR_BUILD_FOLDER%\WindowResizer\bin\x64\Release
+after_test:
+artifacts:
+- path: window_resizer_$(APPVEYOR_BUILD_VERSION).zip
+  name: WindowResizer_$(APPVEYOR_BUILD_VERSION)
