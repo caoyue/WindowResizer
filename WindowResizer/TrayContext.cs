@@ -52,7 +52,7 @@ namespace WindowResizer
         private void OnKeyPressed(object sender, KeyPressedEventArgs e)
         {
             var handle = WindowControl.GetForegroundHandle();
-            var process = WindowControl.GetProcessPath(handle);
+            var process = WindowControl.GetRealProcessPath(handle);
             if (_config.WindowSizes == null)
             {
                 _config.WindowSizes = new List<WindowSize>();

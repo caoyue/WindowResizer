@@ -19,12 +19,17 @@ namespace WindowResizer
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern int GetWindowThreadProcessId(IntPtr handle, out uint processId);
+        public delegate bool WindowEnumProc(IntPtr hwnd, IntPtr lparam);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr FindWindow(string strClassName, string strWindowName);
 
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool EnumChildWindows(IntPtr hwnd, WindowEnumProc callback, IntPtr lParam);
 
         public static IntPtr GetForegroundHandle()
         {
@@ -58,6 +63,51 @@ namespace WindowResizer
             {
                 return string.Empty;
             }
+        }
+
+        public static string GetRealProcessPath(IntPtr handle)
+        {
+            try
+            {
+                var proc = GetRealProcess(handle);
+                return proc.MainModule.FileName;
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+
+        public static Process GetRealProcess(IntPtr handle)
+        {
+            uint pid;
+            GetWindowThreadProcessId(handle, out pid);
+            var foregroundProcess = Process.GetProcessById((int)pid);
+            if (foregroundProcess.ProcessName == "ApplicationFrameHost")
+            {
+                foregroundProcess = GetRealProcess(foregroundProcess);
+            }
+            return foregroundProcess;
+        }
+
+        private static Process _realProcess;
+
+        private static Process GetRealProcess(Process foregroundProcess)
+        {
+            EnumChildWindows(foregroundProcess.MainWindowHandle, ChildWindowCallback, IntPtr.Zero);
+            return _realProcess;
+        }
+
+        private static bool ChildWindowCallback(IntPtr handle, IntPtr lparam)
+        {
+            uint pid;
+            GetWindowThreadProcessId(handle, out pid);
+            var process = Process.GetProcessById((int)pid);
+            if (process.ProcessName != "ApplicationFrameHost")
+            {
+                _realProcess = process;
+            }
+            return true;
         }
 
         public static Rect GetRect(IntPtr handle)
