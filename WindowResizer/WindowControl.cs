@@ -66,6 +66,20 @@ namespace WindowResizer
             GetWindowRect(handle, ref rect);
             return rect;
         }
+
+
+        public static bool IsForegroundFullScreen(Screen screen = null)
+        {
+
+            if (screen == null)
+            {
+                screen = Screen.PrimaryScreen;
+            }
+
+            var rect = GetRect(GetForegroundWindow());
+            return screen.Bounds.Width == rect.Right - rect.Left
+                   && screen.Bounds.Height == rect.Bottom - rect.Top;
+        }
     }
 
     public struct Rect
