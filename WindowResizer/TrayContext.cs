@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -52,7 +52,7 @@ namespace WindowResizer
         private void OnKeyPressed(object sender, KeyPressedEventArgs e)
         {
             var handle = WindowControl.GetForegroundHandle();
-            var process = WindowControl.GetRealProcessPath(handle);
+            var process = WindowControl.GetRealProcessName(handle);
             if (_config.WindowSizes == null)
             {
                 _config.WindowSizes = new List<WindowSize>();

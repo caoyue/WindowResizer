@@ -16,3 +16,4 @@ you can save and restore window position for different process
 - change hotkey
 
     edit `config.json` in app path
+

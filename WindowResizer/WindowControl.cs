@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -50,14 +50,14 @@ namespace WindowResizer
             SetWindowPos(handle, 0, rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top, 0x0200);
         }
 
-        public static string GetProcessPath(IntPtr handle)
+        public static string GetProcessName(IntPtr handle)
         {
             try
             {
                 uint pid;
                 GetWindowThreadProcessId(handle, out pid);
                 var proc = Process.GetProcessById((int)pid);
-                return proc.MainModule.FileName;
+                return proc.MainModule.ModuleName;
             }
             catch (Exception)
             {
@@ -65,12 +65,12 @@ namespace WindowResizer
             }
         }
 
-        public static string GetRealProcessPath(IntPtr handle)
+        public static string GetRealProcessName(IntPtr handle)
         {
             try
             {
                 var proc = GetRealProcess(handle);
-                return proc.MainModule.FileName;
+                return proc.MainModule.ModuleName;
             }
             catch (Exception)
             {
