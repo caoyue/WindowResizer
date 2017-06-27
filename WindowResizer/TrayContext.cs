@@ -51,6 +51,11 @@ namespace WindowResizer
 
         private void OnKeyPressed(object sender, KeyPressedEventArgs e)
         {
+            if (WindowControl.IsForegroundFullScreen())
+            {
+                return;
+            }
+
             var handle = WindowControl.GetForegroundHandle();
             var process = WindowControl.GetRealProcessName(handle);
             if (_config.WindowSizes == null)
@@ -58,6 +63,7 @@ namespace WindowResizer
                 _config.WindowSizes = new List<WindowSize>();
             }
             var windowSize = _config.WindowSizes.FirstOrDefault(w => w.Process == process);
+
 
             if (e.Modifier == _config.SaveKey.GetModifierKeys() && e.Key == _config.SaveKey.GetKey())
             {
