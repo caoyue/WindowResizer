@@ -12,11 +12,13 @@ namespace WindowResizer
         private readonly KeyboardHook _hook = new KeyboardHook();
         private readonly Config _config = ConfigLoader.Load();
 
+        private static SettingForm _settingForm;
+
         public TrayContext()
         {
             try
             {
-                RegisterHotkey();
+                RegisterHotkey(_config);
             }
             catch (Exception e)
             {
@@ -27,14 +29,17 @@ namespace WindowResizer
             {
                 Icon = Resources.AppIcon,
                 ContextMenu = new ContextMenu(new MenuItem[] {
-                    new MenuItem("Exit", Exit)
+                    new MenuItem("Setting", OnSetting),
+                    new MenuItem("Exit", OnExit)
                 }),
                 Visible = true,
                 Text = "WindowResizer"
             };
+
+            _trayIcon.DoubleClick += OnSetting;
         }
 
-        private void Exit(object sender, EventArgs e)
+        private void OnExit(object sender, EventArgs e)
         {
             ConfigLoader.Save(_config);
             _trayIcon.Visible = false;
@@ -42,10 +47,29 @@ namespace WindowResizer
             Application.Exit();
         }
 
-        private void RegisterHotkey()
+        private void OnSetting(object sender, EventArgs e)
         {
-            _hook.RegisterHotKey(_config.SaveKey.GetModifierKeys(), _config.SaveKey.GetKey());
-            _hook.RegisterHotKey(_config.RestoreKey.GetModifierKeys(), _config.RestoreKey.GetKey());
+            if (_settingForm == null)
+            {
+                _settingForm = new SettingForm(_config, _hook);
+            }
+
+            _settingForm.Show();
+            _settingForm.BringToFront();
+        }
+
+        private void RegisterHotkey(Config config)
+        {
+            if (!config.SaveKey.ValidateKeys())
+            {
+                MessageBox.Show("Save window hotkeys not valid.");
+            }
+            if (!config.RestoreKey.ValidateKeys())
+            {
+                MessageBox.Show("Restore window hotkeys not valid.");
+            }
+            _hook.RegisterHotKey(config.SaveKey.GetModifierKeys(), config.SaveKey.GetKey());
+            _hook.RegisterHotKey(config.RestoreKey.GetModifierKeys(), config.RestoreKey.GetKey());
             _hook.KeyPressed += OnKeyPressed;
         }
 

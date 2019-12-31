@@ -10,14 +10,14 @@ namespace WindowResizer
     {
         public HotKeys SaveKey { get; set; } = new HotKeys()
         {
-            ModifierKeys = new[] { "ctrl", "alt" },
-            Key = "s"
+            ModifierKeys = new[] { "Ctrl", "Alt" },
+            Key = "S"
         };
 
         public HotKeys RestoreKey { get; set; } = new HotKeys()
         {
-            ModifierKeys = new[] { "ctrl", "alt" },
-            Key = "r"
+            ModifierKeys = new[] { "Ctrl", "Alt" },
+            Key = "R"
         };
 
         public List<WindowSize> WindowSizes { get; set; }
@@ -58,6 +58,23 @@ namespace WindowResizer
             return Enum.TryParse(hotKeys.Key, true, out k) ? k : new HotKeys().GetKey();
         }
 
+        public static bool ValidateKeys(this HotKeys hotKeys)
+        {
+            return !(hotKeys.ModifierKeys == null
+                || hotKeys.ModifierKeys.Length == 0
+                || string.IsNullOrEmpty(hotKeys.Key));
+        }
+
+        public static string ToKeysString(this HotKeys hotKeys)
+        {
+            string str = string.Empty;
+            if (hotKeys.ModifierKeys != null && hotKeys.ModifierKeys.Length > 0)
+            {
+                str += string.Join(" + ", hotKeys.ModifierKeys);
+            }
+
+            return $"{str} + {hotKeys.Key}";
+        }
     }
 
     public static class ConfigLoader
