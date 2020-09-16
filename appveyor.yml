@@ -1,20 +1,32 @@
-version: '0.3.{build}'
+version: "0.3.{build}"
 os: Visual Studio 2019
 configuration: Release
 platform: x64
 assembly_info:
-  patch: true
-  file: AssemblyInfo.*
-  assembly_version: '{version}'
-  assembly_file_version: '{version}'
-  assembly_informational_version: '{version}'
+    patch: true
+    file: AssemblyInfo.*
+    assembly_version: "{version}"
+    assembly_file_version: "{version}"
+    assembly_informational_version: "{version}"
 before_build:
-- ps: nuget restore
+    - ps: nuget restore
 build:
-  project: WindowResizer.sln
+    project: WindowResizer.sln
 after_build:
-- 7z a window_resizer_%APPVEYOR_BUILD_VERSION%.zip %APPVEYOR_BUILD_FOLDER%\WindowResizer\bin\x64\Release
+    - 7z a window_resizer_%APPVEYOR_BUILD_VERSION%.zip %APPVEYOR_BUILD_FOLDER%\WindowResizer\bin\x64\Release
 after_test:
 artifacts:
-- path: window_resizer_$(APPVEYOR_BUILD_VERSION).zip
-  name: WindowResizer_$(APPVEYOR_BUILD_VERSION)
+    - path: window_resizer_$(APPVEYOR_BUILD_VERSION).zip
+      name: WindowResizer_$(APPVEYOR_BUILD_VERSION)
+deploy:
+    release: window_resizer_$(APPVEYOR_BUILD_VERSION).zip
+    description: WindowResizer_$(APPVEYOR_BUILD_VERSION)
+    provider: GitHub
+    auth_token:
+        secure: UcxrOFRJ1elSazvncT3nPGT+xt+CjplLJ/D0avU9+Qru7HBVxUfUdoe0Iwcd412S
+    artifact: window_resizer_$(APPVEYOR_BUILD_VERSION).zip
+    draft: false
+    prerelease: false
+    on:
+        branch: master
+        APPVEYOR_REPO_TAG: true
