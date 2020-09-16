@@ -8,6 +8,7 @@ namespace WindowResizer
 {
     public static class WindowControl
     {
+        #region api
         [DllImport("user32.dll")]
         private static extern IntPtr GetForegroundWindow();
 
@@ -31,6 +32,23 @@ namespace WindowResizer
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool EnumChildWindows(IntPtr hwnd, WindowEnumProc callback, IntPtr lParam);
 
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [Flags]
+        public enum SetWindowPosFlags : uint
+        {
+            SWP_NOOWNERZORDER = 0x0200
+        }
+
+        [Flags]
+        public enum ShowWindowFlags : uint
+        {
+            SW_SHOWNORMAL = 1
+        }
+
+        #endregion
+
         public static IntPtr GetForegroundHandle()
         {
             return GetForegroundWindow();
@@ -45,9 +63,13 @@ namespace WindowResizer
 
         public static void MoveWindow(IntPtr handle, Rect rect)
         {
-            if (handle == IntPtr.Zero) return;
+            if (handle == IntPtr.Zero)
+                return;
 
-            SetWindowPos(handle, 0, rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top, 0x0200);
+            ShowWindow(handle, (int)ShowWindowFlags.SW_SHOWNORMAL);
+            SetWindowPos(handle, 0, rect.Left, rect.Top,
+                rect.Right - rect.Left, rect.Bottom - rect.Top,
+                (int)SetWindowPosFlags.SWP_NOOWNERZORDER);
         }
 
         public static string GetProcessName(IntPtr handle)
