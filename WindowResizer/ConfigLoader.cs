@@ -8,6 +8,8 @@ namespace WindowResizer
 {
     public class Config
     {
+        public bool DisbaleInFullScreen { get; set; } = true;
+
         public HotKeys SaveKey { get; set; } = new HotKeys()
         {
             ModifierKeys = new[] { "Ctrl", "Alt" },
@@ -47,7 +49,7 @@ namespace WindowResizer
                 if (!Enum.TryParse(k, true, out m))
                     continue;
 
-                keys = keys | m;
+                keys |= m;
             }
             return keys;
         }
@@ -79,25 +81,27 @@ namespace WindowResizer
 
     public static class ConfigLoader
     {
-        private static readonly string Path = System.IO.Path.Combine(Application.StartupPath, "config.json");
+        private static readonly string _path =
+            System.IO.Path.Combine(Application.StartupPath, "config.json");
 
         public static Config Load()
         {
-            if (!File.Exists(Path))
+            var config = new Config();
+            if (!File.Exists(_path))
             {
-                var config = new Config();
                 Save(config);
                 return config;
             }
 
-            var text = File.ReadAllText(Path);
-            return JsonConvert.DeserializeObject<Config>(text);
+            var text = File.ReadAllText(_path);
+            config = JsonConvert.DeserializeObject<Config>(text);
+            return config;
         }
 
         public static void Save(Config config)
         {
             var json = JsonConvert.SerializeObject(config);
-            File.WriteAllText(Path, json);
+            File.WriteAllText(_path, json);
         }
     }
 }

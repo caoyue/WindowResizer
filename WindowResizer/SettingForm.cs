@@ -11,6 +11,7 @@ namespace WindowResizer
         private static Config _config;
         private static HotKeys _saveKeys;
         private static HotKeys _restoreKeys;
+        private static bool _disableInFullScreen;
         private static KeyboardHook _hook;
 
         public SettingForm(Config config, KeyboardHook hook)
@@ -19,11 +20,14 @@ namespace WindowResizer
 
             _config = config;
             _hook = hook;
+            _saveKeys = _config.SaveKey;
+            _restoreKeys = _config.RestoreKey;
+            _disableInFullScreen = _config.DisbaleInFullScreen;
 
             FormClosing += SettingForm_Closing;
-            this.Text = "Setting";
+            Text = "Setting";
 
-            TextBoxInit();
+            PanelInit();
 
             textBox1.KeyDown += (s, e) => textBox_KeyDown(s, e, textBox1, ref _saveKeys);
             textBox1.ReadOnly = true;
@@ -124,10 +128,16 @@ namespace WindowResizer
             Restore();
         }
 
+        /// <summary>
+        /// save settings
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
             _config.SaveKey = _saveKeys;
             _config.RestoreKey = _restoreKeys;
+            _config.DisbaleInFullScreen = _disableInFullScreen;
             ConfigLoader.Save(_config);
 
             //hook
@@ -138,6 +148,11 @@ namespace WindowResizer
             Hide();
         }
 
+        /// <summary>
+        /// close settings panel
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
         {
             Restore();
@@ -145,11 +160,11 @@ namespace WindowResizer
 
         private void Restore()
         {
-            TextBoxInit();
+            PanelInit();
             Hide();
         }
 
-        private void TextBoxInit()
+        private void PanelInit()
         {
             textBox1.BackColor = Color.Blue;
             textBox1.ForeColor = Color.White;
@@ -157,8 +172,15 @@ namespace WindowResizer
             textBox2.BackColor = Color.Blue;
             textBox2.ForeColor = Color.White;
 
-            textBox1.Text = _config.SaveKey.ToKeysString();
-            textBox2.Text = _config.RestoreKey.ToKeysString();
+            textBox1.Text = _saveKeys.ToKeysString();
+            textBox2.Text = _restoreKeys.ToKeysString();
+
+            checkBox1.Checked = _config.DisbaleInFullScreen;
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            _disableInFullScreen = checkBox1.Checked;
         }
     }
 }
