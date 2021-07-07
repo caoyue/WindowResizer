@@ -1,57 +1,65 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 namespace WindowResizer
 {
     public partial class SettingForm : Form
     {
-        private static Config _config;
         private static HotKeys _saveKeys;
         private static HotKeys _restoreKeys;
         private static bool _disableInFullScreen;
         private static KeyboardHook _hook;
 
-        public SettingForm(Config config, KeyboardHook hook)
+        public SettingForm(KeyboardHook hook)
         {
             InitializeComponent();
 
-            _config = config;
             _hook = hook;
-            _saveKeys = _config.SaveKey;
-            _restoreKeys = _config.RestoreKey;
-            _disableInFullScreen = _config.DisbaleInFullScreen;
+            _saveKeys = ConfigLoader.config.SaveKey;
+            _restoreKeys = ConfigLoader.config.RestoreKey;
+            _disableInFullScreen = ConfigLoader.config.DisbaleInFullScreen;
+
+            SaveKeysBox.BackColor = Color.Blue;
+            SaveKeysBox.ForeColor = Color.White;
+
+            RestoreKeysBox.BackColor = Color.Blue;
+            RestoreKeysBox.ForeColor = Color.White;
 
             FormClosing += SettingForm_Closing;
             Text = "Setting";
 
-            PanelInit();
+            SaveKeysBox.KeyDown += (s, e) => textBox_KeyDown(s, e, SaveKeysBox, ref _saveKeys);
+            SaveKeysBox.ReadOnly = true;
 
-            textBox1.KeyDown += (s, e) => textBox_KeyDown(s, e, textBox1, ref _saveKeys);
-            textBox1.ReadOnly = true;
+            RestoreKeysBox.KeyDown += (s, e) => textBox_KeyDown(s, e, RestoreKeysBox, ref _restoreKeys);
+            RestoreKeysBox.ReadOnly = true;
 
-            textBox2.KeyDown += (s, e) => textBox_KeyDown(s, e, textBox2, ref _restoreKeys);
-            textBox2.ReadOnly = true;
+            SaveKeysBox.GotFocus += (s, e) => textBox_GotFocus(s, e, SaveKeysBox);
+            RestoreKeysBox.GotFocus += (s, e) => textBox_GotFocus(s, e, RestoreKeysBox);
 
-            textBox1.GotFocus += (s, e) => textBox_GotFocus(s, e, textBox1);
-            textBox2.GotFocus += (s, e) => textBox_GotFocus(s, e, textBox2);
+            SaveKeysBox.LostFocus += (s, e) => textBox_LostFocus(s, e, SaveKeysBox);
+            RestoreKeysBox.LostFocus += (s, e) => textBox_LostFocus(s, e, RestoreKeysBox);
 
-            textBox1.LostFocus += (s, e) => textBox_LostFocus(s, e, textBox1);
-            textBox2.LostFocus += (s, e) => textBox_LostFocus(s, e, textBox2);
+            WindowsGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Name", DataPropertyName = "name", HeaderText = "ExeName" });
+            WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Title", DataPropertyName = "Title", HeaderText = "Title Ending" });
+            WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Top", DataPropertyName = "Top", HeaderText = "Top" });
+            WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Left", DataPropertyName = "Left", HeaderText = "Left" });
+            WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Right", DataPropertyName = "Right", HeaderText = "Right" });
+            WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Bottom", DataPropertyName = "Bottom", HeaderText = "Bottom" });
+            WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Rect", DataPropertyName = "Rect", Visible = false });
+
+            WindowsGrid.DataSource = ConfigLoader.config.WindowSizes;
+            SaveKeysBox.Text = _saveKeys.ToKeysString();
+            RestoreKeysBox.Text = _restoreKeys.ToKeysString();
+            checkBox1.Checked = ConfigLoader.config.DisbaleInFullScreen;
         }
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
 
         private void textBox_KeyDown(object sender, KeyEventArgs e,
             TextBox textBox, ref HotKeys hotKeys)
@@ -106,11 +114,6 @@ namespace WindowResizer
             e.SuppressKeyPress = true;
         }
 
-        private void textBox_KeyUp(object sender, KeyEventArgs e)
-        {
-
-        }
-
         private void textBox_GotFocus(object sender, EventArgs e, TextBox textBox)
         {
             textBox.BackColor = Color.OrangeRed;
@@ -125,7 +128,6 @@ namespace WindowResizer
         private void SettingForm_Closing(object sender, CancelEventArgs e)
         {
             e.Cancel = true;
-            Restore();
         }
 
         /// <summary>
@@ -133,17 +135,18 @@ namespace WindowResizer
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button1_Click(object sender, EventArgs e)
+        private void SaveBtn_Click(object sender, EventArgs e)
         {
-            _config.SaveKey = _saveKeys;
-            _config.RestoreKey = _restoreKeys;
-            _config.DisbaleInFullScreen = _disableInFullScreen;
-            ConfigLoader.Save(_config);
+            ConfigLoader.config.SaveKey = _saveKeys;
+            ConfigLoader.config.RestoreKey = _restoreKeys;
+            ConfigLoader.config.DisbaleInFullScreen = _disableInFullScreen;
+
+            ConfigLoader.Save();
 
             //hook
             _hook.UnRegisterHotKey();
-            _hook.RegisterHotKey(_config.SaveKey.GetModifierKeys(), _config.SaveKey.GetKey());
-            _hook.RegisterHotKey(_config.RestoreKey.GetModifierKeys(), _config.RestoreKey.GetKey());
+            _hook.RegisterHotKey(ConfigLoader.config.SaveKey.GetModifierKeys(), ConfigLoader.config.SaveKey.GetKey());
+            _hook.RegisterHotKey(ConfigLoader.config.RestoreKey.GetModifierKeys(), ConfigLoader.config.RestoreKey.GetKey());
 
             Hide();
         }
@@ -153,34 +156,65 @@ namespace WindowResizer
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button2_Click(object sender, EventArgs e)
+        private void CancelBtn_Click(object sender, EventArgs e)
         {
-            Restore();
-        }
-
-        private void Restore()
-        {
-            PanelInit();
             Hide();
-        }
-
-        private void PanelInit()
-        {
-            textBox1.BackColor = Color.Blue;
-            textBox1.ForeColor = Color.White;
-
-            textBox2.BackColor = Color.Blue;
-            textBox2.ForeColor = Color.White;
-
-            textBox1.Text = _saveKeys.ToKeysString();
-            textBox2.Text = _restoreKeys.ToKeysString();
-
-            checkBox1.Checked = _config.DisbaleInFullScreen;
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             _disableInFullScreen = checkBox1.Checked;
+        }
+
+        private void SettingForm_Load(object sender, EventArgs e)
+        {
+            this.BringToFront();
+        }
+
+        private void ConfigExportBtn_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Title = "Export Config",
+                AddExtension = true,
+                DefaultExt = "json",
+                FileName = Application.ProductName + "Config.json"
+            };
+            if (saveFileDialog.ShowDialog() != DialogResult.Cancel && saveFileDialog.FileName != "")
+            {
+                if(File.Exists(saveFileDialog.FileName)) {
+                    File.Delete(saveFileDialog.FileName);
+                }
+                File.Copy(ConfigLoader.ConfigPath, saveFileDialog.FileName);
+            }
+        }
+
+        private void ConfigImportBtn_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Title = "Import Config",
+            };
+            if(openFileDialog.ShowDialog() != DialogResult.Cancel && openFileDialog.FileName != "")
+            {
+                try
+                {
+                    var text = File.ReadAllText(openFileDialog.FileName);
+                    var config = JsonConvert.DeserializeObject<Config>(text);
+                    ConfigLoader.config = config;
+                    _saveKeys = ConfigLoader.config.SaveKey;
+                    _restoreKeys = ConfigLoader.config.RestoreKey;
+                    _disableInFullScreen = ConfigLoader.config.DisbaleInFullScreen;
+                    WindowsGrid.DataSource = ConfigLoader.config.WindowSizes;
+                    SaveKeysBox.Text = _saveKeys.ToKeysString();
+                    RestoreKeysBox.Text = _restoreKeys.ToKeysString();
+                    checkBox1.Checked = ConfigLoader.config.DisbaleInFullScreen;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Import failed! " + ex.Message);
+                }
+            }
         }
     }
 }

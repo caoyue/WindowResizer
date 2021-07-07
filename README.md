@@ -6,7 +6,7 @@ a simple tool gives you a way to quickly reset window size with a hotkey
 you can save and restore window position for different process
 
 ## support
-- .NET Framework 4.5+
+- .NET Framework 4.5.2+
 
 ## hotkey
 you can change hoykeys in setting
