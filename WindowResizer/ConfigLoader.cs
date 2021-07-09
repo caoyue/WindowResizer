@@ -43,6 +43,30 @@ namespace WindowResizer
         public int Bottom { get { return Rect.Bottom; } set { Rect = new Rect { Top = Rect.Top, Left = Rect.Left, Right = Rect.Right, Bottom = value }; } }
     }
 
+    public class ConfigOld
+    {
+        public bool DisbaleInFullScreen { get; set; } = true;
+
+        public HotKeys SaveKey { get; set; } = new HotKeys()
+        {
+            ModifierKeys = new[] { "Ctrl", "Alt" },
+            Key = "S"
+        };
+
+        public HotKeys RestoreKey { get; set; } = new HotKeys()
+        {
+            ModifierKeys = new[] { "Ctrl", "Alt" },
+            Key = "R"
+        };
+
+        public List<WindowSizeOldCfg> WindowSizes { get; set; }
+    }
+    public class WindowSizeOldCfg
+    {
+        public string Process { get; set; }
+        public Rect Rect { get; set; }
+    }
+
     public class HotKeys
     {
         public string[] ModifierKeys { get; set; }
@@ -101,7 +125,27 @@ namespace WindowResizer
         {
             if(!File.Exists(ConfigPath) && File.Exists(_oldpath))
             {
-                File.Move(_oldpath, ConfigPath);
+                var text = File.ReadAllText(_oldpath);
+                ConfigOld oldcfg = JsonConvert.DeserializeObject<ConfigOld>(text);
+                config.DisbaleInFullScreen = oldcfg.DisbaleInFullScreen;
+                config.RestoreKey = oldcfg.RestoreKey;
+                config.SaveKey = oldcfg.SaveKey;
+                config.WindowSizes = new BindingList<WindowSize>();
+                foreach (var w in oldcfg.WindowSizes) {
+                    config.WindowSizes.Add(new WindowSize
+                    {
+                        Name = w.Process,
+                        Title = "",
+                        Rect = new Rect
+                        {
+                            Top = w.Rect.Top,
+                            Left = w.Rect.Left,
+                            Right = w.Rect.Right,
+                            Bottom = w.Rect.Bottom
+                        }
+                    });
+                }
+                //File.Move(_oldpath, ConfigPath);
             }
             if (!File.Exists(ConfigPath))
             {
