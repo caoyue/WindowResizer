@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using WindowResizer.Properties;
@@ -10,7 +11,6 @@ namespace WindowResizer
     {
         private readonly NotifyIcon _trayIcon;
         private readonly KeyboardHook _hook = new KeyboardHook();
-        private readonly Config _config = ConfigLoader.Load();
 
         private static SettingForm _settingForm;
 
@@ -18,7 +18,14 @@ namespace WindowResizer
         {
             try
             {
-                RegisterHotkey(_config);
+                ConfigLoader.Load();
+            } catch (Exception e)
+            {
+                MessageBox.Show($"WindowResizer: config load failed! Exception: {e.Message}");
+            }
+            try
+            {
+                RegisterHotkey();
             }
             catch (Exception e)
             {
@@ -41,62 +48,76 @@ namespace WindowResizer
 
         private void OnExit(object sender, EventArgs e)
         {
-            ConfigLoader.Save(_config);
-            _trayIcon.Visible = false;
+            _settingForm?.Close();
+            ConfigLoader.Save();
+            _trayIcon.Dispose();
             _hook.Dispose();
-            Application.Exit();
+            Environment.Exit(0);
         }
 
         private void OnSetting(object sender, EventArgs e)
         {
             if (_settingForm == null)
             {
-                _settingForm = new SettingForm(_config, _hook);
+                _settingForm = new SettingForm(_hook);
             }
 
             _settingForm.Show();
-            _settingForm.BringToFront();
         }
 
-        private void RegisterHotkey(Config config)
+        private void RegisterHotkey()
         {
-            if (!config.SaveKey.ValidateKeys())
+            if (!ConfigLoader.config.SaveKey.ValidateKeys())
             {
                 MessageBox.Show("Save window hotkeys not valid.");
             }
-            if (!config.RestoreKey.ValidateKeys())
+            if (!ConfigLoader.config.RestoreKey.ValidateKeys())
             {
                 MessageBox.Show("Restore window hotkeys not valid.");
             }
-            _hook.RegisterHotKey(config.SaveKey.GetModifierKeys(), config.SaveKey.GetKey());
-            _hook.RegisterHotKey(config.RestoreKey.GetModifierKeys(), config.RestoreKey.GetKey());
+            _hook.RegisterHotKey(ConfigLoader.config.SaveKey.GetModifierKeys(), ConfigLoader.config.SaveKey.GetKey());
+            _hook.RegisterHotKey(ConfigLoader.config.RestoreKey.GetModifierKeys(), ConfigLoader.config.RestoreKey.GetKey());
             _hook.KeyPressed += OnKeyPressed;
         }
 
         private void OnKeyPressed(object sender, KeyPressedEventArgs e)
         {
-            if (_config.DisbaleInFullScreen && WindowControl.IsForegroundFullScreen())
+            if (ConfigLoader.config.DisbaleInFullScreen && WindowControl.IsForegroundFullScreen())
             {
                 return;
             }
 
             var handle = WindowControl.GetForegroundHandle();
-            var process = WindowControl.GetRealProcessName(handle);
-            if (_config.WindowSizes == null)
+            var process = WindowControl.GetRealProcess(handle);
+            if (ConfigLoader.config.WindowSizes == null)
             {
-                _config.WindowSizes = new List<WindowSize>();
+                ConfigLoader.config.WindowSizes = new BindingList<WindowSize>();
             }
-            var windowSize = _config.WindowSizes.FirstOrDefault(w => w.Process == process);
+            var windowSize = ConfigLoader.config.WindowSizes.FirstOrDefault(w =>
+            {
+                if (w.Title.StartsWith("*"))
+                {
+                    return w.Name == process.MainModule.ModuleName && process.MainWindowTitle.EndsWith(w.Title.Substring(1));
+                }
+                else if (w.Title.EndsWith("*"))
+                {
+                    return w.Name == process.MainModule.ModuleName && process.MainWindowTitle.StartsWith(w.Title.Substring(0, w.Title.Length - 1));
+                }
+                else
+                {
+                    return w.Name == process.MainModule.ModuleName && process.MainWindowTitle == w.Title;
+                }
+            });
 
-
-            if (e.Modifier == _config.SaveKey.GetModifierKeys() && e.Key == _config.SaveKey.GetKey())
+            if (e.Modifier == ConfigLoader.config.SaveKey.GetModifierKeys() && e.Key == ConfigLoader.config.SaveKey.GetKey())
             {
                 var rect = WindowControl.GetRect(handle);
                 if (windowSize == null)
                 {
-                    _config.WindowSizes.Add(new WindowSize
+                    ConfigLoader.config.WindowSizes.Add(new WindowSize
                     {
-                        Process = process,
+                        Name = process.MainModule.ModuleName,
+                        Title = process.MainWindowTitle,
                         Rect = rect
                     });
                 }
@@ -104,18 +125,18 @@ namespace WindowResizer
                 {
                     windowSize.Rect = WindowControl.GetRect(handle);
                 }
-                ConfigLoader.Save(_config);
+                ConfigLoader.Save();
             }
             else
             {
-                var rect = windowSize?.Rect ?? new Rect
+                if (windowSize == null)
                 {
-                    Top = 0,
-                    Bottom = 720,
-                    Left = 0,
-                    Right = 1280
-                };
-                WindowControl.MoveWindow(handle, rect);
+                    MessageBox.Show("No saved settings for " + process.MainModule.ModuleName + ":" + process.MainWindowTitle, "WindowResizer");
+                }
+                else
+                {
+                    WindowControl.MoveWindow(handle, windowSize.Rect);
+                }
             }
         }
     }

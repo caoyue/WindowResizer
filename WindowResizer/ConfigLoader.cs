@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
 using Newtonsoft.Json;
@@ -22,14 +23,24 @@ namespace WindowResizer
             Key = "R"
         };
 
-        public List<WindowSize> WindowSizes { get; set; }
+        public BindingList<WindowSize> WindowSizes { get; set; }
     }
 
     public class WindowSize
     {
-        public string Process { get; set; }
+        public string Name { get; set; }
+        public string Title { get; set; }
 
         public Rect Rect { get; set; }
+        //seperate these for the grid edit, but flag so they don't get JSON seriealized
+        [JsonIgnore]
+        public int Top { get { return Rect.Top; } set { Rect = new Rect { Top = value, Left = Rect.Left, Right = Rect.Right, Bottom = Rect.Bottom }; } }
+        [JsonIgnore]
+        public int Left { get { return Rect.Left; } set { Rect = new Rect { Top = Rect.Top, Left = value, Right = Rect.Right, Bottom = Rect.Bottom }; } }
+        [JsonIgnore]
+        public int Right { get { return Rect.Right; } set { Rect = new Rect { Top = Rect.Top, Left = Rect.Left, Right = value, Bottom = Rect.Bottom }; } }
+        [JsonIgnore]
+        public int Bottom { get { return Rect.Bottom; } set { Rect = new Rect { Top = Rect.Top, Left = Rect.Left, Right = Rect.Right, Bottom = value }; } }
     }
 
     public class HotKeys
@@ -40,6 +51,7 @@ namespace WindowResizer
 
     public static class ConfigHelper
     {
+
         public static ModifierKeys GetModifierKeys(this HotKeys hotKeys)
         {
             ModifierKeys keys = 0;
@@ -81,27 +93,31 @@ namespace WindowResizer
 
     public static class ConfigLoader
     {
-        private static readonly string _path =
-            System.IO.Path.Combine(Application.StartupPath, "config.json");
+        public static Config config = new Config();
+        private static string _oldpath = Path.Combine(Application.StartupPath, "config.json");
+        public static string ConfigPath { get; } = Path.Combine(Application.UserAppDataPath, "config.json");
 
-        public static Config Load()
+        public static void Load()
         {
-            var config = new Config();
-            if (!File.Exists(_path))
+            if(!File.Exists(ConfigPath) && File.Exists(_oldpath))
             {
-                Save(config);
-                return config;
+                File.Move(_oldpath, ConfigPath);
             }
-
-            var text = File.ReadAllText(_path);
-            config = JsonConvert.DeserializeObject<Config>(text);
-            return config;
+            if (!File.Exists(ConfigPath))
+            {
+                Save();
+            }
+            else
+            {
+                var text = File.ReadAllText(ConfigPath);
+                config = JsonConvert.DeserializeObject<Config>(text);
+            }
         }
 
-        public static void Save(Config config)
+        public static void Save()
         {
             var json = JsonConvert.SerializeObject(config);
-            File.WriteAllText(_path, json);
+            File.WriteAllText(ConfigPath, json);
         }
     }
 }
