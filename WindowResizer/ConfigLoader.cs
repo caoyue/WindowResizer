@@ -135,7 +135,7 @@ namespace WindowResizer
                     config.WindowSizes.Add(new WindowSize
                     {
                         Name = w.Process,
-                        Title = "",
+                        Title = "*",
                         Rect = new Rect
                         {
                             Top = w.Rect.Top,
