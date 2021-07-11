@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
@@ -19,10 +18,12 @@ namespace WindowResizer
             try
             {
                 ConfigLoader.Load();
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 MessageBox.Show($"WindowResizer: config load failed! Exception: {e.Message}");
             }
+
             try
             {
                 RegisterHotkey();
@@ -35,10 +36,8 @@ namespace WindowResizer
             _trayIcon = new NotifyIcon
             {
                 Icon = Resources.AppIcon,
-                ContextMenu = new ContextMenu(new MenuItem[] {
-                    new MenuItem("Setting", OnSetting),
-                    new MenuItem("Exit", OnExit)
-                }),
+                ContextMenu =
+                    new ContextMenu(new MenuItem[] {new MenuItem("Setting", OnSetting), new MenuItem("Exit", OnExit)}),
                 Visible = true,
                 Text = "WindowResizer"
             };
@@ -71,12 +70,15 @@ namespace WindowResizer
             {
                 MessageBox.Show("Save window hotkeys not valid.");
             }
+
             if (!ConfigLoader.config.RestoreKey.ValidateKeys())
             {
                 MessageBox.Show("Restore window hotkeys not valid.");
             }
+
             _hook.RegisterHotKey(ConfigLoader.config.SaveKey.GetModifierKeys(), ConfigLoader.config.SaveKey.GetKey());
-            _hook.RegisterHotKey(ConfigLoader.config.RestoreKey.GetModifierKeys(), ConfigLoader.config.RestoreKey.GetKey());
+            _hook.RegisterHotKey(ConfigLoader.config.RestoreKey.GetModifierKeys(),
+                ConfigLoader.config.RestoreKey.GetKey());
             _hook.KeyPressed += OnKeyPressed;
         }
 
@@ -93,45 +95,86 @@ namespace WindowResizer
             {
                 ConfigLoader.config.WindowSizes = new BindingList<WindowSize>();
             }
-            var windowSize = ConfigLoader.config.WindowSizes.FirstOrDefault(w =>
+
+            var name = process.MainModule.ModuleName;
+            var title = process.MainWindowTitle;
+            WindowSize windowSize;
+            var windowSizes = ConfigLoader.config.WindowSizes.Where(w => w.Name == name).ToList();
+
+            // full match
+            var fullMatch = windowSizes.FirstOrDefault(w => w.Title == title);
+            if (fullMatch != null)
             {
-                if (w.Title.StartsWith("*"))
+                windowSize = fullMatch;
+            }
+            else
+            {
+                // prefix match (*title)
+                var prefixMatch = windowSizes.FirstOrDefault(w => w.Title.StartsWith("*") &&
+                                                                  title.EndsWith(w.Title.TrimStart('*')));
+                if (prefixMatch != null)
                 {
-                    return w.Name == process.MainModule.ModuleName && process.MainWindowTitle.EndsWith(w.Title.Substring(1));
-                }
-                else if (w.Title.EndsWith("*"))
-                {
-                    return w.Name == process.MainModule.ModuleName && process.MainWindowTitle.StartsWith(w.Title.Substring(0, w.Title.Length - 1));
+                    windowSize = prefixMatch;
                 }
                 else
                 {
-                    return w.Name == process.MainModule.ModuleName && process.MainWindowTitle == w.Title;
+                    // suffix match (title*)
+                    var suffixMatch = windowSizes.FirstOrDefault(w =>
+                        w.Title.EndsWith("*") && title.StartsWith(w.Title.TrimEnd('*')));
+                    if (suffixMatch != null)
+                    {
+                        windowSize = suffixMatch;
+                    }
+                    else
+                    {
+                        // wildcard match (*)
+                        var wildcardMatch = windowSizes.FirstOrDefault(w => w.Title == "*");
+                        windowSize = wildcardMatch;
+                    }
                 }
-            });
+            }
 
-            if (e.Modifier == ConfigLoader.config.SaveKey.GetModifierKeys() && e.Key == ConfigLoader.config.SaveKey.GetKey())
+            if (e.Modifier == ConfigLoader.config.SaveKey.GetModifierKeys() &&
+                e.Key == ConfigLoader.config.SaveKey.GetKey())
             {
                 var rect = WindowControl.GetRect(handle);
-                if (windowSize == null)
+                if (windowSize != null)
+                {
+                    if (windowSize.Title == "*")
+                    {
+                        ConfigLoader.config.WindowSizes.Add(new WindowSize
+                        {
+                            Name = process.MainModule.ModuleName, Title = process.MainWindowTitle, Rect = rect
+                        });
+                    }
+                    else
+                    {
+                        windowSize.Rect = WindowControl.GetRect(handle);
+                    }
+                }
+                else
                 {
                     ConfigLoader.config.WindowSizes.Add(new WindowSize
                     {
-                        Name = process.MainModule.ModuleName,
-                        Title = process.MainWindowTitle,
-                        Rect = rect
+                        Name = process.MainModule.ModuleName, Title = process.MainWindowTitle, Rect = rect
+                    });
+
+                    // Add a wildcard match for all titles
+                    ConfigLoader.config.WindowSizes.Add(new WindowSize
+                    {
+                        Name = process.MainModule.ModuleName, Title = "*", Rect = rect
                     });
                 }
-                else
-                {
-                    windowSize.Rect = WindowControl.GetRect(handle);
-                }
+
                 ConfigLoader.Save();
             }
             else
             {
                 if (windowSize == null)
                 {
-                    MessageBox.Show("No saved settings for " + process.MainModule.ModuleName + ":" + process.MainWindowTitle, "WindowResizer");
+                    MessageBox.Show(
+                        "No saved settings for " + process.MainModule.ModuleName + ":" + process.MainWindowTitle,
+                        "WindowResizer");
                 }
                 else
                 {
