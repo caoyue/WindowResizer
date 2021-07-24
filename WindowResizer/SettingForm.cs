@@ -128,6 +128,7 @@ namespace WindowResizer
         private void SettingForm_Closing(object sender, CancelEventArgs e)
         {
             e.Cancel = true;
+            Hide();
         }
 
         /// <summary>
