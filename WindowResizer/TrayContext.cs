@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
@@ -162,12 +163,17 @@ namespace WindowResizer
 
         private static void UpdateOrSaveConfig(MatchWindowSize match, string processName, string title, Rect rect)
         {
+            if (string.IsNullOrWhiteSpace(processName) || string.IsNullOrWhiteSpace(title))
+            {
+                return;
+            }
+
             if (match.NoMatch)
             {
-                ConfigLoader.config.WindowSizes.Add(new WindowSize {Name = processName, Title = title, Rect = rect});
-
                 // Add a wildcard match for all titles
-                ConfigLoader.config.WindowSizes.Add(new WindowSize {Name = processName, Title = "*", Rect = rect});
+                InsertOrder(new WindowSize {Name = processName, Title = "*", Rect = rect});
+                InsertOrder(new WindowSize {Name = processName, Title = title, Rect = rect});
+                ConfigLoader.Save();
                 return;
             }
 
@@ -177,7 +183,7 @@ namespace WindowResizer
             }
             else
             {
-                ConfigLoader.config.WindowSizes.Add(new WindowSize {Name = processName, Title = title, Rect = rect});
+                InsertOrder(new WindowSize {Name = processName, Title = title, Rect = rect});
             }
 
             if (match.SuffixMatch != null)
@@ -196,10 +202,19 @@ namespace WindowResizer
             }
             else
             {
-                ConfigLoader.config.WindowSizes.Add(new WindowSize {Name = processName, Title = "*", Rect = rect});
+                InsertOrder(new WindowSize {Name = processName, Title = "*", Rect = rect});
             }
 
             ConfigLoader.Save();
+        }
+
+        private static void InsertOrder(WindowSize item)
+        {
+            var list = ConfigLoader.config.WindowSizes;
+            var backing = list.ToList();
+            backing.Add(item);
+            var index = backing.OrderBy(l => l.Name).ThenBy(l => l.Title).ToList().IndexOf(item);
+            list.Insert(index, item);
         }
     }
 }
