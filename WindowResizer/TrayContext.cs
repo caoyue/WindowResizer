@@ -96,91 +96,110 @@ namespace WindowResizer
                 ConfigLoader.config.WindowSizes = new BindingList<WindowSize>();
             }
 
-            var name = process.MainModule.ModuleName;
+            var processName = process.MainModule?.ModuleName;
             var title = process.MainWindowTitle;
-            WindowSize windowSize;
-            var windowSizes = ConfigLoader.config.WindowSizes.Where(w => w.Name == name).ToList();
 
-            // full match
-            var fullMatch = windowSizes.FirstOrDefault(w => w.Title == title);
-            if (fullMatch != null)
-            {
-                windowSize = fullMatch;
-            }
-            else
-            {
-                // prefix match (*title)
-                var prefixMatch = windowSizes.FirstOrDefault(w => w.Title.StartsWith("*") &&
-                                                                  title.EndsWith(w.Title.TrimStart('*')));
-                if (prefixMatch != null)
-                {
-                    windowSize = prefixMatch;
-                }
-                else
-                {
-                    // suffix match (title*)
-                    var suffixMatch = windowSizes.FirstOrDefault(w =>
-                        w.Title.EndsWith("*") && title.StartsWith(w.Title.TrimEnd('*')));
-                    if (suffixMatch != null)
-                    {
-                        windowSize = suffixMatch;
-                    }
-                    else
-                    {
-                        // wildcard match (*)
-                        var wildcardMatch = windowSizes.FirstOrDefault(w => w.Title == "*");
-                        windowSize = wildcardMatch;
-                    }
-                }
-            }
+            var match = GetMatchWindowSize(ConfigLoader.config.WindowSizes, processName, title);
 
             if (e.Modifier == ConfigLoader.config.SaveKey.GetModifierKeys() &&
                 e.Key == ConfigLoader.config.SaveKey.GetKey())
             {
-                var rect = WindowControl.GetRect(handle);
-                if (windowSize != null)
-                {
-                    if (windowSize.Title == "*")
-                    {
-                        ConfigLoader.config.WindowSizes.Add(new WindowSize
-                        {
-                            Name = process.MainModule.ModuleName, Title = process.MainWindowTitle, Rect = rect
-                        });
-                    }
-                    else
-                    {
-                        windowSize.Rect = WindowControl.GetRect(handle);
-                    }
-                }
-                else
-                {
-                    ConfigLoader.config.WindowSizes.Add(new WindowSize
-                    {
-                        Name = process.MainModule.ModuleName, Title = process.MainWindowTitle, Rect = rect
-                    });
-
-                    // Add a wildcard match for all titles
-                    ConfigLoader.config.WindowSizes.Add(new WindowSize
-                    {
-                        Name = process.MainModule.ModuleName, Title = "*", Rect = rect
-                    });
-                }
-
-                ConfigLoader.Save();
+                UpdateOrSaveConfig(match, processName, title, WindowControl.GetRect(handle));
             }
             else
             {
-                if (windowSize == null)
+                if (match.NoMatch)
                 {
-                    MessageBox.Show(
-                        "No saved settings for " + process.MainModule.ModuleName + ":" + process.MainWindowTitle,
-                        "WindowResizer");
+                    MessageBox.Show($"No saved settings for {processName}:{title}", "WindowResizer");
                 }
                 else
                 {
-                    WindowControl.MoveWindow(handle, windowSize.Rect);
+                    MoveMatchWindow(match, handle);
                 }
             }
+        }
+
+        private static MatchWindowSize GetMatchWindowSize(BindingList<WindowSize> windowSizes, string processName,
+            string title)
+        {
+            var windows = windowSizes.Where(w => w.Name == processName).ToList();
+            return new MatchWindowSize
+            {
+                FullMatch = windows.FirstOrDefault(w => w.Title == title),
+                PrefixMatch = windows.FirstOrDefault(w =>
+                    w.Title.StartsWith("*") && w.Title.Length > 1 && title.EndsWith(w.Title.TrimStart('*'))),
+                SuffixMatch = windows.FirstOrDefault(w =>
+                    w.Title.EndsWith("*") && w.Title.Length > 1 && title.StartsWith(w.Title.TrimEnd('*'))),
+                WildcardMatch = windows.FirstOrDefault(w => w.Title.Equals("*"))
+            };
+        }
+
+        private static void MoveMatchWindow(MatchWindowSize match, IntPtr handle)
+        {
+            if (match.FullMatch != null)
+            {
+                WindowControl.MoveWindow(handle, match.FullMatch.Rect);
+                return;
+            }
+
+            if (match.PrefixMatch != null)
+            {
+                WindowControl.MoveWindow(handle, match.PrefixMatch.Rect);
+                return;
+            }
+
+            if (match.SuffixMatch != null)
+            {
+                WindowControl.MoveWindow(handle, match.SuffixMatch.Rect);
+                return;
+            }
+
+            if (match.WildcardMatch != null)
+            {
+                WindowControl.MoveWindow(handle, match.WildcardMatch.Rect);
+            }
+        }
+
+        private static void UpdateOrSaveConfig(MatchWindowSize match, string processName, string title, Rect rect)
+        {
+            if (match.NoMatch)
+            {
+                ConfigLoader.config.WindowSizes.Add(new WindowSize {Name = processName, Title = title, Rect = rect});
+
+                // Add a wildcard match for all titles
+                ConfigLoader.config.WindowSizes.Add(new WindowSize {Name = processName, Title = "*", Rect = rect});
+                return;
+            }
+
+            if (match.FullMatch != null)
+            {
+                match.FullMatch.Rect = rect;
+            }
+            else
+            {
+                ConfigLoader.config.WindowSizes.Add(new WindowSize {Name = processName, Title = title, Rect = rect});
+            }
+
+            if (match.SuffixMatch != null)
+            {
+                match.SuffixMatch.Rect = rect;
+            }
+
+            if (match.PrefixMatch != null)
+            {
+                match.PrefixMatch.Rect = rect;
+            }
+
+            if (match.WildcardMatch != null)
+            {
+                match.WildcardMatch.Rect = rect;
+            }
+            else
+            {
+                ConfigLoader.config.WindowSizes.Add(new WindowSize {Name = processName, Title = "*", Rect = rect});
+            }
+
+            ConfigLoader.Save();
         }
     }
 }
