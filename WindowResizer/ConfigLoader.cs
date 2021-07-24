@@ -129,23 +129,23 @@ namespace WindowResizer
 
     public static class ConfigLoader
     {
-        public static Config config = new Config();
-        private static string _oldpath = Path.Combine(Application.StartupPath, "config.json");
+        public static Config Config = new Config();
+        private static readonly string _oldPath = Path.Combine(Application.StartupPath, "config.json");
         public static string ConfigPath { get; } = Path.Combine(Application.UserAppDataPath, "config.json");
 
         public static void Load()
         {
-            if (!File.Exists(ConfigPath) && File.Exists(_oldpath))
+            if (!File.Exists(ConfigPath) && File.Exists(_oldPath))
             {
-                var text = File.ReadAllText(_oldpath);
-                ConfigOld oldcfg = JsonConvert.DeserializeObject<ConfigOld>(text);
-                config.DisbaleInFullScreen = oldcfg.DisbaleInFullScreen;
-                config.RestoreKey = oldcfg.RestoreKey;
-                config.SaveKey = oldcfg.SaveKey;
-                config.WindowSizes = new BindingList<WindowSize>();
-                foreach (var w in oldcfg.WindowSizes)
+                var text = File.ReadAllText(_oldPath);
+                ConfigOld configOld = JsonConvert.DeserializeObject<ConfigOld>(text);
+                Config.DisbaleInFullScreen = configOld.DisbaleInFullScreen;
+                Config.RestoreKey = configOld.RestoreKey;
+                Config.SaveKey = configOld.SaveKey;
+                Config.WindowSizes = new BindingList<WindowSize>();
+                foreach (var w in configOld.WindowSizes)
                 {
-                    config.WindowSizes.Add(new WindowSize
+                    Config.WindowSizes.Add(new WindowSize
                     {
                         Name = w.Process,
                         Title = "*",
@@ -160,30 +160,33 @@ namespace WindowResizer
 
             if (!File.Exists(ConfigPath))
             {
-                config.WindowSizes = new BindingList<WindowSize>();
+                if (Config.WindowSizes == null)
+                {
+                    Config.WindowSizes = new BindingList<WindowSize>();
+                }
                 Save();
             }
             else
             {
                 var text = File.ReadAllText(ConfigPath);
-                config = JsonConvert.DeserializeObject<Config>(text);
+                Config = JsonConvert.DeserializeObject<Config>(text);
 
-                if (config.WindowSizes.Any())
+                if (Config.WindowSizes.Any())
                 {
                     var sortedInstance = new BindingList<WindowSize>(
-                        config.WindowSizes
+                        Config.WindowSizes
                             .OrderBy(w => w.Name)
                             .ThenBy(w => w.Title)
                             .ToList()
                     );
-                    config.WindowSizes = sortedInstance;
+                    Config.WindowSizes = sortedInstance;
                 }
             }
         }
 
         public static void Save()
         {
-            var json = JsonConvert.SerializeObject(config);
+            var json = JsonConvert.SerializeObject(Config);
             File.WriteAllText(ConfigPath, json);
         }
     }

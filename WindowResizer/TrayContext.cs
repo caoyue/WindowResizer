@@ -67,43 +67,43 @@ namespace WindowResizer
 
         private void RegisterHotkey()
         {
-            if (!ConfigLoader.config.SaveKey.ValidateKeys())
+            if (!ConfigLoader.Config.SaveKey.ValidateKeys())
             {
                 MessageBox.Show("Save window hotkeys not valid.");
             }
 
-            if (!ConfigLoader.config.RestoreKey.ValidateKeys())
+            if (!ConfigLoader.Config.RestoreKey.ValidateKeys())
             {
                 MessageBox.Show("Restore window hotkeys not valid.");
             }
 
-            _hook.RegisterHotKey(ConfigLoader.config.SaveKey.GetModifierKeys(), ConfigLoader.config.SaveKey.GetKey());
-            _hook.RegisterHotKey(ConfigLoader.config.RestoreKey.GetModifierKeys(),
-                ConfigLoader.config.RestoreKey.GetKey());
+            _hook.RegisterHotKey(ConfigLoader.Config.SaveKey.GetModifierKeys(), ConfigLoader.Config.SaveKey.GetKey());
+            _hook.RegisterHotKey(ConfigLoader.Config.RestoreKey.GetModifierKeys(),
+                ConfigLoader.Config.RestoreKey.GetKey());
             _hook.KeyPressed += OnKeyPressed;
         }
 
         private void OnKeyPressed(object sender, KeyPressedEventArgs e)
         {
-            if (ConfigLoader.config.DisbaleInFullScreen && WindowControl.IsForegroundFullScreen())
+            if (ConfigLoader.Config.DisbaleInFullScreen && WindowControl.IsForegroundFullScreen())
             {
                 return;
             }
 
             var handle = WindowControl.GetForegroundHandle();
             var process = WindowControl.GetRealProcess(handle);
-            if (ConfigLoader.config.WindowSizes == null)
+            if (ConfigLoader.Config.WindowSizes == null)
             {
-                ConfigLoader.config.WindowSizes = new BindingList<WindowSize>();
+                ConfigLoader.Config.WindowSizes = new BindingList<WindowSize>();
             }
 
             var processName = process.MainModule?.ModuleName;
             var title = process.MainWindowTitle;
 
-            var match = GetMatchWindowSize(ConfigLoader.config.WindowSizes, processName, title);
+            var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, title);
 
-            if (e.Modifier == ConfigLoader.config.SaveKey.GetModifierKeys() &&
-                e.Key == ConfigLoader.config.SaveKey.GetKey())
+            if (e.Modifier == ConfigLoader.Config.SaveKey.GetModifierKeys() &&
+                e.Key == ConfigLoader.Config.SaveKey.GetKey())
             {
                 UpdateOrSaveConfig(match, processName, title, WindowControl.GetRect(handle));
             }
@@ -210,7 +210,7 @@ namespace WindowResizer
 
         private static void InsertOrder(WindowSize item)
         {
-            var list = ConfigLoader.config.WindowSizes;
+            var list = ConfigLoader.Config.WindowSizes;
             var backing = list.ToList();
             backing.Add(item);
             var index = backing.OrderBy(l => l.Name).ThenBy(l => l.Title).ToList().IndexOf(item);
