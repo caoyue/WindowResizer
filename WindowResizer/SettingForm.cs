@@ -74,8 +74,6 @@ namespace WindowResizer
                 DataPropertyName = "Name",
                 HeaderText = "ExeName",
                 ReadOnly = true,
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
-                Width = 200,
                 DefaultCellStyle = new DataGridViewCellStyle { ForeColor = Color.Blue }
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
@@ -84,8 +82,6 @@ namespace WindowResizer
                 DataPropertyName = "Title",
                 HeaderText = "Title",
                 Resizable = DataGridViewTriState.True,
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
-                Width = 400,
                 DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleLeft }
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
