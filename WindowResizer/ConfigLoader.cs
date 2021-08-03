@@ -10,7 +10,7 @@ namespace WindowResizer
 {
     public class Config
     {
-        public bool DisbaleInFullScreen { get; set; } = true;
+        public bool DisableInFullScreen { get; set; } = true;
 
         public HotKeys SaveKey { get; set; } = new HotKeys() { ModifierKeys = new[] { "Ctrl", "Alt" }, Key = "S" };
 
@@ -253,7 +253,7 @@ namespace WindowResizer
 
             var text = File.ReadAllText(_oldPath);
             ConfigOld configOld = JsonConvert.DeserializeObject<ConfigOld>(text);
-            Config.DisbaleInFullScreen = configOld.DisbaleInFullScreen;
+            Config.DisableInFullScreen = configOld.DisbaleInFullScreen;
             Config.RestoreKey = configOld.RestoreKey;
             Config.SaveKey = configOld.SaveKey;
             Config.WindowSizes = new BindingList<WindowSize>();
@@ -295,7 +295,8 @@ namespace WindowResizer
                 var lastConfig = files.FirstOrDefault();
                 if (lastConfig != null)
                 {
-                    File.Copy(lastConfig.FullName, ConfigPath);
+                    var text = FixTypo(File.ReadAllText(lastConfig.FullName));
+                    File.WriteAllText(ConfigPath, text);
                 }
 
                 // clean up
@@ -308,6 +309,11 @@ namespace WindowResizer
             {
                 // ignored
             }
+        }
+
+        private static string FixTypo(string config)
+        {
+            return config.Replace("DisbaleInFullScreen", "DisableInFullScreen");
         }
 
         #endregion

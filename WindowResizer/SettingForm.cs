@@ -26,7 +26,7 @@ namespace WindowResizer
             _hook = hook;
             _saveKeys = ConfigLoader.Config.SaveKey;
             _restoreKeys = ConfigLoader.Config.RestoreKey;
-            _disableInFullScreen = ConfigLoader.Config.DisbaleInFullScreen;
+            _disableInFullScreen = ConfigLoader.Config.DisableInFullScreen;
 
             SaveKeysBox.BackColor = Color.Blue;
             SaveKeysBox.ForeColor = Color.White;
@@ -53,7 +53,7 @@ namespace WindowResizer
 
             SaveKeysBox.Text = _saveKeys.ToKeysString();
             RestoreKeysBox.Text = _restoreKeys.ToKeysString();
-            checkBox1.Checked = ConfigLoader.Config.DisbaleInFullScreen;
+            checkBox1.Checked = ConfigLoader.Config.DisableInFullScreen;
 
             checkBox2.Checked = ConfigLoader.PortableMode;
             checkBox2.CheckedChanged += checkBox2_CheckedChanged;
@@ -250,7 +250,7 @@ namespace WindowResizer
         {
             ConfigLoader.Config.SaveKey = _saveKeys;
             ConfigLoader.Config.RestoreKey = _restoreKeys;
-            ConfigLoader.Config.DisbaleInFullScreen = _disableInFullScreen;
+            ConfigLoader.Config.DisableInFullScreen = _disableInFullScreen;
 
             ConfigLoader.Save();
 
@@ -316,11 +316,11 @@ namespace WindowResizer
                     ConfigLoader.Config = config;
                     _saveKeys = ConfigLoader.Config.SaveKey;
                     _restoreKeys = ConfigLoader.Config.RestoreKey;
-                    _disableInFullScreen = ConfigLoader.Config.DisbaleInFullScreen;
+                    _disableInFullScreen = ConfigLoader.Config.DisableInFullScreen;
                     WindowsGrid.DataSource = ConfigLoader.Config.WindowSizes;
                     SaveKeysBox.Text = _saveKeys.ToKeysString();
                     RestoreKeysBox.Text = _restoreKeys.ToKeysString();
-                    checkBox1.Checked = ConfigLoader.Config.DisbaleInFullScreen;
+                    checkBox1.Checked = ConfigLoader.Config.DisableInFullScreen;
                 }
                 catch (Exception ex)
                 {
