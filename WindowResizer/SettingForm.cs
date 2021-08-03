@@ -67,14 +67,15 @@ namespace WindowResizer
             WindowsGrid.AllowUserToAddRows = false;
             WindowsGrid.RowTemplate.Height = 50;
             WindowsGrid.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            WindowsGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+            WindowsGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Name",
                 DataPropertyName = "Name",
                 HeaderText = "ExeName",
                 ReadOnly = true,
-                DefaultCellStyle = new DataGridViewCellStyle { ForeColor = Color.Blue }
+                DefaultCellStyle = new DataGridViewCellStyle { ForeColor = Color.Blue },
+                FillWeight = 15
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -82,31 +83,36 @@ namespace WindowResizer
                 DataPropertyName = "Title",
                 HeaderText = "Title",
                 Resizable = DataGridViewTriState.True,
-                DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleLeft }
+                DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleLeft },
+                FillWeight = 35
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Top",
                 DataPropertyName = "Top",
-                HeaderText = "Top"
+                HeaderText = "Top",
+                FillWeight = 10
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Left",
                 DataPropertyName = "Left",
-                HeaderText = "Left"
+                HeaderText = "Left",
+                FillWeight = 10
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Right",
                 DataPropertyName = "Right",
-                HeaderText = "Right"
+                HeaderText = "Right",
+                FillWeight = 10
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Bottom",
                 DataPropertyName = "Bottom",
-                HeaderText = "Bottom"
+                HeaderText = "Bottom",
+                FillWeight = 10
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -122,7 +128,8 @@ namespace WindowResizer
                 Name = "Remove",
                 HeaderText = "",
                 FlatStyle = FlatStyle.Flat,
-                DefaultCellStyle = { ForeColor = Color.Blue }
+                DefaultCellStyle = { ForeColor = Color.Blue },
+                FillWeight = 10
             };
             WindowsGrid.Columns.Add(rmBtn);
 

@@ -46,22 +46,26 @@
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
+
             // 
             // SaveKeysBox
             // 
             this.SaveKeysBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.SaveKeysBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.SaveKeysBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular,
+                System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.SaveKeysBox.Location = new System.Drawing.Point(105, 33);
             this.SaveKeysBox.Margin = new System.Windows.Forms.Padding(2);
             this.SaveKeysBox.Name = "SaveKeysBox";
             this.SaveKeysBox.Size = new System.Drawing.Size(160, 33);
             this.SaveKeysBox.TabIndex = 0;
             this.SaveKeysBox.TabStop = false;
+
             // 
             // SaveBtn
             // 
             this.SaveBtn.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.SaveBtn.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.SaveBtn.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular,
+                System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.SaveBtn.Location = new System.Drawing.Point(743, 590);
             this.SaveBtn.Margin = new System.Windows.Forms.Padding(2);
             this.SaveBtn.Name = "SaveBtn";
@@ -70,22 +74,27 @@
             this.SaveBtn.Text = "Save";
             this.SaveBtn.UseVisualStyleBackColor = true;
             this.SaveBtn.Click += new System.EventHandler(this.SaveBtn_Click);
+
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label1.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular,
+                System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label1.Location = new System.Drawing.Point(27, 35);
-            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2,
+                0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(57, 27);
             this.label1.TabIndex = 2;
             this.label1.Text = "Save";
+
             // 
             // CancelBtn
             // 
             this.CancelBtn.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.CancelBtn.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.CancelBtn.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular,
+                System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.CancelBtn.Location = new System.Drawing.Point(552, 590);
             this.CancelBtn.Margin = new System.Windows.Forms.Padding(2);
             this.CancelBtn.Name = "CancelBtn";
@@ -94,11 +103,13 @@
             this.CancelBtn.Text = "Cancel";
             this.CancelBtn.UseVisualStyleBackColor = true;
             this.CancelBtn.Click += new System.EventHandler(this.CancelBtn_Click);
+
             // 
             // RestoreKeysBox
             // 
             this.RestoreKeysBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.RestoreKeysBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.RestoreKeysBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular,
+                System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.RestoreKeysBox.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.RestoreKeysBox.Location = new System.Drawing.Point(396, 33);
             this.RestoreKeysBox.Margin = new System.Windows.Forms.Padding(2);
@@ -106,22 +117,27 @@
             this.RestoreKeysBox.Size = new System.Drawing.Size(160, 33);
             this.RestoreKeysBox.TabIndex = 4;
             this.RestoreKeysBox.TabStop = false;
+
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label2.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular,
+                System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label2.Location = new System.Drawing.Point(308, 35);
-            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2,
+                0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(84, 27);
             this.label2.TabIndex = 5;
             this.label2.Text = "Restore";
+
             // 
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.checkBox1.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular,
+                System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.checkBox1.Location = new System.Drawing.Point(596, 33);
             this.checkBox1.Margin = new System.Windows.Forms.Padding(2);
             this.checkBox1.Name = "checkBox1";
@@ -131,6 +147,7 @@
             this.checkBox1.Text = "Disable in FullScreen Mode";
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+
             // 
             // WindowsGrid
             // 
@@ -148,6 +165,7 @@
             this.WindowsGrid.Size = new System.Drawing.Size(881, 487);
             this.WindowsGrid.TabIndex = 7;
             this.WindowsGrid.TabStop = false;
+
             // 
             // ConfigExportBtn
             // 
@@ -159,6 +177,7 @@
             this.ConfigExportBtn.Text = "Export Config";
             this.ConfigExportBtn.UseVisualStyleBackColor = true;
             this.ConfigExportBtn.Click += new System.EventHandler(this.ConfigExportBtn_Click);
+
             // 
             // ConfigImportBtn
             // 
@@ -170,6 +189,7 @@
             this.ConfigImportBtn.Text = "Import Config";
             this.ConfigImportBtn.UseVisualStyleBackColor = true;
             this.ConfigImportBtn.Click += new System.EventHandler(this.ConfigImportBtn_Click);
+
             // 
             // checkBox2
             // 
@@ -180,6 +200,7 @@
             this.checkBox2.TabIndex = 11;
             this.checkBox2.Text = "Portable Mode";
             this.checkBox2.UseVisualStyleBackColor = true;
+
             // 
             // groupBox1
             // 
@@ -192,6 +213,7 @@
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Import/Export Config";
+
             // 
             // groupBox2
             // 
@@ -209,6 +231,7 @@
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Config";
+
             // 
             // SettingForm
             // 
@@ -217,7 +240,8 @@
             this.ClientSize = new System.Drawing.Size(940, 925);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Font = new System.Drawing.Font("Microsoft YaHei UI", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.Font = new System.Drawing.Font("Microsoft YaHei UI", 10.125F, System.Drawing.FontStyle.Regular,
+                System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(2);
@@ -230,7 +254,6 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
-
         }
 
         #endregion
