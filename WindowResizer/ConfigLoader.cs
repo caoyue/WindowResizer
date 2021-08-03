@@ -98,23 +98,6 @@ namespace WindowResizer
         }
     }
 
-    public class ConfigOld
-    {
-        public bool DisbaleInFullScreen { get; set; } = true;
-
-        public HotKeys SaveKey { get; set; } = new HotKeys() { ModifierKeys = new[] { "Ctrl", "Alt" }, Key = "S" };
-
-        public HotKeys RestoreKey { get; set; } = new HotKeys() { ModifierKeys = new[] { "Ctrl", "Alt" }, Key = "R" };
-
-        public List<WindowSizeOldCfg> WindowSizes { get; set; }
-    }
-
-    public class WindowSizeOldCfg
-    {
-        public string Process { get; set; }
-        public Rect Rect { get; set; }
-    }
-
     public class HotKeys
     {
         public string[] ModifierKeys { get; set; }
@@ -236,11 +219,29 @@ namespace WindowResizer
 
             if (!portable && PortableMode)
             {
+                new FileInfo(_roamingConfigPath).Directory?.Create();
                 File.Move(_portableConfigPath, _roamingConfigPath);
             }
         }
 
         #region config migration
+
+        public class ConfigOld
+        {
+            public bool DisbaleInFullScreen { get; set; } = true;
+
+            public HotKeys SaveKey { get; set; } = new HotKeys() { ModifierKeys = new[] { "Ctrl", "Alt" }, Key = "S" };
+
+            public HotKeys RestoreKey { get; set; } = new HotKeys() { ModifierKeys = new[] { "Ctrl", "Alt" }, Key = "R" };
+
+            public List<WindowSizeOldCfg> WindowSizes { get; set; }
+        }
+
+        public class WindowSizeOldCfg
+        {
+            public string Process { get; set; }
+            public Rect Rect { get; set; }
+        }
 
         private static readonly string _oldPath = Path.Combine(Application.StartupPath, "config.json");
 
