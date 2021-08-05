@@ -85,7 +85,7 @@ namespace WindowResizer
 
         private void OnKeyPressed(object sender, KeyPressedEventArgs e)
         {
-            if (ConfigLoader.Config.DisbaleInFullScreen && WindowControl.IsForegroundFullScreen())
+            if (ConfigLoader.Config.DisableInFullScreen && WindowControl.IsForegroundFullScreen())
             {
                 return;
             }

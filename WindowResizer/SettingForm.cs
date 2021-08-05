@@ -6,6 +6,8 @@ using System.IO;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 
+// ReSharper disable LocalizableElement
+
 namespace WindowResizer
 {
     public partial class SettingForm : Form
@@ -24,7 +26,7 @@ namespace WindowResizer
             _hook = hook;
             _saveKeys = ConfigLoader.Config.SaveKey;
             _restoreKeys = ConfigLoader.Config.RestoreKey;
-            _disableInFullScreen = ConfigLoader.Config.DisbaleInFullScreen;
+            _disableInFullScreen = ConfigLoader.Config.DisableInFullScreen;
 
             SaveKeysBox.BackColor = Color.Blue;
             SaveKeysBox.ForeColor = Color.White;
@@ -35,10 +37,12 @@ namespace WindowResizer
             FormClosing += SettingForm_Closing;
             Text = "Setting";
 
-            SaveKeysBox.KeyDown += (s, e) => textBox_KeyDown(s, e, SaveKeysBox, ref _saveKeys);
+            SaveKeysBox.KeyDown += (s, e) => textBox_KeyDown(s, e, SaveKeysBox,
+                ref _saveKeys);
             SaveKeysBox.ReadOnly = true;
 
-            RestoreKeysBox.KeyDown += (s, e) => textBox_KeyDown(s, e, RestoreKeysBox, ref _restoreKeys);
+            RestoreKeysBox.KeyDown += (s, e) => textBox_KeyDown(s, e, RestoreKeysBox,
+                ref _restoreKeys);
             RestoreKeysBox.ReadOnly = true;
 
             SaveKeysBox.GotFocus += (s, e) => textBox_GotFocus(s, e, SaveKeysBox);
@@ -49,26 +53,29 @@ namespace WindowResizer
 
             SaveKeysBox.Text = _saveKeys.ToKeysString();
             RestoreKeysBox.Text = _restoreKeys.ToKeysString();
-            checkBox1.Checked = ConfigLoader.Config.DisbaleInFullScreen;
+            checkBox1.Checked = ConfigLoader.Config.DisableInFullScreen;
 
+            checkBox2.Checked = ConfigLoader.PortableMode;
+            checkBox2.CheckedChanged += checkBox2_CheckedChanged;
             InitDataGrid();
         }
+
+        #region config grid
 
         private void InitDataGrid()
         {
             WindowsGrid.AllowUserToAddRows = false;
             WindowsGrid.RowTemplate.Height = 50;
             WindowsGrid.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            WindowsGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+            WindowsGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Name",
                 DataPropertyName = "Name",
                 HeaderText = "ExeName",
                 ReadOnly = true,
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
-                Width = 300,
-                DefaultCellStyle = new DataGridViewCellStyle {ForeColor = Color.Blue}
+                DefaultCellStyle = new DataGridViewCellStyle { ForeColor = Color.Blue },
+                FillWeight = 15
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -76,29 +83,42 @@ namespace WindowResizer
                 DataPropertyName = "Title",
                 HeaderText = "Title",
                 Resizable = DataGridViewTriState.True,
-                AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
-                Width = 600,
-                DefaultCellStyle = new DataGridViewCellStyle {Alignment = DataGridViewContentAlignment.MiddleLeft}
+                DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleLeft },
+                FillWeight = 35
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
-                Name = "Top", DataPropertyName = "Top", HeaderText = "Top"
+                Name = "Top",
+                DataPropertyName = "Top",
+                HeaderText = "Top",
+                FillWeight = 10
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
-                Name = "Left", DataPropertyName = "Left", HeaderText = "Left"
+                Name = "Left",
+                DataPropertyName = "Left",
+                HeaderText = "Left",
+                FillWeight = 10
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
-                Name = "Right", DataPropertyName = "Right", HeaderText = "Right"
+                Name = "Right",
+                DataPropertyName = "Right",
+                HeaderText = "Right",
+                FillWeight = 10
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
-                Name = "Bottom", DataPropertyName = "Bottom", HeaderText = "Bottom"
+                Name = "Bottom",
+                DataPropertyName = "Bottom",
+                HeaderText = "Bottom",
+                FillWeight = 10
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
-                Name = "Rect", DataPropertyName = "Rect", Visible = false
+                Name = "Rect",
+                DataPropertyName = "Rect",
+                Visible = false
             });
 
             var rmBtn = new DataGridViewButtonColumn
@@ -108,7 +128,8 @@ namespace WindowResizer
                 Name = "Remove",
                 HeaderText = "",
                 FlatStyle = FlatStyle.Flat,
-                DefaultCellStyle = {ForeColor = Color.Blue}
+                DefaultCellStyle = { ForeColor = Color.Blue },
+                FillWeight = 10
             };
             WindowsGrid.Columns.Add(rmBtn);
 
@@ -116,10 +137,12 @@ namespace WindowResizer
             {
                 col.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
                 col.HeaderCell.Style.Font =
-                    new Font("Microsoft YaHei UI", 26F, FontStyle.Bold, GraphicsUnit.Pixel);
+                    new Font("Microsoft YaHei UI", 18F, FontStyle.Bold,
+                        GraphicsUnit.Pixel);
             }
 
-            WindowsGrid.RowTemplate.DefaultCellStyle.Padding = new Padding(3, 0, 3, 0);
+            WindowsGrid.RowTemplate.DefaultCellStyle.Padding = new Padding(3, 0, 3,
+                0);
             WindowsGrid.DataSource = ConfigLoader.Config.WindowSizes;
 
             WindowsGrid.ShowCellToolTips = true;
@@ -127,6 +150,8 @@ namespace WindowResizer
             WindowsGrid.CellClick += WindowsGrid_CellClick;
             WindowsGrid.CellValueChanged += WindowsGrid_CellValueChanged;
         }
+
+        #endregion
 
         private void WindowsGrid_CellValueChanged(object sender,
             DataGridViewCellEventArgs e)
@@ -136,8 +161,9 @@ namespace WindowResizer
         private void WindowsGrid_CellFormatting(object sender,
             DataGridViewCellFormattingEventArgs e)
         {
-            if (e.Value != null && (e.ColumnIndex == WindowsGrid.Columns["Name"]?.Index ||
-                                    e.ColumnIndex == WindowsGrid.Columns["Title"]?.Index))
+            if (e.Value != null &&
+                (e.ColumnIndex == WindowsGrid.Columns["Name"]?.Index ||
+                    e.ColumnIndex == WindowsGrid.Columns["Title"]?.Index))
             {
                 DataGridViewCell cell =
                     WindowsGrid.Rows[e.RowIndex].Cells[e.ColumnIndex];
@@ -147,8 +173,9 @@ namespace WindowResizer
 
         private void WindowsGrid_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex == WindowsGrid.Columns["Remove"]?.Index
-                && e.RowIndex >= 0 && e.RowIndex < ConfigLoader.Config.WindowSizes.Count)
+            if (e.ColumnIndex == WindowsGrid.Columns["Remove"]?.Index &&
+                e.RowIndex >= 0 &&
+                e.RowIndex < ConfigLoader.Config.WindowSizes.Count)
             {
                 ConfigLoader.Config.WindowSizes.RemoveAt(e.RowIndex);
             }
@@ -171,22 +198,22 @@ namespace WindowResizer
 
                 if (modifierKeys != Keys.None && pressedKey != Keys.None)
                 {
-                    if (e.Control == true)
+                    if (e.Control)
                     {
                         keys.Add("Ctrl");
                     }
 
-                    if (e.Alt == true)
+                    if (e.Alt)
                     {
                         keys.Add("Alt");
                     }
 
-                    if (e.Shift == true)
+                    if (e.Shift)
                     {
                         keys.Add("Shift");
                     }
 
-                    hotKeys = new HotKeys() {ModifierKeys = keys.ToArray(), Key = pressedKey.ToString()};
+                    hotKeys = new HotKeys() { ModifierKeys = keys.ToArray(), Key = pressedKey.ToString() };
 
                     textBox.Text = hotKeys.ToKeysString();
                 }
@@ -214,7 +241,6 @@ namespace WindowResizer
             textBox.BackColor = Color.Blue;
         }
 
-
         private void SettingForm_Closing(object sender, CancelEventArgs e)
         {
             e.Cancel = true;
@@ -231,7 +257,7 @@ namespace WindowResizer
         {
             ConfigLoader.Config.SaveKey = _saveKeys;
             ConfigLoader.Config.RestoreKey = _restoreKeys;
-            ConfigLoader.Config.DisbaleInFullScreen = _disableInFullScreen;
+            ConfigLoader.Config.DisableInFullScreen = _disableInFullScreen;
 
             ConfigLoader.Save();
 
@@ -287,7 +313,7 @@ namespace WindowResizer
 
         private void ConfigImportBtn_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog {Title = "Import Config",};
+            OpenFileDialog openFileDialog = new OpenFileDialog { Title = "Import Config", };
             if (openFileDialog.ShowDialog() != DialogResult.Cancel && openFileDialog.FileName != "")
             {
                 try
@@ -297,11 +323,11 @@ namespace WindowResizer
                     ConfigLoader.Config = config;
                     _saveKeys = ConfigLoader.Config.SaveKey;
                     _restoreKeys = ConfigLoader.Config.RestoreKey;
-                    _disableInFullScreen = ConfigLoader.Config.DisbaleInFullScreen;
+                    _disableInFullScreen = ConfigLoader.Config.DisableInFullScreen;
                     WindowsGrid.DataSource = ConfigLoader.Config.WindowSizes;
                     SaveKeysBox.Text = _saveKeys.ToKeysString();
                     RestoreKeysBox.Text = _restoreKeys.ToKeysString();
-                    checkBox1.Checked = ConfigLoader.Config.DisbaleInFullScreen;
+                    checkBox1.Checked = ConfigLoader.Config.DisableInFullScreen;
                 }
                 catch (Exception ex)
                 {
@@ -314,6 +340,23 @@ namespace WindowResizer
         {
             ConfigLoader.Load();
             WindowsGrid.DataSource = ConfigLoader.Config.WindowSizes;
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            var desc = checkBox2.Checked ? "Enter" : "Exit";
+            const MessageBoxButtons messButton = MessageBoxButtons.OKCancel;
+            DialogResult dr = MessageBox.Show($"{desc} portable mode?", "Confirm", messButton);
+            if (dr == DialogResult.OK)
+            {
+                ConfigLoader.Move(checkBox2.Checked);
+            }
+            else
+            {
+                checkBox2.CheckedChanged -= checkBox2_CheckedChanged;
+                checkBox2.Checked = !checkBox2.Checked;
+                checkBox2.CheckedChanged += checkBox2_CheckedChanged;
+            }
         }
     }
 }
