@@ -17,3 +17,7 @@ you can change hoykeys in setting
 - restore window position
 
     default hotkey: `ctrl+alt+r`
+
+- restore all open window position
+
+    default hotkey: `ctrl+alt+t`

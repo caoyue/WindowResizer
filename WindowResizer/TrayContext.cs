@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
@@ -38,7 +37,7 @@ namespace WindowResizer
             {
                 Icon = Resources.AppIcon,
                 ContextMenu =
-                    new ContextMenu(new MenuItem[] {new MenuItem("Setting", OnSetting), new MenuItem("Exit", OnExit)}),
+                    new ContextMenu(new MenuItem[] { new MenuItem("Setting", OnSetting), new MenuItem("Exit", OnExit) }),
                 Visible = true,
                 Text = "WindowResizer"
             };
@@ -78,8 +77,8 @@ namespace WindowResizer
             }
 
             _hook.RegisterHotKey(ConfigLoader.Config.SaveKey.GetModifierKeys(), ConfigLoader.Config.SaveKey.GetKey());
-            _hook.RegisterHotKey(ConfigLoader.Config.RestoreKey.GetModifierKeys(),
-                ConfigLoader.Config.RestoreKey.GetKey());
+            _hook.RegisterHotKey(ConfigLoader.Config.RestoreKey.GetModifierKeys(), ConfigLoader.Config.RestoreKey.GetKey());
+            _hook.RegisterHotKey(ConfigLoader.Config.RestoreAllKey.GetModifierKeys(), ConfigLoader.Config.RestoreAllKey.GetKey());
             _hook.KeyPressed += OnKeyPressed;
         }
 
@@ -90,34 +89,66 @@ namespace WindowResizer
                 return;
             }
 
-            var handle = WindowControl.GetForegroundHandle();
-            var process = WindowControl.GetRealProcess(handle);
             if (ConfigLoader.Config.WindowSizes == null)
             {
                 ConfigLoader.Config.WindowSizes = new BindingList<WindowSize>();
             }
 
-            var processName = process.MainModule?.ModuleName;
-            var title = process.MainWindowTitle;
-
-            var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, title);
-
-            if (e.Modifier == ConfigLoader.Config.SaveKey.GetModifierKeys() &&
-                e.Key == ConfigLoader.Config.SaveKey.GetKey())
+            if (e.Modifier == ConfigLoader.Config.RestoreAllKey.GetModifierKeys()
+                && e.Key == ConfigLoader.Config.RestoreAllKey.GetKey())
             {
-                UpdateOrSaveConfig(match, processName, title, WindowControl.GetRect(handle));
+                var windows = WindowControl.GetOpenWindows();
+                windows.Reverse();
+                foreach (var window in windows)
+                {
+                    ResizeWindow(window, false);
+                }
             }
             else
             {
-                if (match.NoMatch)
+                var handle = WindowControl.GetForegroundHandle();
+
+                if (e.Modifier == ConfigLoader.Config.SaveKey.GetModifierKeys() &&
+                    e.Key == ConfigLoader.Config.SaveKey.GetKey())
                 {
-                    MessageBox.Show($"No saved settings for {processName}:{title}", "WindowResizer");
+                    UpdateOrSaveWindowSize(handle);
                 }
-                else
+                else if (e.Modifier == ConfigLoader.Config.RestoreKey.GetModifierKeys() &&
+                    e.Key == ConfigLoader.Config.RestoreKey.GetKey())
                 {
-                    MoveMatchWindow(match, handle);
+                    ResizeWindow(handle, true);
                 }
             }
+        }
+
+        private void ResizeWindow(IntPtr handle, bool tips = false)
+        {
+            var process = WindowControl.GetRealProcess(handle);
+            if (process == null) return;
+            var processName = process.MainModule?.ModuleName;
+            var title = process.MainWindowTitle;
+            var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, title);
+            if (!match.NoMatch)
+            {
+                MoveMatchWindow(match, handle);
+            }
+            else
+            {
+                if (tips)
+                {
+                    _trayIcon.ShowBalloonTip(2000, "WindowResizer",
+                        $"No saved settings for {processName}:{title}", ToolTipIcon.Info);
+                }
+            }
+        }
+
+        private void UpdateOrSaveWindowSize(IntPtr handle)
+        {
+            var process = WindowControl.GetRealProcess(handle);
+            var processName = process.MainModule?.ModuleName;
+            var title = process.MainWindowTitle;
+            var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, title);
+            UpdateOrSaveConfig(match, processName, title, WindowControl.GetRect(handle));
         }
 
         private static MatchWindowSize GetMatchWindowSize(BindingList<WindowSize> windowSizes, string processName,
@@ -171,8 +202,8 @@ namespace WindowResizer
             if (match.NoMatch)
             {
                 // Add a wildcard match for all titles
-                InsertOrder(new WindowSize {Name = processName, Title = "*", Rect = rect});
-                InsertOrder(new WindowSize {Name = processName, Title = title, Rect = rect});
+                InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect });
+                InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect });
                 ConfigLoader.Save();
                 return;
             }
@@ -183,7 +214,7 @@ namespace WindowResizer
             }
             else
             {
-                InsertOrder(new WindowSize {Name = processName, Title = title, Rect = rect});
+                InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect });
             }
 
             if (match.SuffixMatch != null)
@@ -202,7 +233,7 @@ namespace WindowResizer
             }
             else
             {
-                InsertOrder(new WindowSize {Name = processName, Title = "*", Rect = rect});
+                InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect });
             }
 
             ConfigLoader.Save();
