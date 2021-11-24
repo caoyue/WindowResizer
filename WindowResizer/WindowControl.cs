@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -9,6 +10,7 @@ namespace WindowResizer
     public static class WindowControl
     {
         #region api
+
         [DllImport("user32.dll")]
         private static extern IntPtr GetForegroundWindow();
 
@@ -16,10 +18,12 @@ namespace WindowResizer
         private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
 
         [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
-        public static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy, int wFlags);
+        public static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy,
+            int wFlags);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern int GetWindowThreadProcessId(IntPtr handle, out uint processId);
+
         public delegate bool WindowEnumProc(IntPtr hwnd, IntPtr lparam);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
@@ -35,6 +39,20 @@ namespace WindowResizer
         [DllImport("user32.dll")]
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
+        [DllImport("user32.dll")]
+        private static extern bool EnumWindows(EnumWindowsProc enumFunc, int lParam);
+
+        [DllImport("user32.dll")]
+        private static extern int GetWindowTextLength(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool IsWindowVisible(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetShellWindow();
+
+        private delegate bool EnumWindowsProc(IntPtr hWnd, int lParam);
+
         [Flags]
         public enum SetWindowPosFlags : uint
         {
@@ -48,6 +66,31 @@ namespace WindowResizer
         }
 
         #endregion
+
+        /// <summary>
+        ///    Get all open windows
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>via https://stackoverflow.com/questions/7268302/get-the-titles-of-all-open-windows/43640787#43640787</remarks>
+        public static List<IntPtr> GetOpenWindows()
+        {
+            var shellWindow = GetShellWindow();
+            var windows = new List<IntPtr>();
+
+            EnumWindows(delegate(IntPtr hWnd, int lParam)
+            {
+                if (hWnd == shellWindow) return true;
+                if (!IsWindowVisible(hWnd)) return true;
+
+                var length = GetWindowTextLength(hWnd);
+                if (length == 0) return true;
+
+                windows.Add(hWnd);
+                return true;
+            }, 0);
+
+            return windows;
+        }
 
         public static IntPtr GetForegroundHandle()
         {
@@ -79,7 +122,7 @@ namespace WindowResizer
                 uint pid;
                 GetWindowThreadProcessId(handle, out pid);
                 var proc = Process.GetProcessById((int)pid);
-                return proc.MainModule.ModuleName;
+                return proc.MainModule?.ModuleName;
             }
             catch (Exception)
             {
@@ -92,7 +135,7 @@ namespace WindowResizer
             try
             {
                 var proc = GetRealProcess(handle);
-                return proc.MainModule.ModuleName;
+                return proc.MainModule?.ModuleName;
             }
             catch (Exception)
             {
@@ -109,6 +152,7 @@ namespace WindowResizer
             {
                 foregroundProcess = GetRealProcess(foregroundProcess);
             }
+
             return foregroundProcess;
         }
 
@@ -129,6 +173,7 @@ namespace WindowResizer
             {
                 _realProcess = process;
             }
+
             return true;
         }
 
@@ -139,10 +184,8 @@ namespace WindowResizer
             return rect;
         }
 
-
         public static bool IsForegroundFullScreen(Screen screen = null)
         {
-
             if (screen == null)
             {
                 screen = Screen.PrimaryScreen;
@@ -150,7 +193,7 @@ namespace WindowResizer
 
             var rect = GetRect(GetForegroundWindow());
             return screen.Bounds.Width == rect.Right - rect.Left
-                   && screen.Bounds.Height == rect.Bottom - rect.Top;
+                && screen.Bounds.Height == rect.Bottom - rect.Top;
         }
     }
 

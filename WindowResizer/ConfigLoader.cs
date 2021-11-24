@@ -16,6 +16,8 @@ namespace WindowResizer
 
         public HotKeys RestoreKey { get; set; } = new HotKeys() { ModifierKeys = new[] { "Ctrl", "Alt" }, Key = "R" };
 
+        public HotKeys RestoreAllKey { get; set; } = new HotKeys() { ModifierKeys = new[] { "Ctrl", "Alt" }, Key = "T" };
+
         public BindingList<WindowSize> WindowSizes { get; set; }
     }
 

@@ -14,6 +14,7 @@ namespace WindowResizer
     {
         private static HotKeys _saveKeys;
         private static HotKeys _restoreKeys;
+        private static HotKeys _restoreAllKeys;
         private static bool _disableInFullScreen;
         private static KeyboardHook _hook;
 
@@ -26,37 +27,13 @@ namespace WindowResizer
             _hook = hook;
             _saveKeys = ConfigLoader.Config.SaveKey;
             _restoreKeys = ConfigLoader.Config.RestoreKey;
+            _restoreAllKeys = ConfigLoader.Config.RestoreAllKey;
             _disableInFullScreen = ConfigLoader.Config.DisableInFullScreen;
-
-            SaveKeysBox.BackColor = Color.Blue;
-            SaveKeysBox.ForeColor = Color.White;
-
-            RestoreKeysBox.BackColor = Color.Blue;
-            RestoreKeysBox.ForeColor = Color.White;
 
             FormClosing += SettingForm_Closing;
             Text = "Setting";
 
-            SaveKeysBox.KeyDown += (s, e) => textBox_KeyDown(s, e, SaveKeysBox,
-                ref _saveKeys);
-            SaveKeysBox.ReadOnly = true;
-
-            RestoreKeysBox.KeyDown += (s, e) => textBox_KeyDown(s, e, RestoreKeysBox,
-                ref _restoreKeys);
-            RestoreKeysBox.ReadOnly = true;
-
-            SaveKeysBox.GotFocus += (s, e) => textBox_GotFocus(s, e, SaveKeysBox);
-            RestoreKeysBox.GotFocus += (s, e) => textBox_GotFocus(s, e, RestoreKeysBox);
-
-            SaveKeysBox.LostFocus += (s, e) => textBox_LostFocus(s, e, SaveKeysBox);
-            RestoreKeysBox.LostFocus += (s, e) => textBox_LostFocus(s, e, RestoreKeysBox);
-
-            SaveKeysBox.Text = _saveKeys.ToKeysString();
-            RestoreKeysBox.Text = _restoreKeys.ToKeysString();
-            checkBox1.Checked = ConfigLoader.Config.DisableInFullScreen;
-
-            checkBox2.Checked = ConfigLoader.PortableMode;
-            checkBox2.CheckedChanged += checkBox2_CheckedChanged;
+            InitKeyTextBox();
             InitDataGrid();
         }
 
@@ -152,6 +129,44 @@ namespace WindowResizer
         }
 
         #endregion
+
+        private void InitKeyTextBox()
+        {
+            SaveKeysBox.BackColor = Color.Blue;
+            SaveKeysBox.ForeColor = Color.White;
+
+            RestoreKeysBox.BackColor = Color.Blue;
+            RestoreKeysBox.ForeColor = Color.White;
+
+            RestoreAllKeyBox.BackColor = Color.Blue;
+            RestoreAllKeyBox.ForeColor = Color.White;
+
+            SaveKeysBox.KeyDown += (s, e) => textBox_KeyDown(s, e, SaveKeysBox,
+                ref _saveKeys);
+            SaveKeysBox.ReadOnly = true;
+
+            RestoreKeysBox.KeyDown += (s, e) => textBox_KeyDown(s, e, RestoreKeysBox, ref _restoreKeys);
+            RestoreKeysBox.ReadOnly = true;
+
+            RestoreAllKeyBox.KeyDown += (s, e) => textBox_KeyDown(s, e, RestoreAllKeyBox, ref _restoreAllKeys);
+            RestoreAllKeyBox.ReadOnly = true;
+
+            SaveKeysBox.GotFocus += (s, e) => textBox_GotFocus(s, e, SaveKeysBox);
+            RestoreKeysBox.GotFocus += (s, e) => textBox_GotFocus(s, e, RestoreKeysBox);
+            RestoreAllKeyBox.GotFocus += (s, e) => textBox_GotFocus(s, e, RestoreAllKeyBox);
+
+            SaveKeysBox.LostFocus += (s, e) => textBox_LostFocus(s, e, SaveKeysBox);
+            RestoreKeysBox.LostFocus += (s, e) => textBox_LostFocus(s, e, RestoreKeysBox);
+            RestoreAllKeyBox.LostFocus += (s, e) => textBox_LostFocus(s, e, RestoreAllKeyBox);
+
+            SaveKeysBox.Text = _saveKeys.ToKeysString();
+            RestoreKeysBox.Text = _restoreKeys.ToKeysString();
+            RestoreAllKeyBox.Text = _restoreAllKeys.ToKeysString();
+            checkBox1.Checked = ConfigLoader.Config.DisableInFullScreen;
+
+            checkBox2.Checked = ConfigLoader.PortableMode;
+            checkBox2.CheckedChanged += checkBox2_CheckedChanged;
+        }
 
         private void WindowsGrid_CellValueChanged(object sender,
             DataGridViewCellEventArgs e)
@@ -257,6 +272,7 @@ namespace WindowResizer
         {
             ConfigLoader.Config.SaveKey = _saveKeys;
             ConfigLoader.Config.RestoreKey = _restoreKeys;
+            ConfigLoader.Config.RestoreAllKey = _restoreAllKeys;
             ConfigLoader.Config.DisableInFullScreen = _disableInFullScreen;
 
             ConfigLoader.Save();
@@ -264,8 +280,8 @@ namespace WindowResizer
             //hook
             _hook.UnRegisterHotKey();
             _hook.RegisterHotKey(ConfigLoader.Config.SaveKey.GetModifierKeys(), ConfigLoader.Config.SaveKey.GetKey());
-            _hook.RegisterHotKey(ConfigLoader.Config.RestoreKey.GetModifierKeys(),
-                ConfigLoader.Config.RestoreKey.GetKey());
+            _hook.RegisterHotKey(ConfigLoader.Config.RestoreKey.GetModifierKeys(), ConfigLoader.Config.RestoreKey.GetKey());
+            _hook.RegisterHotKey(ConfigLoader.Config.RestoreAllKey.GetModifierKeys(), ConfigLoader.Config.RestoreAllKey.GetKey());
 
             Hide();
         }
@@ -327,6 +343,7 @@ namespace WindowResizer
                     WindowsGrid.DataSource = ConfigLoader.Config.WindowSizes;
                     SaveKeysBox.Text = _saveKeys.ToKeysString();
                     RestoreKeysBox.Text = _restoreKeys.ToKeysString();
+                    RestoreAllKeyBox.Text = _restoreAllKeys.ToKeysString();
                     checkBox1.Checked = ConfigLoader.Config.DisableInFullScreen;
                 }
                 catch (Exception ex)
