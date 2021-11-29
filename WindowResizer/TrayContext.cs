@@ -125,7 +125,10 @@ namespace WindowResizer
         {
             var process = WindowControl.GetRealProcess(handle);
             if (process == null) return;
+
             var processName = process.MainModule?.ModuleName;
+            if (string.IsNullOrWhiteSpace(processName)) return;
+
             var title = process.MainWindowTitle;
             var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, title);
             if (!match.NoMatch)
@@ -136,8 +139,9 @@ namespace WindowResizer
             {
                 if (tips)
                 {
+                    var titleStr = string.IsNullOrWhiteSpace(title) ? "" : $"({title})";
                     _trayIcon.ShowBalloonTip(2000, "WindowResizer",
-                        $"No saved settings for {processName}:{title}", ToolTipIcon.Info);
+                        $"No saved settings for <{processName}>{titleStr}.", ToolTipIcon.Info);
                 }
             }
         }
@@ -154,7 +158,7 @@ namespace WindowResizer
         private static MatchWindowSize GetMatchWindowSize(BindingList<WindowSize> windowSizes, string processName,
             string title)
         {
-            var windows = windowSizes.Where(w => w.Name == processName).ToList();
+            var windows = windowSizes.Where(w => w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase)).ToList();
             return new MatchWindowSize
             {
                 FullMatch = windows.FirstOrDefault(w => w.Title == title),
@@ -194,16 +198,17 @@ namespace WindowResizer
 
         private static void UpdateOrSaveConfig(MatchWindowSize match, string processName, string title, Rect rect)
         {
-            if (string.IsNullOrWhiteSpace(processName) || string.IsNullOrWhiteSpace(title))
-            {
-                return;
-            }
+            if (string.IsNullOrWhiteSpace(processName)) return;
 
             if (match.NoMatch)
             {
                 // Add a wildcard match for all titles
                 InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect });
-                InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect });
+                if (string.IsNullOrWhiteSpace(title))
+                {
+                    InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect });
+                }
+
                 ConfigLoader.Save();
                 return;
             }
