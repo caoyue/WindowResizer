@@ -217,7 +217,7 @@ namespace WindowResizer
             {
                 match.FullMatch.Rect = rect;
             }
-            else
+            else if(!string.IsNullOrWhiteSpace(title))
             {
                 InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect });
             }
