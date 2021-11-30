@@ -339,6 +339,7 @@ namespace WindowResizer
                     ConfigLoader.Config = config;
                     _saveKeys = ConfigLoader.Config.SaveKey;
                     _restoreKeys = ConfigLoader.Config.RestoreKey;
+                    _restoreAllKeys = ConfigLoader.Config.RestoreAllKey;
                     _disableInFullScreen = ConfigLoader.Config.DisableInFullScreen;
                     WindowsGrid.DataSource = ConfigLoader.Config.WindowSizes;
                     SaveKeysBox.Text = _saveKeys.ToKeysString();
