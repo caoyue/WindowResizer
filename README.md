@@ -9,15 +9,20 @@ you can save and restore window position for different process
 - .NET Framework 4.5.2+
 
 ## hotkey
-you can change hoykeys in setting
+you can change hotkeys in setting
 
 - save window position
 
     default hotkey: `ctrl+alt+s`
+
 - restore window position
 
     default hotkey: `ctrl+alt+r`
 
-- restore all open window position
+- restore all opened window position
 
     default hotkey: `ctrl+alt+t`
+
+## restore window position automatically
+
+- check the checkbox on `Auto` column and `Save` configs.

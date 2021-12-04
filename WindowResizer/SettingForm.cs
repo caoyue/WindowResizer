@@ -37,7 +37,7 @@ namespace WindowResizer
             InitDataGrid();
         }
 
-        #region config grid
+        #region Init Config Grid
 
         private void InitDataGrid()
         {
@@ -52,7 +52,8 @@ namespace WindowResizer
                 HeaderText = "ExeName",
                 ReadOnly = true,
                 DefaultCellStyle = new DataGridViewCellStyle { ForeColor = Color.Blue },
-                FillWeight = 15
+                FillWeight = 15,
+                DisplayIndex = 0,
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -61,44 +62,58 @@ namespace WindowResizer
                 HeaderText = "Title",
                 Resizable = DataGridViewTriState.True,
                 DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleLeft },
-                FillWeight = 35
+                FillWeight = 35,
+                DisplayIndex = 1,
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Top",
                 DataPropertyName = "Top",
                 HeaderText = "Top",
-                FillWeight = 10
+                FillWeight = 8,
+                DisplayIndex = 2,
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Left",
                 DataPropertyName = "Left",
                 HeaderText = "Left",
-                FillWeight = 10
+                FillWeight = 8,
+                DisplayIndex = 3,
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Right",
                 DataPropertyName = "Right",
                 HeaderText = "Right",
-                FillWeight = 10
+                FillWeight = 8,
+                DisplayIndex = 4,
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Bottom",
                 DataPropertyName = "Bottom",
                 HeaderText = "Bottom",
-                FillWeight = 10
+                FillWeight = 8,
+                DisplayIndex = 5,
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = "Rect",
                 DataPropertyName = "Rect",
-                Visible = false
+                Visible = false,
             });
 
-            var rmBtn = new DataGridViewButtonColumn
+            WindowsGrid.Columns.Add(new DataGridViewCheckBoxColumn
+            {
+                Name = "AutoResize",
+                DataPropertyName = "AutoResize",
+                HeaderText = "Auto",
+                FillWeight = 8,
+                DisplayIndex = 6,
+            });
+
+            WindowsGrid.Columns.Add(new DataGridViewButtonColumn
             {
                 UseColumnTextForButtonValue = true,
                 Text = "Remove",
@@ -106,20 +121,19 @@ namespace WindowResizer
                 HeaderText = "",
                 FlatStyle = FlatStyle.Flat,
                 DefaultCellStyle = { ForeColor = Color.Blue },
-                FillWeight = 10
-            };
-            WindowsGrid.Columns.Add(rmBtn);
+                FillWeight = 10,
+                DisplayIndex = 7,
+            });
 
             foreach (DataGridViewColumn col in WindowsGrid.Columns)
             {
                 col.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
                 col.HeaderCell.Style.Font =
-                    new Font("Microsoft YaHei UI", 18F, FontStyle.Bold,
-                        GraphicsUnit.Pixel);
+                    new Font("Microsoft YaHei UI", 16F, FontStyle.Bold, GraphicsUnit.Pixel);
             }
 
-            WindowsGrid.RowTemplate.DefaultCellStyle.Padding = new Padding(3, 0, 3,
-                0);
+            WindowsGrid.AutoGenerateColumns = false;
+            WindowsGrid.RowTemplate.DefaultCellStyle.Padding = new Padding(3, 0, 3, 0);
             WindowsGrid.DataSource = ConfigLoader.Config.WindowSizes;
 
             WindowsGrid.ShowCellToolTips = true;
@@ -129,6 +143,8 @@ namespace WindowResizer
         }
 
         #endregion
+
+        #region Init Key Bind
 
         private void InitKeyTextBox()
         {
@@ -167,6 +183,8 @@ namespace WindowResizer
             checkBox2.Checked = ConfigLoader.PortableMode;
             checkBox2.CheckedChanged += checkBox2_CheckedChanged;
         }
+
+        #endregion
 
         private void WindowsGrid_CellValueChanged(object sender,
             DataGridViewCellEventArgs e)

@@ -28,6 +28,8 @@ namespace WindowResizer
 
         public Rect Rect { get; set; }
 
+        public bool AutoResize { get; set; }
+
         //seperate these for the grid edit, but flag so they don't get JSON seriealized
         [JsonIgnore]
         public int Top
@@ -228,6 +230,7 @@ namespace WindowResizer
 
         #region config migration
 
+        [Obsolete]
         public class ConfigOld
         {
             public bool DisbaleInFullScreen { get; set; } = true;
@@ -239,6 +242,7 @@ namespace WindowResizer
             public List<WindowSizeOldCfg> WindowSizes { get; set; }
         }
 
+        [Obsolete]
         public class WindowSizeOldCfg
         {
             public string Process { get; set; }

@@ -13,6 +13,8 @@ namespace WindowResizer
 
         private static SettingForm _settingForm;
 
+        private static WindowEventHandler _windowEventHandler;
+
         public TrayContext()
         {
             try
@@ -43,11 +45,15 @@ namespace WindowResizer
             };
 
             _trayIcon.DoubleClick += OnSetting;
+
+            _windowEventHandler = new WindowEventHandler(OnWindowCreated);
+            _windowEventHandler.AddWindowCreateHandle();
         }
 
         private void OnExit(object sender, EventArgs e)
         {
             _settingForm?.Close();
+            _windowEventHandler.RemoveWindowCreateHandle();
             ConfigLoader.Save();
             _trayIcon.Dispose();
             _hook.Dispose();
@@ -121,7 +127,15 @@ namespace WindowResizer
             }
         }
 
-        private void ResizeWindow(IntPtr handle, bool tips = false)
+        private void OnWindowCreated(IntPtr handle)
+        {
+            if (WindowControl.IsWindowVisible(handle))
+            {
+                ResizeWindow(handle, false, true);
+            }
+        }
+
+        private void ResizeWindow(IntPtr handle, bool tips = false, bool auto = false)
         {
             var process = WindowControl.GetRealProcess(handle);
             if (process == null) return;
@@ -130,7 +144,7 @@ namespace WindowResizer
             if (string.IsNullOrWhiteSpace(processName)) return;
 
             var title = process.MainWindowTitle;
-            var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, title);
+            var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, title, auto);
             if (!match.NoMatch)
             {
                 MoveMatchWindow(match, handle);
@@ -156,9 +170,15 @@ namespace WindowResizer
         }
 
         private static MatchWindowSize GetMatchWindowSize(BindingList<WindowSize> windowSizes, string processName,
-            string title)
+            string title, bool auto = false)
         {
             var windows = windowSizes.Where(w => w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (auto)
+            {
+                windows = windows.Where(w => w.AutoResize).ToList();
+            }
+
             return new MatchWindowSize
             {
                 FullMatch = windows.FirstOrDefault(w => w.Title == title),
@@ -217,7 +237,7 @@ namespace WindowResizer
             {
                 match.FullMatch.Rect = rect;
             }
-            else if(!string.IsNullOrWhiteSpace(title))
+            else if (!string.IsNullOrWhiteSpace(title))
             {
                 InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect });
             }
