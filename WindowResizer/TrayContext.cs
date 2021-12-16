@@ -137,6 +137,11 @@ namespace WindowResizer
 
         private void ResizeWindow(IntPtr handle, bool tips = false, bool auto = false)
         {
+            if (WindowControl.IsChildWindow(handle))
+            {
+                return;
+            }
+
             var process = WindowControl.GetRealProcess(handle);
             if (process == null) return;
 

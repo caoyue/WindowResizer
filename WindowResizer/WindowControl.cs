@@ -51,6 +51,9 @@ namespace WindowResizer
         [DllImport("user32.dll")]
         private static extern IntPtr GetShellWindow();
 
+        [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
+        private static extern IntPtr GetParent(IntPtr hWnd);
+
         private delegate bool EnumWindowsProc(IntPtr hWnd, int lParam);
 
         [Flags]
@@ -95,6 +98,11 @@ namespace WindowResizer
         public static IntPtr GetForegroundHandle()
         {
             return GetForegroundWindow();
+        }
+        public static bool IsChildWindow(IntPtr handle)
+        {
+            var r = GetParent(handle);
+            return r != IntPtr.Zero;
         }
 
         public static string GetActiveWindowTitle(IntPtr handle)
