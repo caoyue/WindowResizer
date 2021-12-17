@@ -54,18 +54,28 @@ namespace WindowResizer
         [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
         private static extern IntPtr GetParent(IntPtr hWnd);
 
+        [DllImport("user32.dll", EntryPoint = "GetWindowLong")]
+        static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex);
+
         private delegate bool EnumWindowsProc(IntPtr hWnd, int lParam);
 
         [Flags]
         public enum SetWindowPosFlags : uint
         {
-            SWP_NOOWNERZORDER = 0x0200
+            SWP_NOOWNERZORDER = 0x0200,
         }
 
         [Flags]
         public enum ShowWindowFlags : uint
         {
-            SW_SHOWNORMAL = 1
+            SW_SHOWNORMAL = 1,
+            SW_SHOWMAXIMIZED = 3,
+        }
+
+        public enum WindowStyles : uint
+        {
+            WS_MINIMIZE = 0x20000000,
+            WS_MAXIMIZE = 0x1000000,
         }
 
         #endregion
@@ -80,7 +90,7 @@ namespace WindowResizer
             var shellWindow = GetShellWindow();
             var windows = new List<IntPtr>();
 
-            EnumWindows(delegate(IntPtr hWnd, int lParam)
+            EnumWindows(delegate (IntPtr hWnd, int lParam)
             {
                 if (hWnd == shellWindow) return true;
                 if (!IsWindowVisible(hWnd)) return true;
@@ -105,11 +115,33 @@ namespace WindowResizer
             return r != IntPtr.Zero;
         }
 
+        public static WindowState GetWIndowState(IntPtr handle)
+        {
+            const int GWL_STYLE = -16;
+            var style = (WindowStyles)GetWindowLongPtr(handle, GWL_STYLE);
+            if ((style & WindowStyles.WS_MAXIMIZE) == WindowStyles.WS_MAXIMIZE)
+            {
+                return WindowState.Maximized;
+            }
+            if ((style & WindowStyles.WS_MINIMIZE) == WindowStyles.WS_MINIMIZE)
+            {
+                return WindowState.Minimized;
+            }
+
+            return WindowState.Normal;
+        }
+
         public static string GetActiveWindowTitle(IntPtr handle)
         {
             const int nChars = 256;
             var buff = new StringBuilder(nChars);
             return GetWindowText(handle, buff, nChars) > 0 ? buff.ToString() : null;
+        }
+
+        public static void MaximizeWindow(IntPtr handle)
+        {
+            if (handle == IntPtr.Zero) return;
+            ShowWindow(handle, (int)ShowWindowFlags.SW_SHOWMAXIMIZED);
         }
 
         public static void MoveWindow(IntPtr handle, Rect rect)
@@ -211,5 +243,12 @@ namespace WindowResizer
         public int Top { get; set; }
         public int Right { get; set; }
         public int Bottom { get; set; }
+    }
+
+    public enum WindowState
+    {
+        Normal = 0,
+        Minimized = 1,
+        Maximized = 2,
     }
 }

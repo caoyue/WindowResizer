@@ -14,9 +14,6 @@ namespace WindowResizer
                 AutomationElement src = sender as AutomationElement;
                 if (src != null)
                 {
-                    Console.WriteLine("Class : " + src.Current.ClassName);
-                    Console.WriteLine("Title : " + src.Current.Name);
-                    Console.WriteLine("Handle: " + src.Current.NativeWindowHandle);
                     windowCreatedHandler(new IntPtr(src.Current.NativeWindowHandle));
                 }
             };
