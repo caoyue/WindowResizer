@@ -171,7 +171,8 @@ namespace WindowResizer
             var processName = process.MainModule?.ModuleName;
             var title = process.MainWindowTitle;
             var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, title);
-            UpdateOrSaveConfig(match, processName, title, WindowControl.GetRect(handle));
+            var state = WindowControl.GetWIndowState(handle);
+            UpdateOrSaveConfig(match, processName, title, WindowControl.GetRect(handle), state);
         }
 
         private static MatchWindowSize GetMatchWindowSize(BindingList<WindowSize> windowSizes, string processName,
@@ -199,39 +200,51 @@ namespace WindowResizer
         {
             if (match.FullMatch != null)
             {
-                WindowControl.MoveWindow(handle, match.FullMatch.Rect);
+                MoveWindow(handle, match.FullMatch);
                 return;
             }
 
             if (match.PrefixMatch != null)
             {
-                WindowControl.MoveWindow(handle, match.PrefixMatch.Rect);
+                MoveWindow(handle, match.PrefixMatch);
                 return;
             }
 
             if (match.SuffixMatch != null)
             {
-                WindowControl.MoveWindow(handle, match.SuffixMatch.Rect);
+                MoveWindow(handle, match.SuffixMatch);
                 return;
             }
 
             if (match.WildcardMatch != null)
             {
-                WindowControl.MoveWindow(handle, match.WildcardMatch.Rect);
+                MoveWindow(handle, match.WildcardMatch);
             }
         }
 
-        private static void UpdateOrSaveConfig(MatchWindowSize match, string processName, string title, Rect rect)
+        private static void MoveWindow(IntPtr handle, WindowSize match)
+        {
+            if (match.State == WindowState.Maximized)
+            {
+                WindowControl.MaximizeWindow(handle);
+            }
+            else
+            {
+                WindowControl.MoveWindow(handle, match.Rect);
+            }
+        }
+
+        private static void UpdateOrSaveConfig(MatchWindowSize match, string processName, string title, Rect rect, WindowState state = WindowState.Normal)
         {
             if (string.IsNullOrWhiteSpace(processName)) return;
 
             if (match.NoMatch)
             {
                 // Add a wildcard match for all titles
-                InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect });
+                InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect, State = state });
                 if (string.IsNullOrWhiteSpace(title))
                 {
-                    InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect });
+                    InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect, State = state });
                 }
 
                 ConfigLoader.Save();
@@ -241,29 +254,33 @@ namespace WindowResizer
             if (match.FullMatch != null)
             {
                 match.FullMatch.Rect = rect;
+                match.FullMatch.State = state;
             }
             else if (!string.IsNullOrWhiteSpace(title))
             {
-                InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect });
+                InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect, State = state });
             }
 
             if (match.SuffixMatch != null)
             {
                 match.SuffixMatch.Rect = rect;
+                match.SuffixMatch.State = state;
             }
 
             if (match.PrefixMatch != null)
             {
                 match.PrefixMatch.Rect = rect;
+                match.PrefixMatch.State = state;
             }
 
             if (match.WildcardMatch != null)
             {
                 match.WildcardMatch.Rect = rect;
+                match.WildcardMatch.State = state;
             }
             else
             {
-                InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect });
+                InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect, State = state });
             }
 
             ConfigLoader.Save();

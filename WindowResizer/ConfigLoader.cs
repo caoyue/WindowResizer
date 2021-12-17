@@ -28,6 +28,11 @@ namespace WindowResizer
 
         public Rect Rect { get; set; }
 
+        /// <summary>
+        ///     Window State
+        /// </summary>
+        public WindowState State { get; set; } = WindowState.Normal;
+
         public bool AutoResize { get; set; }
 
         //seperate these for the grid edit, but flag so they don't get JSON seriealized
