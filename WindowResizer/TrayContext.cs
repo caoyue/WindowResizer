@@ -171,7 +171,7 @@ namespace WindowResizer
             var processName = process.MainModule?.ModuleName;
             var title = process.MainWindowTitle;
             var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, title);
-            var state = WindowControl.GetWIndowState(handle);
+            var state = WindowControl.GetWindowState(handle);
             UpdateOrSaveConfig(match, processName, title, WindowControl.GetRect(handle), state);
         }
 

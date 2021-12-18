@@ -115,15 +115,15 @@ namespace WindowResizer
             return r != IntPtr.Zero;
         }
 
-        public static WindowState GetWIndowState(IntPtr handle)
+        public static WindowState GetWindowState(IntPtr handle)
         {
             const int GWL_STYLE = -16;
-            var style = (WindowStyles)GetWindowLongPtr(handle, GWL_STYLE);
-            if ((style & WindowStyles.WS_MAXIMIZE) == WindowStyles.WS_MAXIMIZE)
+            var style = (long)GetWindowLongPtr(handle, GWL_STYLE);
+            if ((style & (int)WindowStyles.WS_MAXIMIZE) == (int)WindowStyles.WS_MAXIMIZE)
             {
                 return WindowState.Maximized;
             }
-            if ((style & WindowStyles.WS_MINIMIZE) == WindowStyles.WS_MINIMIZE)
+            if ((style & (int)WindowStyles.WS_MINIMIZE) == (int)WindowStyles.WS_MINIMIZE)
             {
                 return WindowState.Minimized;
             }
