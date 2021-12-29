@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package>
+    <metadata>
+        <id>WindowResizer</id>
+        <title>WindowResizer</title>
+        <icon>AppIcon.png</icon>
+        <version>$version$</version>
+        <authors>caoyue</authors>
+        <projectUrl>https://github.com/caoyue/WindowResizer</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Save and restore your window size and position with a hotkey</description>
+        <dependencies>
+            <group targetFramework=".NETFramework4.5.2" />
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="**\*.*" target="lib\net452\" exclude="*.vshost.exe;*.vshost.exe.config;*.vshost.exe.manifest;*.nupkg;Setup.exe;RELEASES" />
+        <file src="AppIcon.png" />
+    </files>
+</package>
