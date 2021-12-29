@@ -35,6 +35,7 @@ namespace WindowResizer
 
             InitKeyTextBox();
             InitDataGrid();
+            About();
         }
 
         #region Init Config Grid
@@ -182,6 +183,25 @@ namespace WindowResizer
 
             checkBox2.Checked = ConfigLoader.PortableMode;
             checkBox2.CheckedChanged += checkBox2_CheckedChanged;
+        }
+
+        #endregion
+
+        #region About
+
+        private const string ProjectLink = @"https://github.com/caoyue/WindowResizer";
+        private void About()
+        {
+            label4.Text = $"WindowResizer {Application.ProductVersion}";
+
+            linkLabel1.Text = ProjectLink;
+            linkLabel1.LinkClicked += LinkClicked;
+        }
+
+        private void LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            linkLabel1.LinkVisited = true;
+            System.Diagnostics.Process.Start(ProjectLink);
         }
 
         #endregion

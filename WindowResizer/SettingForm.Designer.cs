@@ -44,6 +44,8 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label3 = new System.Windows.Forms.Label();
             this.RestoreAllKeyBox = new System.Windows.Forms.TextBox();
+            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.WindowsGrid)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -225,23 +227,46 @@
             this.label3.TabIndex = 9;
             this.label3.Text = "Restore All";
             // 
-            // restoreAllKeyBox
+            // RestoreAllKeyBox
             // 
             this.RestoreAllKeyBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.RestoreAllKeyBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.RestoreAllKeyBox.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.RestoreAllKeyBox.Location = new System.Drawing.Point(713, 33);
             this.RestoreAllKeyBox.Margin = new System.Windows.Forms.Padding(2);
-            this.RestoreAllKeyBox.Name = "restoreAllKeyBox";
+            this.RestoreAllKeyBox.Name = "RestoreAllKeyBox";
             this.RestoreAllKeyBox.Size = new System.Drawing.Size(160, 33);
             this.RestoreAllKeyBox.TabIndex = 8;
             this.RestoreAllKeyBox.TabStop = false;
+            // 
+            // linkLabel1
+            // 
+            this.linkLabel1.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.linkLabel1.Location = new System.Drawing.Point(421, 956);
+            this.linkLabel1.Name = "linkLabel1";
+            this.linkLabel1.Size = new System.Drawing.Size(500, 24);
+            this.linkLabel1.TabIndex = 14;
+            this.linkLabel1.TabStop = true;
+            this.linkLabel1.Text = "linkLabel1";
+            this.linkLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label4
+            // 
+            this.label4.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label4.Location = new System.Drawing.Point(621, 922);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(300, 24);
+            this.label4.TabIndex = 15;
+            this.label4.Text = "label4";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // SettingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(940, 925);
+            this.ClientSize = new System.Drawing.Size(940, 989);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Font = new System.Drawing.Font("Microsoft YaHei UI", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
@@ -277,5 +302,7 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox RestoreAllKeyBox;
+        private System.Windows.Forms.LinkLabel linkLabel1;
+        private System.Windows.Forms.Label label4;
     }
 }

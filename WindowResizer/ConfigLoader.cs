@@ -170,7 +170,7 @@ namespace WindowResizer
 
         public static bool PortableMode
         {
-            get { return !File.Exists(_roamingConfigPath); }
+            get { return File.Exists(_roamingPath); }
         }
 
         public static string ConfigPath
@@ -212,6 +212,7 @@ namespace WindowResizer
         public static void Save()
         {
             var json = JsonConvert.SerializeObject(Config);
+            new FileInfo(ConfigPath).Directory?.Create();
             File.WriteAllText(ConfigPath, json);
         }
 

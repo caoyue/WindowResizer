@@ -1,8 +1,15 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.12
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowResizer", "WindowResizer\WindowResizer.csproj", "{B3E7EB82-3DB1-4F1B-9C3C-D67643AE0B00}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer", "Installer", "{1F1C70CA-5669-40F4-87BF-CE371C67EFD2}"
+	ProjectSection(SolutionItems) = preProject
+		Installer\AppIcon.png = Installer\AppIcon.png
+		Installer\build.ps1 = Installer\build.ps1
+		Installer\WindowResizer.nuspec = Installer\WindowResizer.nuspec
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +31,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0BDA6027-46C2-4025-BE55-C45C34EB0DE1}
 	EndGlobalSection
 EndGlobal

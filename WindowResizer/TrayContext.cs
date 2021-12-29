@@ -1,7 +1,10 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using Squirrel;
 using WindowResizer.Properties;
 
 namespace WindowResizer
@@ -39,7 +42,10 @@ namespace WindowResizer
             {
                 Icon = Resources.AppIcon,
                 ContextMenu =
-                    new ContextMenu(new MenuItem[] { new MenuItem("Setting", OnSetting), new MenuItem("Exit", OnExit) }),
+                    new ContextMenu(new MenuItem[] {
+                        new MenuItem("Setting", OnSetting),
+                        new MenuItem("Exit", OnExit),
+                    }),
                 Visible = true,
                 Text = "WindowResizer"
             };
@@ -48,6 +54,51 @@ namespace WindowResizer
 
             _windowEventHandler = new WindowEventHandler(OnWindowCreated);
             _windowEventHandler.AddWindowCreateHandle();
+
+            _ = Update();
+        }
+
+        private async Task Update()
+        {
+            const string githubRepo = @"https://github.com/caoyue/WindowResizer";
+            try
+            {
+                using (var mgr = await UpdateManager.GitHubUpdateManager(githubRepo))
+                {
+                    var updateInfo = await mgr.CheckForUpdate();
+
+                    if (updateInfo.ReleasesToApply.Any())
+                    {
+                        var versionCount = updateInfo.ReleasesToApply.Count;
+                        var latest = updateInfo.ReleasesToApply.First().Version;
+                        var message = new StringBuilder().
+                            AppendLine($"New version {latest} found.").
+                            AppendLine("Would you like to download and install update?").
+                            ToString();
+
+                        var res = MessageBox.Show(message, "WindowResizer Update", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                        if (res == DialogResult.Cancel)
+                        {
+                            return;
+                        }
+
+                        if (res == DialogResult.OK)
+                        {
+                            var updateResult = await mgr.UpdateApp();                            
+                            if (updateResult != null)
+                            {
+                                _trayIcon.ShowBalloonTip(2000, "WindowResizer", $" Version {updateResult.Version} download complete. The app will restart to take effect.", ToolTipIcon.Info);
+                                UpdateManager.RestartApp();
+                            }
+                        }
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                _trayIcon.ShowBalloonTip(1500, "WindowResizer", $"Check update error, {e.Message}.", ToolTipIcon.Error);
+            }
         }
 
         private void OnExit(object sender, EventArgs e)
