@@ -182,10 +182,6 @@ namespace WindowResizer
 
         public static void Load()
         {
-            // migration
-            ConfigMigrationV2();
-            ConfigMigrationV1();
-
             if (!File.Exists(ConfigPath))
             {
                 if (Config.WindowSizes == null)
@@ -232,102 +228,5 @@ namespace WindowResizer
                 File.Move(_portableConfigPath, _roamingConfigPath);
             }
         }
-
-        #region config migration
-
-        [Obsolete]
-        public class ConfigOld
-        {
-            public bool DisbaleInFullScreen { get; set; } = true;
-
-            public HotKeys SaveKey { get; set; } = new HotKeys() { ModifierKeys = new[] { "Ctrl", "Alt" }, Key = "S" };
-
-            public HotKeys RestoreKey { get; set; } = new HotKeys() { ModifierKeys = new[] { "Ctrl", "Alt" }, Key = "R" };
-
-            public List<WindowSizeOldCfg> WindowSizes { get; set; }
-        }
-
-        [Obsolete]
-        public class WindowSizeOldCfg
-        {
-            public string Process { get; set; }
-            public Rect Rect { get; set; }
-        }
-
-        private static readonly string _oldPath = Path.Combine(Application.StartupPath, "config.json");
-
-        private static void ConfigMigrationV1()
-        {
-            if (File.Exists(ConfigPath) || !File.Exists(_oldPath))
-            {
-                return;
-            }
-
-            var text = File.ReadAllText(_oldPath);
-            ConfigOld configOld = JsonConvert.DeserializeObject<ConfigOld>(text);
-            Config.DisableInFullScreen = configOld.DisbaleInFullScreen;
-            Config.RestoreKey = configOld.RestoreKey;
-            Config.SaveKey = configOld.SaveKey;
-            Config.WindowSizes = new BindingList<WindowSize>();
-            foreach (var w in configOld.WindowSizes)
-            {
-                Config.WindowSizes.Add(new WindowSize
-                {
-                    Name = w.Process,
-                    Title = "*",
-                    Rect = new Rect
-                    {
-                        Top = w.Rect.Top,
-                        Left = w.Rect.Left,
-                        Right = w.Rect.Right,
-                        Bottom = w.Rect.Bottom
-                    }
-                });
-            }
-
-            File.Move(_oldPath, $"{_oldPath}.bak");
-        }
-
-        private static void ConfigMigrationV2()
-        {
-            if (File.Exists(_roamingConfigPath) || File.Exists(_portableConfigPath))
-            {
-                return;
-            }
-
-            try
-            {
-                var directoryInfo = new DirectoryInfo(_roamingPath);
-                var files = directoryInfo
-                            .GetFiles("config.json", SearchOption.AllDirectories)
-                            .OrderByDescending(f => f.LastWriteTime)
-                            .ToList();
-
-                // copy file
-                var lastConfig = files.FirstOrDefault();
-                if (lastConfig != null)
-                {
-                    var text = FixTypo(File.ReadAllText(lastConfig.FullName));
-                    File.WriteAllText(ConfigPath, text);
-                }
-
-                // clean up
-                foreach (var file in files)
-                {
-                    File.Move(file.FullName, $"{file.FullName}.bak");
-                }
-            }
-            catch
-            {
-                // ignored
-            }
-        }
-
-        private static string FixTypo(string config)
-        {
-            return config.Replace("DisbaleInFullScreen", "DisableInFullScreen");
-        }
-
-        #endregion
     }
 }
