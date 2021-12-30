@@ -1,3 +1,4 @@
+$ErrorActionPreference = "Stop"
 New-Alias squirrel .\packages\squirrel.windows.2.0.1\tools\Squirrel.exe
 
 $version=$args[0]
