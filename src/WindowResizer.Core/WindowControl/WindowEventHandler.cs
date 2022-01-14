@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Automation;
 
-namespace WindowResizer
+namespace WindowResizer.Core.WindowControl
 {
     public class WindowEventHandler
     {

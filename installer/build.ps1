@@ -57,15 +57,15 @@ patchFile($version)
 # build
 Write-Output ">> building..."
 nuget restore .\WindowResizer.sln
-msbuild .\WindowResizer\WindowResizer.csproj /p:Configuration=Release
+msbuild .\src\WindowResizer\WindowResizer.csproj /p:Configuration=Release
 
 # nuget pack
 Write-Output ">> packing..."
-Copy-Item .\Installer\AppIcon.png .\WindowResizer\bin\Release\AppIcon.png
-Nuget pack .\Installer\WindowResizer.nuspec -Version $version -Properties Configuration=Release -BasePath .\WindowResizer\bin\Release -OutputDirectory  .\publish
+Copy-Item .\installer\AppIcon.png .\src\WindowResizer\bin\Release\AppIcon.png
+Nuget pack .\installer\WindowResizer.nuspec -Version $version -Properties Configuration=Release -BasePath .\src\WindowResizer\bin\Release -OutputDirectory  .\publish
 
 # squirrel release
 Write-Output ">> releasing..."
-squirrel  --setupIcon .\WindowResizer\Resources\AppIcon.ico --shortcut-locations 'StartMenu' --releasify .\publish\WindowResizer.$version.nupkg --no-msi
+squirrel  --setupIcon .\src\WindowResizer\Resources\AppIcon.ico --shortcut-locations 'StartMenu' --releasify .\publish\WindowResizer.$version.nupkg --no-msi
 
 Write-Output ">> done."

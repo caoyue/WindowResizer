@@ -6,9 +6,10 @@ a simple tool gives you a way to quickly reset window size and position with a h
 
 you can save and restore window position for different process.
 
-## support
+## require
 
--   .NET Framework 4.7.2
+-   Windows 7+ 
+-   .NET Framework 4.7.2+
 
 ## hotkey
 
@@ -41,3 +42,6 @@ you can change hotkeys in setting window
 -   restore window position automatically
 
     check the checkbox on `Auto` column and `Save` configs.
+
+## Stats
+![Alt](https://repobeats.axiom.co/api/embed/75ddcde135edf6e28a84cbe8c5fbe2b029f73c8e.svg "Repobeats analytics image")

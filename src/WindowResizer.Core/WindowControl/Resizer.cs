@@ -1,96 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using static WindowResizer.Core.WindowControl.NativeMethods;
 
-namespace WindowResizer
+namespace WindowResizer.Core.WindowControl
 {
-    public static class WindowControl
+    public static class Resizer
     {
-        #region api
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetForegroundWindow();
-
-        [DllImport("user32.dll")]
-        private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
-
-        [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
-        public static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy,
-            int wFlags);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int GetWindowThreadProcessId(IntPtr handle, out uint processId);
-
-        public delegate bool WindowEnumProc(IntPtr hwnd, IntPtr lparam);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr FindWindow(string strClassName, string strWindowName);
-
-        [DllImport("user32.dll")]
-        public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool EnumChildWindows(IntPtr hwnd, WindowEnumProc callback, IntPtr lParam);
-
-        [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        [DllImport("user32.dll")]
-        private static extern bool EnumWindows(EnumWindowsProc enumFunc, int lParam);
-
-        [DllImport("user32.dll")]
-        private static extern int GetWindowTextLength(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        public static extern bool IsWindowVisible(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetShellWindow();
-
-        [DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
-        private static extern IntPtr GetParent(IntPtr hWnd);
-
-        [DllImport("user32.dll", EntryPoint = "GetWindowLong")]
-        static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex);
-
-        private delegate bool EnumWindowsProc(IntPtr hWnd, int lParam);
-
-        [Flags]
-        public enum SetWindowPosFlags : uint
-        {
-            SWP_NOOWNERZORDER = 0x0200,
-        }
-
-        [Flags]
-        public enum ShowWindowFlags : uint
-        {
-            SW_SHOWNORMAL = 1,
-            SW_SHOWMAXIMIZED = 3,
-        }
-
-        public enum WindowStyles : uint
-        {
-            WS_MINIMIZE = 0x20000000,
-            WS_MAXIMIZE = 0x1000000,
-        }
-
-        #endregion
-
         /// <summary>
         ///    Get all open windows
         /// </summary>
         /// <returns></returns>
-        /// <remarks>via https://stackoverflow.com/questions/7268302/get-the-titles-of-all-open-windows/43640787#43640787</remarks>
         public static List<IntPtr> GetOpenWindows()
         {
             var shellWindow = GetShellWindow();
             var windows = new List<IntPtr>();
 
-            EnumWindows(delegate (IntPtr hWnd, int lParam)
+            EnumWindows(delegate(IntPtr hWnd, int lParam)
             {
                 if (hWnd == shellWindow) return true;
                 if (!IsWindowVisible(hWnd)) return true;
@@ -109,6 +37,7 @@ namespace WindowResizer
         {
             return GetForegroundWindow();
         }
+
         public static bool IsChildWindow(IntPtr handle)
         {
             var r = GetParent(handle);
@@ -123,12 +52,15 @@ namespace WindowResizer
             {
                 return WindowState.Maximized;
             }
-            if ((style & (int)WindowStyles.WS_MINIMIZE) == (int)WindowStyles.WS_MINIMIZE)
-            {
-                return WindowState.Minimized;
-            }
 
-            return WindowState.Normal;
+            return (style & (int)WindowStyles.WS_MINIMIZE) == (int)WindowStyles.WS_MINIMIZE
+                ? WindowState.Minimized
+                : WindowState.Normal;
+        }
+
+        public static bool IsWindowVisible(IntPtr handle)
+        {
+            return NativeMethods.IsWindowVisible(handle);
         }
 
         public static string GetActiveWindowTitle(IntPtr handle)
@@ -206,8 +138,7 @@ namespace WindowResizer
 
         private static bool ChildWindowCallback(IntPtr handle, IntPtr lparam)
         {
-            uint pid;
-            GetWindowThreadProcessId(handle, out pid);
+            GetWindowThreadProcessId(handle, out var pid);
             var process = Process.GetProcessById((int)pid);
             if (process.ProcessName != "ApplicationFrameHost")
             {
@@ -235,20 +166,5 @@ namespace WindowResizer
             return screen.Bounds.Width == rect.Right - rect.Left
                 && screen.Bounds.Height == rect.Bottom - rect.Top;
         }
-    }
-
-    public struct Rect
-    {
-        public int Left { get; set; }
-        public int Top { get; set; }
-        public int Right { get; set; }
-        public int Bottom { get; set; }
-    }
-
-    public enum WindowState
-    {
-        Normal = 0,
-        Minimized = 1,
-        Maximized = 2,
     }
 }
