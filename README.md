@@ -1,6 +1,6 @@
 # WindowResizer
 
-![WindowResizer](https://github.com/caoyue/WindowResizer/actions/workflows/WindowsResizer.yml/badge.svg)
+[![WindowResizer](https://github.com/caoyue/WindowResizer/actions/workflows/WindowsResizer.yml/badge.svg)](https://github.com/caoyue/WindowResizer/actions) [![GitHub all releases](https://img.shields.io/github/downloads/caoyue/WindowResizer/total)](https://github.com/caoyue/WindowResizer/releases)  [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/caoyue/WindowResizer?sort=semver)](https://github.com/caoyue/WindowResizer/releases/latest)
 
 a simple tool gives you a way to quickly reset window size and position with a hotkey.
 
@@ -23,9 +23,13 @@ you can change hotkeys in setting window
 
     default hotkey: `ctrl+alt+r`
 
+    ![restore](https://i.imgur.com/5TJdL44.gif)
+
 -   restore all opened window position
 
     default hotkey: `ctrl+alt+t`
+
+    ![restore-all.gif](https://i.imgur.com/3558lKS.gif)
 
 ## usage
 
@@ -42,6 +46,8 @@ you can change hotkeys in setting window
 -   restore window position automatically
 
     check the checkbox on `Auto` column and `Save` configs.
+
+    ![auto-restore](https://i.imgur.com/LeNyJQu.gif)
 
 ## Stats
 ![Alt](https://repobeats.axiom.co/api/embed/75ddcde135edf6e28a84cbe8c5fbe2b029f73c8e.svg "Repobeats analytics image")
