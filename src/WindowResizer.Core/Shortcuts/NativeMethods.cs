@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
-namespace WindowResizer.Core.KeyboardHook
+namespace WindowResizer.Core.Shortcuts
 {
     internal static class NativeMethods
     {

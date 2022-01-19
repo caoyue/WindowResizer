@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Newtonsoft.Json;
 using WindowResizer.Core.WindowControl;
 
@@ -6,9 +6,9 @@ namespace WindowResizer.Configuration
 {
     public class WindowSize : IComparable<WindowSize>
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = String.Empty;
 
-        public string Title { get; set; }
+        public string Title { get; set; } = String.Empty;
 
         public Rect Rect { get; set; }
 
@@ -19,10 +19,10 @@ namespace WindowResizer.Configuration
 
         public bool AutoResize { get; set; }
 
-        public int CompareTo(WindowSize other)
+        public int CompareTo(WindowSize? other)
         {
-            var c = string.Compare(other.Name, Name, StringComparison.Ordinal);
-            return c == 0 ? string.Compare(other.Title, Title, StringComparison.Ordinal) : c;
+            var c = string.Compare(other?.Name ?? String.Empty, Name, StringComparison.Ordinal);
+            return c == 0 ? string.Compare(other?.Title ?? String.Empty, Title, StringComparison.Ordinal) : c;
         }
 
         #region properties
@@ -35,7 +35,10 @@ namespace WindowResizer.Configuration
             {
                 Rect = new Rect
                 {
-                    Top = value, Left = Rect.Left, Right = Rect.Right, Bottom = Rect.Bottom
+                    Top = value,
+                    Left = Rect.Left,
+                    Right = Rect.Right,
+                    Bottom = Rect.Bottom
                 };
             }
         }
@@ -48,7 +51,10 @@ namespace WindowResizer.Configuration
             {
                 Rect = new Rect
                 {
-                    Top = Rect.Top, Left = value, Right = Rect.Right, Bottom = Rect.Bottom
+                    Top = Rect.Top,
+                    Left = value,
+                    Right = Rect.Right,
+                    Bottom = Rect.Bottom
                 };
             }
         }
@@ -61,7 +67,10 @@ namespace WindowResizer.Configuration
             {
                 Rect = new Rect
                 {
-                    Top = Rect.Top, Left = Rect.Left, Right = value, Bottom = Rect.Bottom
+                    Top = Rect.Top,
+                    Left = Rect.Left,
+                    Right = value,
+                    Bottom = Rect.Bottom
                 };
             }
         }
@@ -74,7 +83,10 @@ namespace WindowResizer.Configuration
             {
                 Rect = new Rect
                 {
-                    Top = Rect.Top, Left = Rect.Left, Right = Rect.Right, Bottom = value
+                    Top = Rect.Top,
+                    Left = Rect.Left,
+                    Right = Rect.Right,
+                    Bottom = value
                 };
             }
         }

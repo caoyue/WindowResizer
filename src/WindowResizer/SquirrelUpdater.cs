@@ -4,9 +4,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Squirrel;
 
-namespace WindowResizer.Updater
+namespace WindowResizer
 {
-    public class SquirrelUpdater : IUpdater
+    public class SquirrelUpdater
     {
         private readonly Action<string, bool, int> _showTips;
         private readonly Func<string, bool> _confirmUpdate;

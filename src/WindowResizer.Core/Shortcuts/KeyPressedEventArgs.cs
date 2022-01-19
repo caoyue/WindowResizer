@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Windows.Forms;
+using WindowResizer.Common.Shortcuts;
 
-namespace WindowResizer.Core.KeyboardHook
+namespace WindowResizer.Core.Shortcuts
 {
     public class KeyPressedEventArgs : EventArgs
     {

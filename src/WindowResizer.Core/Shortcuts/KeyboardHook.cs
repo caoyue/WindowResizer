@@ -1,17 +1,24 @@
 using System;
 using System.Windows.Forms;
-using static WindowResizer.Core.KeyboardHook.NativeMethods;
+using WindowResizer.Common.Shortcuts;
+using static WindowResizer.Core.Shortcuts.NativeMethods;
 
-namespace WindowResizer.Core.KeyboardHook
+namespace WindowResizer.Core.Shortcuts
 {
-    public sealed class Hook : IDisposable
+
+    public sealed class KeyboardHook : IDisposable
     {
-        private readonly Window _window = new Window();
+        private readonly Window _window = new();
         private int _currentId;
 
-        public Hook()
+        public KeyboardHook()
         {
-            _window.KeyPressed += delegate(object sender, KeyPressedEventArgs args)
+            KeyHook();
+        }
+
+        private void KeyHook()
+        {
+            _window.KeyPressed += delegate (object? _, KeyPressedEventArgs args)
             {
                 KeyPressed?.Invoke(this, args);
             };
@@ -38,7 +45,7 @@ namespace WindowResizer.Core.KeyboardHook
         /// <summary>
         /// A hot key has been pressed.
         /// </summary>
-        public event EventHandler<KeyPressedEventArgs> KeyPressed;
+        public event EventHandler<KeyPressedEventArgs>? KeyPressed;
 
         #region IDisposable Members
 
@@ -66,7 +73,7 @@ namespace WindowResizer.Core.KeyboardHook
                 if (m.Msg != WM_HOTKEY)
                     return;
 
-                var key = (Keys)(((int)m.LParam >> 16) & 0xFFFF);
+                var key = (Keys)((int)m.LParam >> 16 & 0xFFFF);
                 var modifier = (ModifierKeys)((int)m.LParam & 0xFFFF);
                 KeyPressed?.Invoke(this, new KeyPressedEventArgs(modifier, key));
             }
@@ -76,7 +83,7 @@ namespace WindowResizer.Core.KeyboardHook
                 CreateHandle(new CreateParams());
             }
 
-            public event EventHandler<KeyPressedEventArgs> KeyPressed;
+            public event EventHandler<KeyPressedEventArgs>? KeyPressed;
 
             #region IDisposable Members
 

@@ -18,17 +18,17 @@ namespace WindowResizer.Core.WindowControl
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         internal static extern int GetWindowThreadProcessId(IntPtr handle, out uint processId);
 
-        internal delegate bool WindowEnumProc(IntPtr hwnd, IntPtr lparam);
+        internal delegate bool WindowEnumProc(IntPtr hWnd, IntPtr lparam);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         internal static extern IntPtr FindWindow(string strClassName, string strWindowName);
 
         [DllImport("user32.dll")]
-        internal static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
+        internal static extern bool GetWindowRect(IntPtr hWnd, ref Rect rectangle);
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool EnumChildWindows(IntPtr hwnd, WindowEnumProc callback, IntPtr lParam);
+        internal static extern bool EnumChildWindows(IntPtr hWnd, WindowEnumProc callback, IntPtr lParam);
 
         [DllImport("user32.dll")]
         internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);

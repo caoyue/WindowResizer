@@ -5,13 +5,13 @@ namespace WindowResizer.Core.WindowControl
 {
     public class WindowEventHandler
     {
-        private static AutomationEventHandler _eventHandler = null;
+        private static AutomationEventHandler? _eventHandler;
 
         public WindowEventHandler(Action<IntPtr> windowCreatedHandler)
         {
-            _eventHandler = (sender, e) =>
+            _eventHandler = (sender, _) =>
             {
-                AutomationElement src = sender as AutomationElement;
+                var src = sender as AutomationElement;
                 if (src != null)
                 {
                     windowCreatedHandler(new IntPtr(src.Current.NativeWindowHandle));

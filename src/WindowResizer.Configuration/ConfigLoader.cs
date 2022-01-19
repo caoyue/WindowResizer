@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 using Newtonsoft.Json;
 
 namespace WindowResizer.Configuration
@@ -14,55 +13,49 @@ namespace WindowResizer.Configuration
         private static readonly string RoamingPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WindowResizer");
 
-        private static readonly string PortableConfigPath = Path.Combine(
-            Application.StartupPath, ConfigFile);
+        private static string _roamingConfigPath = Path.Combine(RoamingPath, ConfigFile);
 
-        private static readonly string RoamingConfigPath = Path.Combine(
-            RoamingPath, ConfigFile);
+        private static string _portableConfigPath = string.Empty;
 
-        public static bool PortableMode
+        public static bool PortableMode => File.Exists(RoamingPath);
+
+        public static void SetPath(string roamingPath, string portablePath)
         {
-            get { return File.Exists(RoamingPath); }
+            _roamingConfigPath = roamingPath;
+            _portableConfigPath = portablePath;
         }
 
-        public static string ConfigPath
-        {
-            get { return PortableMode ? PortableConfigPath : RoamingConfigPath; }
-        }
+        public static string ConfigPath => PortableMode ? _portableConfigPath : _roamingConfigPath;
 
-        public static Config Config = new Config();
+        public static Config Config = new();
 
         public static void Load()
         {
             if (!File.Exists(ConfigPath))
             {
-                if (Config.WindowSizes == null)
-                {
-                    Config.WindowSizes = new BindingList<WindowSize>();
-                }
-
                 Save();
+                return;
             }
-            else
+
+            var text = File.ReadAllText(ConfigPath);
+            var c = JsonConvert.DeserializeObject<Config>(text);
+            if (c != null)
             {
-                var text = File.ReadAllText(ConfigPath);
-                var c  = JsonConvert.DeserializeObject<Config>(text);
-                if (c != null)
-                {
-                    Config = c;
-                }
-                
-                if (Config.WindowSizes.Any())
-                {
-                    var sortedInstance = new BindingList<WindowSize>(
-                        Config.WindowSizes
-                              .OrderBy(w => w.Name)
-                              .ThenBy(w => w.Title)
-                              .ToList()
-                    );
-                    Config.WindowSizes = sortedInstance;
-                }
+                Config = c;
             }
+
+            if (!Config.WindowSizes.Any())
+            {
+                return;
+            }
+
+            var sortedInstance = new BindingList<WindowSize>(
+                Config.WindowSizes
+                    .OrderBy(w => w.Name)
+                    .ThenBy(w => w.Title)
+                    .ToList()
+            );
+            Config.WindowSizes = sortedInstance;
         }
 
         public static void Save()
@@ -76,13 +69,13 @@ namespace WindowResizer.Configuration
         {
             if (portable && !PortableMode)
             {
-                File.Move(RoamingConfigPath, PortableConfigPath);
+                File.Move(_roamingConfigPath, _portableConfigPath);
             }
 
             if (!portable && PortableMode)
             {
-                new FileInfo(RoamingConfigPath).Directory?.Create();
-                File.Move(PortableConfigPath, RoamingConfigPath);
+                new FileInfo(_roamingConfigPath).Directory?.Create();
+                File.Move(_portableConfigPath, _roamingConfigPath);
             }
         }
     }

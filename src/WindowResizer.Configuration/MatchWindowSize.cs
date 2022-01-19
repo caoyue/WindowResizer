@@ -2,13 +2,13 @@ namespace WindowResizer.Configuration
 {
     public class MatchWindowSize
     {
-        public WindowSize FullMatch { get; set; }
+        public WindowSize? FullMatch { get; set; }
 
-        public WindowSize PrefixMatch { get; set; }
+        public WindowSize? PrefixMatch { get; set; }
 
-        public WindowSize SuffixMatch { get; set; }
+        public WindowSize? SuffixMatch { get; set; }
 
-        public WindowSize WildcardMatch { get; set; }
+        public WindowSize? WildcardMatch { get; set; }
 
         public bool NoMatch =>
             FullMatch == null

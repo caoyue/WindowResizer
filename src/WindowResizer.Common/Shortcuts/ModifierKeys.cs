@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace WindowResizer.Core.KeyboardHook
+namespace WindowResizer.Common.Shortcuts
 {
     [Flags]
     public enum ModifierKeys : uint

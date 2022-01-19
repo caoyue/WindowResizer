@@ -5,9 +5,9 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using WindowResizer.Common.Shortcuts;
 using WindowResizer.Configuration;
-using WindowResizer.Core;
-using WindowResizer.Core.KeyboardHook;
+using WindowResizer.Core.Shortcuts;
 
 namespace WindowResizer
 {
@@ -17,9 +17,9 @@ namespace WindowResizer
         private static HotKeys _restoreKeys;
         private static HotKeys _restoreAllKeys;
         private static bool _disableInFullScreen;
-        private static Hook _hook;
+        private static KeyboardHook _hook;
 
-        public SettingForm(Hook hook)
+        public SettingForm(KeyboardHook hook)
         {
             InitializeComponent();
 
@@ -115,7 +115,9 @@ namespace WindowResizer
             });
             WindowsGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
-                Name = "Rect", DataPropertyName = "Rect", Visible = false,
+                Name = "Rect",
+                DataPropertyName = "Rect",
+                Visible = false,
             });
 
             WindowsGrid.Columns.Add(new DataGridViewCheckBoxColumn
@@ -285,7 +287,8 @@ namespace WindowResizer
 
                     hotKeys = new HotKeys()
                     {
-                        ModifierKeys = keys.ToArray(), Key = pressedKey.ToString()
+                        ModifierKeys = keys.ToArray(),
+                        Key = pressedKey.ToString()
                     };
 
                     textBox.Text = hotKeys.ToKeysString();
@@ -369,7 +372,10 @@ namespace WindowResizer
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
-                Title = "Export Config", AddExtension = true, DefaultExt = "json", FileName = Application.ProductName + "Config.json"
+                Title = "Export Config",
+                AddExtension = true,
+                DefaultExt = "json",
+                FileName = Application.ProductName + "Config.json"
             };
             if (saveFileDialog.ShowDialog() != DialogResult.Cancel && saveFileDialog.FileName != "")
             {

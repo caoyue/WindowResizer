@@ -18,7 +18,7 @@ namespace WindowResizer.Core.WindowControl
             var shellWindow = GetShellWindow();
             var windows = new List<IntPtr>();
 
-            EnumWindows(delegate(IntPtr hWnd, int lParam)
+            EnumWindows(delegate (IntPtr hWnd, int _)
             {
                 if (hWnd == shellWindow) return true;
                 if (!IsWindowVisible(hWnd)) return true;
@@ -63,7 +63,7 @@ namespace WindowResizer.Core.WindowControl
             return NativeMethods.IsWindowVisible(handle);
         }
 
-        public static string GetActiveWindowTitle(IntPtr handle)
+        public static string? GetActiveWindowTitle(IntPtr handle)
         {
             const int nChars = 256;
             var buff = new StringBuilder(nChars);
@@ -87,35 +87,34 @@ namespace WindowResizer.Core.WindowControl
                 (int)SetWindowPosFlags.SWP_NOOWNERZORDER);
         }
 
-        public static string GetProcessName(IntPtr handle)
+        public static string? GetProcessName(IntPtr handle)
         {
             try
             {
-                uint pid;
-                GetWindowThreadProcessId(handle, out pid);
+                _ = GetWindowThreadProcessId(handle, out var pid);
                 var proc = Process.GetProcessById((int)pid);
                 return proc.MainModule?.ModuleName;
             }
             catch (Exception)
             {
-                return string.Empty;
+                return null;
             }
         }
 
-        public static string GetRealProcessName(IntPtr handle)
+        public static string? GetRealProcessName(IntPtr handle)
         {
             try
             {
                 var proc = GetRealProcess(handle);
-                return proc.MainModule?.ModuleName;
+                return proc?.MainModule?.ModuleName;
             }
             catch (Exception)
             {
-                return string.Empty;
+                return null;
             }
         }
 
-        public static Process GetRealProcess(IntPtr handle)
+        public static Process? GetRealProcess(IntPtr handle)
         {
             uint pid;
             GetWindowThreadProcessId(handle, out pid);
@@ -128,9 +127,9 @@ namespace WindowResizer.Core.WindowControl
             return foregroundProcess;
         }
 
-        private static Process _realProcess;
+        private static Process? _realProcess;
 
-        private static Process GetRealProcess(Process foregroundProcess)
+        private static Process? GetRealProcess(Process foregroundProcess)
         {
             EnumChildWindows(foregroundProcess.MainWindowHandle, ChildWindowCallback, IntPtr.Zero);
             return _realProcess;
@@ -138,14 +137,26 @@ namespace WindowResizer.Core.WindowControl
 
         private static bool ChildWindowCallback(IntPtr handle, IntPtr lparam)
         {
-            GetWindowThreadProcessId(handle, out var pid);
-            var process = Process.GetProcessById((int)pid);
-            if (process.ProcessName != "ApplicationFrameHost")
+            _ = GetWindowThreadProcessId(handle, out var pid);
+            var process = GetProcess(pid);
+            if (process != null && process.ProcessName != "ApplicationFrameHost")
             {
                 _realProcess = process;
             }
 
             return true;
+        }
+
+        private static Process? GetProcess(uint pid)
+        {
+            try
+            {
+                return Process.GetProcessById((int)pid);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public static Rect GetRect(IntPtr handle)
@@ -155,12 +166,9 @@ namespace WindowResizer.Core.WindowControl
             return rect;
         }
 
-        public static bool IsForegroundFullScreen(Screen screen = null)
+        public static bool IsForegroundFullScreen(Screen? screen = null)
         {
-            if (screen == null)
-            {
-                screen = Screen.PrimaryScreen;
-            }
+            screen ??= Screen.PrimaryScreen;
 
             var rect = GetRect(GetForegroundWindow());
             return screen.Bounds.Width == rect.Right - rect.Left
