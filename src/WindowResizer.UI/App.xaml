@@ -1,0 +1,16 @@
+<Application x:Class="WindowResizer.UI.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="Views/ContainerWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/WPFUI;component/Styles/Theme/Light.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/WPFUI;component/Styles/WPFUI.xaml" />
+                <ResourceDictionary Source="Assets/StringResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <BitmapImage x:Key="AppIcon" UriSource="Assets/AppIcon.ico" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,43 @@
+<Page x:Class="WindowResizer.UI.Views.AboutPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:controls="clr-namespace:WPFUI.Controls;assembly=WPFUI"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      Title="About">
+    <Grid Margin="0,0,0,12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition MinWidth="480" />
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Row="1" Margin="12,6,12,12">
+            <StackPanel>
+                <controls:CardControl
+                Title="{Binding Version}"
+                Margin="0,0,0,8"
+                Icon="CommentMultiple28"
+                Subtitle="{StaticResource CurrentVersion}">
+                    <controls:Button
+                    Appearance="Primary"
+                    Command="{Binding GoToPageCommand}"
+                    Content="{StaticResource CheckUpdate}" />
+                </controls:CardControl>
+
+                <controls:CardControl
+                Title="{Binding RepoUrl}"
+                Margin="0,0,0,8"
+                Icon="Book24"
+                Subtitle="{StaticResource CurrentRepo}">
+                    <controls:Button
+                    Appearance="Success"
+                    Command="{Binding GoToPageCommand}"
+                    Content="{StaticResource GoToRepo}" />
+                </controls:CardControl>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

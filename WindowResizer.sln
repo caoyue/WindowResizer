@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowResizer.Common", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowResizer.Configuration", "src\WindowResizer.Configuration\WindowResizer.Configuration.csproj", "{19BAFF49-92DB-453E-B53D-4FE13F0EF158}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowResizer", "src\WindowResizer\WindowResizer.csproj", "{2351FD0B-C713-4432-AD06-F3F0EA96C7C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowResizer", "src\WindowResizer\WindowResizer.csproj", "{2351FD0B-C713-4432-AD06-F3F0EA96C7C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowResizer.UI", "src\WindowResizer.UI\WindowResizer.UI.csproj", "{861E8BAE-4D6D-4D62-BA0F-89C8E446259E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +61,14 @@ Global
 		{2351FD0B-C713-4432-AD06-F3F0EA96C7C3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2351FD0B-C713-4432-AD06-F3F0EA96C7C3}.Release|x64.ActiveCfg = Release|Any CPU
 		{2351FD0B-C713-4432-AD06-F3F0EA96C7C3}.Release|x64.Build.0 = Release|Any CPU
+		{861E8BAE-4D6D-4D62-BA0F-89C8E446259E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{861E8BAE-4D6D-4D62-BA0F-89C8E446259E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{861E8BAE-4D6D-4D62-BA0F-89C8E446259E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{861E8BAE-4D6D-4D62-BA0F-89C8E446259E}.Debug|x64.Build.0 = Debug|Any CPU
+		{861E8BAE-4D6D-4D62-BA0F-89C8E446259E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{861E8BAE-4D6D-4D62-BA0F-89C8E446259E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{861E8BAE-4D6D-4D62-BA0F-89C8E446259E}.Release|x64.ActiveCfg = Release|Any CPU
+		{861E8BAE-4D6D-4D62-BA0F-89C8E446259E}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -68,6 +78,7 @@ Global
 		{5B558C42-95B4-450B-A687-B40C4E03B6F0} = {C4CABDDF-2B20-47ED-A60C-CDABFD859432}
 		{19BAFF49-92DB-453E-B53D-4FE13F0EF158} = {C4CABDDF-2B20-47ED-A60C-CDABFD859432}
 		{2351FD0B-C713-4432-AD06-F3F0EA96C7C3} = {C4CABDDF-2B20-47ED-A60C-CDABFD859432}
+		{861E8BAE-4D6D-4D62-BA0F-89C8E446259E} = {C4CABDDF-2B20-47ED-A60C-CDABFD859432}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0BDA6027-46C2-4025-BE55-C45C34EB0DE1}

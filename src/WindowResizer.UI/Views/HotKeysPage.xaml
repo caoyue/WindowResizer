@@ -1,0 +1,72 @@
+<Page x:Class="WindowResizer.UI.Views.HotKeysPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:controls="clr-namespace:WPFUI.Controls;assembly=WPFUI"
+      xmlns:local="clr-namespace:WindowResizer.UI.Controls"
+      mc:Ignorable="d"
+      Title="HotKeys">
+    <Grid Margin="0,0,0,12">
+        <StackPanel>
+            <controls:CardControl
+                Margin="0,0,0,8"
+                Title="{StaticResource SaveShortcut}"
+                Icon="PanelLeftExpand20"
+                Subtitle="{StaticResource SaveShortcutDesc}">
+                <StackPanel Orientation="Horizontal">
+                    <local:KeysVisualControl DataContext="{Binding SaveKeys}" />
+                    <controls:Button
+                        Margin="0,0,16,0"
+                        Icon="Edit20"
+                        Click="ShowKeysDialog"
+                        Appearance="Transparent"
+                        Tag="save"
+                        Content="" />
+                </StackPanel>
+            </controls:CardControl>
+
+            <controls:CardControl
+                Margin="0,0,0,8"
+                Title="{StaticResource RestoreShortcut}"
+                Icon="PanelLeftExpand20"
+                Subtitle="{StaticResource RestoreShortcutDesc}">
+                <StackPanel Orientation="Horizontal">
+                    <local:KeysVisualControl DataContext="{Binding RestoreKeys}" />
+                    <controls:Button
+                        Margin="0,0,16,0"
+                        Icon="Edit20"
+                        Click="ShowKeysDialog"
+                        Appearance="Transparent"
+                        Tag="restore"
+                        Content="" />
+                </StackPanel>
+            </controls:CardControl>
+
+            <controls:CardControl
+                Margin="0,0,0,8"
+                Title="{StaticResource RestoreAllShortcut}"
+                Icon="PanelLeftExpand20"
+                Subtitle="{StaticResource RestoreAllShortcutDesc}">
+                <StackPanel Orientation="Horizontal">
+                    <local:KeysVisualControl DataContext="{Binding RestoreAllKeys}" />
+                    <controls:Button
+                        Margin="0,0,16,0"
+                        Icon="Edit20"
+                        Click="ShowKeysDialog"
+                        Appearance="Transparent"
+                        Tag="restoreAll"
+                        Content="" />
+                </StackPanel>
+            </controls:CardControl>
+
+            <controls:CardControl
+                Title="Disable in fullscreen"
+                Margin="0,0,0,8"
+                Icon="CommentMultiple28"
+                Subtitle="Animated card with a notification displayed at the bottom of the application.">
+                <controls:ToggleSwitch Content="" IsChecked="{Binding DisableInFullscreen}" />
+            </controls:CardControl>
+        </StackPanel>
+    </Grid>
+</Page>

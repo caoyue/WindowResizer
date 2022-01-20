@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\AppIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
+    <PackageReference Include="WPF-UI" Version="1.2.2-prerelease120" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WindowResizer.Common\WindowResizer.Common.csproj" />
+    <ProjectReference Include="..\WindowResizer.Configuration\WindowResizer.Configuration.csproj" />
+    <ProjectReference Include="..\WindowResizer.Core\WindowResizer.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\AppIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Styles" />
+  </ItemGroup>
+
+</Project>

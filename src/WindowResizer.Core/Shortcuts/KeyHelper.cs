@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using WindowResizer.Common.Shortcuts;
 
@@ -25,6 +26,19 @@ namespace WindowResizer.Core.Shortcuts
 
         public static bool ValidateKeys(this HotKeys hotKeys) =>
             hotKeys.ModifierKeys.Length > 0 && !string.IsNullOrEmpty(hotKeys.Key);
+
+        public static List<string> ToKeys(this HotKeys hotKeys)
+        {
+            var list = new List<string>();
+
+            if (hotKeys.Key is not null)
+            {
+                list.AddRange(hotKeys.ModifierKeys);
+                list.Add(hotKeys.Key);
+            }
+
+            return list;
+        }
 
         public static string ToKeysString(this HotKeys hotKeys)
         {
