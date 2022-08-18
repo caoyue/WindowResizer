@@ -5,7 +5,6 @@ using static WindowResizer.Core.Shortcuts.NativeMethods;
 
 namespace WindowResizer.Core.Shortcuts
 {
-
     public sealed class KeyboardHook : IDisposable
     {
         private readonly Window _window = new();
@@ -18,20 +17,27 @@ namespace WindowResizer.Core.Shortcuts
 
         private void KeyHook()
         {
-            _window.KeyPressed += delegate (object? _, KeyPressedEventArgs args)
+            _window.KeyPressed += delegate(object? _, KeyPressedEventArgs args)
             {
                 KeyPressed?.Invoke(this, args);
             };
         }
 
-        public void RegisterHotKey(ModifierKeys modifier, Keys key)
+        public int RegisterHotKey(ModifierKeys modifier, Keys key)
         {
             _currentId += 1;
 
             if (!NativeMethods.RegisterHotKey(_window.Handle, _currentId, (uint)modifier, (uint)key))
             {
-                throw new InvalidOperationException("Couldn't register the hot key.");
+                throw new InvalidOperationException("Couldn't register, hotkey already registered.");
             }
+
+            return _currentId;
+        }
+
+        public void UnRegisterHotKey(int id)
+        {
+            UnregisterHotKey(_window.Handle, id);
         }
 
         public void UnRegisterHotKey()
@@ -47,15 +53,6 @@ namespace WindowResizer.Core.Shortcuts
         /// </summary>
         public event EventHandler<KeyPressedEventArgs>? KeyPressed;
 
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            UnRegisterHotKey();
-            _window.Dispose();
-        }
-
-        #endregion
 
         private class Window : NativeWindow, IDisposable
         {
@@ -85,14 +82,42 @@ namespace WindowResizer.Core.Shortcuts
 
             public event EventHandler<KeyPressedEventArgs>? KeyPressed;
 
-            #region IDisposable Members
+            protected virtual void Dispose(bool disposing)
+            {
+                if (disposing)
+                {
+                    DestroyHandle();
+                }
+            }
 
             public void Dispose()
             {
-                DestroyHandle();
+                Dispose(true);
             }
 
-            #endregion
+            ~Window()
+            {
+                Dispose(false);
+            }
+        }
+
+        private void Dispose(bool disposing)
+        {
+            UnRegisterHotKey();
+            if (disposing)
+            {
+                _window.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        ~KeyboardHook()
+        {
+            Dispose(false);
         }
     }
 }

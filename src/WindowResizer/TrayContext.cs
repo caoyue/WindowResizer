@@ -37,7 +37,7 @@ namespace WindowResizer
             {
                 var message = $"Config file load failed.\nPath: {ConfigLoader.ConfigPath}";
                 Log.Append($"{message}\nException: {e}");
-                ShowMessageBox(message);
+                App.ShowMessageBox(message);
             }
 
             try
@@ -48,7 +48,7 @@ namespace WindowResizer
             {
                 var message = "Register hotkey failed.";
                 Log.Append($"{message}\nException: {e}");
-                ShowMessageBox(message);
+                App.ShowMessageBox(message);
             }
 
             _trayIcon = new NotifyIcon
@@ -109,19 +109,23 @@ namespace WindowResizer
         {
             if (!ConfigLoader.Config.SaveKey.ValidateKeys())
             {
-                ShowMessageBox("Save window hotkeys not valid.");
+                App.ShowMessageBox("Save window hotkeys not valid.");
             }
 
             if (!ConfigLoader.Config.RestoreKey.ValidateKeys())
             {
-                ShowMessageBox("Restore window hotkeys not valid.");
+                App.ShowMessageBox("Restore window hotkeys not valid.");
             }
 
-            _hook.RegisterHotKey(ConfigLoader.Config.SaveKey.GetModifierKeys(), ConfigLoader.Config.SaveKey.GetKey());
-            _hook.RegisterHotKey(ConfigLoader.Config.RestoreKey.GetModifierKeys(),
-                ConfigLoader.Config.RestoreKey.GetKey());
-            _hook.RegisterHotKey(ConfigLoader.Config.RestoreAllKey.GetModifierKeys(),
-                ConfigLoader.Config.RestoreAllKey.GetKey());
+            int id = _hook.RegisterHotKey(ConfigLoader.Config.SaveKey.GetModifierKeys(), ConfigLoader.Config.SaveKey.GetKey());
+            App.RegisteredHotKeys[KeyBindType.Save] = id;
+
+            id = _hook.RegisterHotKey(ConfigLoader.Config.RestoreKey.GetModifierKeys(), ConfigLoader.Config.RestoreKey.GetKey());
+            App.RegisteredHotKeys[KeyBindType.Restore] = id;
+
+            _hook.RegisterHotKey(ConfigLoader.Config.RestoreAllKey.GetModifierKeys(), ConfigLoader.Config.RestoreAllKey.GetKey());
+            App.RegisteredHotKeys[KeyBindType.RestoreAll] = id;
+
             _hook.KeyPressed += OnKeyPressed;
         }
 
@@ -378,11 +382,6 @@ namespace WindowResizer
             backing.Add(item);
             var index = backing.OrderBy(l => l.Name).ThenBy(l => l.Title).ToList().IndexOf(item);
             list.Insert(index, item);
-        }
-
-        private static void ShowMessageBox(string message, string title = nameof(WindowResizer), MessageBoxIcon icon = MessageBoxIcon.Error)
-        {
-            MessageBox.Show(message, title, MessageBoxButtons.OK, icon);
         }
 
         private void ShowTooltips(string message, int tipIcon, int mSeconds) =>

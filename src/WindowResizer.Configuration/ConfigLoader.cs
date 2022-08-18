@@ -33,6 +33,9 @@ namespace WindowResizer.Configuration
         {
             if (!File.Exists(ConfigPath))
             {
+                Config.SaveKey = Config.DefaultSaveKey;
+                Config.RestoreKey = Config.DefaultRestoreKey;
+                Config.RestoreAllKey = Config.DefaultRestoreAllKey;
                 Save();
                 return;
             }
@@ -51,9 +54,9 @@ namespace WindowResizer.Configuration
 
             var sortedInstance = new BindingList<WindowSize>(
                 Config.WindowSizes
-                    .OrderBy(w => w.Name)
-                    .ThenBy(w => w.Title)
-                    .ToList()
+                      .OrderBy(w => w.Name)
+                      .ThenBy(w => w.Title)
+                      .ToList()
             );
             Config.WindowSizes = sortedInstance;
         }

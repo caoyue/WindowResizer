@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel;
 using WindowResizer.Common.Shortcuts;
 
@@ -7,12 +8,39 @@ namespace WindowResizer.Configuration
     {
         public bool DisableInFullScreen { get; set; } = true;
 
-        public HotKeys SaveKey { get; set; } = new() { ModifierKeys = new[] { "Ctrl", "Alt" }, Key = "S" };
+        public Hotkeys SaveKey { get; set; } = new();
 
-        public HotKeys RestoreKey { get; set; } = new() { ModifierKeys = new[] { "Ctrl", "Alt" }, Key = "R" };
+        public Hotkeys RestoreKey { get; set; } = new();
 
-        public HotKeys RestoreAllKey { get; set; } = new() { ModifierKeys = new[] { "Ctrl", "Alt" }, Key = "T" };
+        public Hotkeys RestoreAllKey { get; set; } = new();
 
         public BindingList<WindowSize> WindowSizes { get; set; } = new();
+
+        public static Hotkeys DefaultSaveKey => new()
+        {
+            ModifierKeys = new List<string>
+            {
+                "Ctrl", "Alt"
+            },
+            Key = "S"
+        };
+
+        public static Hotkeys DefaultRestoreKey => new()
+        {
+            ModifierKeys = new List<string>
+            {
+                "Ctrl", "Alt"
+            },
+            Key = "R"
+        };
+
+        public static Hotkeys DefaultRestoreAllKey => new()
+        {
+            ModifierKeys = new List<string>
+            {
+                "Ctrl", "Alt"
+            },
+            Key = "T"
+        };
     }
 }

@@ -4,8 +4,8 @@
         <OutputType>WinExe</OutputType>
         <TargetFramework>net47</TargetFramework>
         <UseWindowsForms>true</UseWindowsForms>
-        <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
         <PlatformTarget>x64</PlatformTarget>
+        <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
         <Version>1.0.0</Version>
         <ProductName>WindowResizer</ProductName>
         <Authors>caoyue</Authors>
@@ -20,15 +20,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Include="..\..\README.md">
-        <Pack>True</Pack>
-        <PackagePath>\</PackagePath>
-      </None>
+        <None Include="..\..\README.md">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="squirrel.windows" Version="2.0.1" />
-        <PackageReference Include="System.Resources.Extensions" Version="5.0.0" />
+        <PackageReference Include="System.Resources.Extensions" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -38,25 +38,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="Resources.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Resources.resx</DependentUpon>
-        </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-        <EmbeddedResource Update="Resources.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="Resources\AppIcon.png">
-        <Pack>True</Pack>
-        <PackagePath>\</PackagePath>
-      </None>
+        <None Update="Resources\AppIcon.png">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
     </ItemGroup>
 
 </Project>

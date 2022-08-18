@@ -6,7 +6,7 @@ namespace WindowResizer.Core.Shortcuts
 {
     public static class KeyHelper
     {
-        public static ModifierKeys GetModifierKeys(this HotKeys hotKeys)
+        public static ModifierKeys GetModifierKeys(this Hotkeys hotKeys)
         {
             ModifierKeys keys = 0;
             foreach (var k in hotKeys.ModifierKeys)
@@ -20,21 +20,32 @@ namespace WindowResizer.Core.Shortcuts
             return keys;
         }
 
-        public static Keys GetKey(this HotKeys hotKeys) =>
-            Enum.TryParse(hotKeys.Key, true, out Keys k) ? k : new HotKeys().GetKey();
+        public static Keys GetKey(this Hotkeys hotKeys) =>
+            Enum.TryParse(hotKeys.Key, true, out Keys k)
+                ? k
+                : throw new ArgumentException($"Key {hotKeys.Key} not valid.");
 
-        public static bool ValidateKeys(this HotKeys hotKeys) =>
-            hotKeys.ModifierKeys.Length > 0 && !string.IsNullOrEmpty(hotKeys.Key);
-
-        public static string ToKeysString(this HotKeys hotKeys)
+        public static bool IsModifierKey(this Keys key)
         {
-            var str = string.Empty;
-            if (hotKeys.ModifierKeys.Length > 0)
-            {
-                str += string.Join(" + ", hotKeys.ModifierKeys);
-            }
-
-            return $"{str} + {hotKeys.Key}";
+            return key is Keys.Control or Keys.LControlKey or Keys.RControlKey
+                or Keys.Shift or Keys.LShiftKey or Keys.RShiftKey
+                or Keys.Alt or Keys.Menu or Keys.LMenu or Keys.RMenu
+                or Keys.LWin or Keys.RWin;
         }
+
+        public static string ToKeyString(this Keys key)
+        {
+            return key switch
+            {
+                Keys.Control or Keys.LControlKey or Keys.RControlKey => ModifierKeys.Ctrl.ToString(),
+                Keys.Shift or Keys.LShiftKey or Keys.RShiftKey => ModifierKeys.Shift.ToString(),
+                Keys.Alt or Keys.Alt or Keys.Menu or Keys.LMenu or Keys.RMenu => ModifierKeys.Alt.ToString(),
+                Keys.LWin or Keys.RWin => ModifierKeys.Win.ToString(),
+                _ => key.ToString()
+            };
+        }
+
+        public static bool ValidateKeys(this Hotkeys hotKeys) =>
+            hotKeys.ModifierKeys.Count > 0 && !string.IsNullOrEmpty(hotKeys.Key);
     }
 }
