@@ -184,7 +184,7 @@ namespace WindowResizer
             }
 
             var process = Resizer.GetRealProcess(handle);
-            if (process == null || !TryGetProcessName(process, out string processName))
+            if (process == null || !TryGetProcessName(process, out string processName, tips))
             {
                 return;
             }
@@ -221,7 +221,7 @@ namespace WindowResizer
             UpdateOrSaveConfig(match, processName, title, Resizer.GetRect(handle), state);
         }
 
-        private bool TryGetProcessName(Process process, out string processName)
+        private bool TryGetProcessName(Process process, out string processName, bool tips = true)
         {
             try
             {
@@ -230,9 +230,13 @@ namespace WindowResizer
             }
             catch (Exception e)
             {
-                var message = $"Unable to resize process <{process.ProcessName}>, elevated privileges may be required.";
-                ShowTooltips(message, 2, 1500);
-                Log.Append($"{message}\nException: {e}");
+                if (tips)
+                {
+                    var message = $"Unable to resize process <{process.ProcessName}>, elevated privileges may be required.";
+                    ShowTooltips(message, 2, 1500);
+                    Log.Append($"{message}\nException: {e}");
+                }
+
                 processName = null;
                 return false;
             }
