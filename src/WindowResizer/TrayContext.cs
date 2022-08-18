@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -26,7 +27,7 @@ namespace WindowResizer
             try
             {
                 var roamingPath = Path.Combine(Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WindowResizer"), ConfigFile);
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(WindowResizer)), ConfigFile);
                 var portablePath = Path.Combine(
                     Application.StartupPath, ConfigFile);
                 ConfigLoader.SetPath(roamingPath, portablePath);
@@ -34,7 +35,9 @@ namespace WindowResizer
             }
             catch (Exception e)
             {
-                MessageBox.Show($"WindowResizer: config load failed! Exception: {e.Message}");
+                var message = $"Config file load failed.\nPath: {ConfigLoader.ConfigPath}";
+                Log.Append($"{message}\nException: {e}");
+                ShowMessageBox(message);
             }
 
             try
@@ -43,7 +46,9 @@ namespace WindowResizer
             }
             catch (Exception e)
             {
-                MessageBox.Show($"WindowResizer: register hotkey failed! Exception: {e.Message}");
+                var message = "Register hotkey failed.";
+                Log.Append($"{message}\nException: {e}");
+                ShowMessageBox(message);
             }
 
             _trayIcon = new NotifyIcon
@@ -56,7 +61,7 @@ namespace WindowResizer
                         new MenuItem("Exit", OnExit),
                     }),
                 Visible = true,
-                Text = "WindowResizer"
+                Text = nameof(WindowResizer)
             };
 
             _trayIcon.DoubleClick += OnSetting;
@@ -79,10 +84,6 @@ namespace WindowResizer
                 MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
             return res == DialogResult.OK;
         }
-
-        private void ShowTooltips(string message, bool isError, int mSeconds) =>
-            _trayIcon.ShowBalloonTip(mSeconds, "WindowResizer", message,
-                isError ? ToolTipIcon.Error : ToolTipIcon.Info);
 
         private void OnExit(object sender, EventArgs e)
         {
@@ -108,12 +109,12 @@ namespace WindowResizer
         {
             if (!ConfigLoader.Config.SaveKey.ValidateKeys())
             {
-                MessageBox.Show("Save window hotkeys not valid.");
+                ShowMessageBox("Save window hotkeys not valid.");
             }
 
             if (!ConfigLoader.Config.RestoreKey.ValidateKeys())
             {
-                MessageBox.Show("Restore window hotkeys not valid.");
+                ShowMessageBox("Restore window hotkeys not valid.");
             }
 
             _hook.RegisterHotKey(ConfigLoader.Config.SaveKey.GetModifierKeys(), ConfigLoader.Config.SaveKey.GetKey());
@@ -126,35 +127,44 @@ namespace WindowResizer
 
         private void OnKeyPressed(object sender, KeyPressedEventArgs e)
         {
-            if (ConfigLoader.Config.DisableInFullScreen && Resizer.IsForegroundFullScreen())
+            try
             {
-                return;
-            }
+                if (ConfigLoader.Config.DisableInFullScreen && Resizer.IsForegroundFullScreen())
+                {
+                    return;
+                }
 
-            if (e.Modifier == ConfigLoader.Config.RestoreAllKey.GetModifierKeys()
-                && e.Key == ConfigLoader.Config.RestoreAllKey.GetKey())
-            {
-                var windows = Resizer.GetOpenWindows();
-                windows.Reverse();
-                foreach (var window in windows)
+                if (e.Modifier == ConfigLoader.Config.RestoreAllKey.GetModifierKeys()
+                    && e.Key == ConfigLoader.Config.RestoreAllKey.GetKey())
                 {
-                    ResizeWindow(window);
+                    var windows = Resizer.GetOpenWindows();
+                    windows.Reverse();
+                    foreach (var window in windows)
+                    {
+                        ResizeWindow(window);
+                    }
+                }
+                else
+                {
+                    var handle = Resizer.GetForegroundHandle();
+
+                    if (e.Modifier == ConfigLoader.Config.SaveKey.GetModifierKeys() &&
+                        e.Key == ConfigLoader.Config.SaveKey.GetKey())
+                    {
+                        UpdateOrSaveWindowSize(handle);
+                    }
+                    else if (e.Modifier == ConfigLoader.Config.RestoreKey.GetModifierKeys() &&
+                             e.Key == ConfigLoader.Config.RestoreKey.GetKey())
+                    {
+                        ResizeWindow(handle, true);
+                    }
                 }
             }
-            else
+            catch (Exception exception)
             {
-                var handle = Resizer.GetForegroundHandle();
-
-                if (e.Modifier == ConfigLoader.Config.SaveKey.GetModifierKeys() &&
-                    e.Key == ConfigLoader.Config.SaveKey.GetKey())
-                {
-                    UpdateOrSaveWindowSize(handle);
-                }
-                else if (e.Modifier == ConfigLoader.Config.RestoreKey.GetModifierKeys() &&
-                         e.Key == ConfigLoader.Config.RestoreKey.GetKey())
-                {
-                    ResizeWindow(handle, true);
-                }
+                var message = "An error occurred, check the log file for more details.";
+                ShowTooltips(message, 2, 2000);
+                Log.Append($"Exception: {exception}");
             }
         }
 
@@ -174,9 +184,11 @@ namespace WindowResizer
             }
 
             var process = Resizer.GetRealProcess(handle);
-            if (process == null) return;
+            if (process == null || !TryGetProcessName(process, out string processName))
+            {
+                return;
+            }
 
-            var processName = process.MainModule?.ModuleName;
             if (string.IsNullOrWhiteSpace(processName)) return;
 
             var title = process.MainWindowTitle;
@@ -190,8 +202,7 @@ namespace WindowResizer
                 if (tips)
                 {
                     var titleStr = string.IsNullOrWhiteSpace(title) ? "" : $"({title})";
-                    _trayIcon.ShowBalloonTip(2000, "WindowResizer",
-                        $"No saved settings for <{processName}>{titleStr}.", ToolTipIcon.Info);
+                    ShowTooltips($"No saved settings for <{processName}>{titleStr}.", 1, 2000);
                 }
             }
         }
@@ -199,16 +210,32 @@ namespace WindowResizer
         private void UpdateOrSaveWindowSize(IntPtr handle)
         {
             var process = Resizer.GetRealProcess(handle);
-            if (process is null)
+            if (process is null || !TryGetProcessName(process, out string processName))
             {
                 return;
             }
 
-            var processName = process.MainModule?.ModuleName;
             var title = process.MainWindowTitle;
             var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, title);
             var state = Resizer.GetWindowState(handle);
             UpdateOrSaveConfig(match, processName, title, Resizer.GetRect(handle), state);
+        }
+
+        private bool TryGetProcessName(Process process, out string processName)
+        {
+            try
+            {
+                processName = process.MainModule?.ModuleName;
+                return true;
+            }
+            catch (Exception e)
+            {
+                var message = $"Unable to resize process <{process.ProcessName}>, elevated privileges may be required.";
+                ShowTooltips(message, 2, 1500);
+                Log.Append($"{message}\nException: {e}");
+                processName = null;
+                return false;
+            }
         }
 
         private static MatchWindowSize GetMatchWindowSize(
@@ -218,8 +245,8 @@ namespace WindowResizer
             bool auto = false)
         {
             var windows = windowSizes.Where(w =>
-                    w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+                                         w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase))
+                                     .ToList();
 
             if (auto)
             {
@@ -285,19 +312,13 @@ namespace WindowResizer
                 // Add a wildcard match for all titles
                 InsertOrder(new WindowSize
                 {
-                    Name = processName,
-                    Title = "*",
-                    Rect = rect,
-                    State = state
+                    Name = processName, Title = "*", Rect = rect, State = state
                 });
                 if (!string.IsNullOrWhiteSpace(title))
                 {
                     InsertOrder(new WindowSize
                     {
-                        Name = processName,
-                        Title = title,
-                        Rect = rect,
-                        State = state
+                        Name = processName, Title = title, Rect = rect, State = state
                     });
                 }
 
@@ -314,10 +335,7 @@ namespace WindowResizer
             {
                 InsertOrder(new WindowSize
                 {
-                    Name = processName,
-                    Title = title,
-                    Rect = rect,
-                    State = state
+                    Name = processName, Title = title, Rect = rect, State = state
                 });
             }
 
@@ -342,10 +360,7 @@ namespace WindowResizer
             {
                 InsertOrder(new WindowSize
                 {
-                    Name = processName,
-                    Title = "*",
-                    Rect = rect,
-                    State = state
+                    Name = processName, Title = "*", Rect = rect, State = state
                 });
             }
 
@@ -360,5 +375,13 @@ namespace WindowResizer
             var index = backing.OrderBy(l => l.Name).ThenBy(l => l.Title).ToList().IndexOf(item);
             list.Insert(index, item);
         }
+
+        private static void ShowMessageBox(string message, string title = nameof(WindowResizer), MessageBoxIcon icon = MessageBoxIcon.Error)
+        {
+            MessageBox.Show(message, title, MessageBoxButtons.OK, icon);
+        }
+
+        private void ShowTooltips(string message, int tipIcon, int mSeconds) =>
+            _trayIcon.ShowBalloonTip(mSeconds, nameof(WindowResizer), message, (ToolTipIcon)tipIcon);
     }
 }

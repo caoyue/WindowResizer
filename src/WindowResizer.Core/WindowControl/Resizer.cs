@@ -76,15 +76,17 @@ namespace WindowResizer.Core.WindowControl
             ShowWindow(handle, (int)ShowWindowFlags.SW_SHOWMAXIMIZED);
         }
 
-        public static void MoveWindow(IntPtr handle, Rect rect)
+        public static bool MoveWindow(IntPtr handle, Rect rect)
         {
             if (handle == IntPtr.Zero)
-                return;
+                return false;
 
             ShowWindow(handle, (int)ShowWindowFlags.SW_SHOWNORMAL);
-            SetWindowPos(handle, 0, rect.Left, rect.Top,
+            var result = SetWindowPos(handle, 0, rect.Left, rect.Top,
                 rect.Right - rect.Left, rect.Bottom - rect.Top,
                 (int)SetWindowPosFlags.SWP_NOOWNERZORDER);
+
+            return result == IntPtr.Zero;
         }
 
         public static string? GetProcessName(IntPtr handle)

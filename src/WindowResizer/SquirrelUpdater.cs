@@ -8,10 +8,10 @@ namespace WindowResizer
 {
     public class SquirrelUpdater
     {
-        private readonly Action<string, bool, int> _showTips;
+        private readonly Action<string, int, int> _showTips;
         private readonly Func<string, bool> _confirmUpdate;
 
-        public SquirrelUpdater(Func<string, bool> confirmUpdate, Action<string, bool, int> showTips = null)
+        public SquirrelUpdater(Func<string, bool> confirmUpdate, Action<string, int, int> showTips = null)
         {
             _confirmUpdate = confirmUpdate;
             _showTips = showTips;
@@ -43,14 +43,14 @@ namespace WindowResizer
                     var updateResult = await mgr.UpdateApp();
                     if (updateResult != null)
                     {
-                        _showTips?.Invoke($" Version {updateResult.Version} download complete. The app will restart to take effect.", false, 2000);
+                        _showTips?.Invoke($" Version {updateResult.Version} download complete. The app will restart to take effect.", 1, 2000);
                         UpdateManager.RestartApp();
                     }
                 }
             }
             catch (Exception e)
             {
-                _showTips?.Invoke($"Check update error, {e.Message}.", true, 2000);
+                _showTips?.Invoke($"Check update error, {e.Message}.", 2, 2000);
             }
         }
     }
