@@ -23,7 +23,7 @@ namespace WindowResizer.Core.WindowControl
             Automation.AddAutomationEventHandler(
                 WindowPattern.WindowOpenedEvent,
                 AutomationElement.RootElement,
-                TreeScope.Subtree,
+                TreeScope.Children,
                 _eventHandler
             );
 
