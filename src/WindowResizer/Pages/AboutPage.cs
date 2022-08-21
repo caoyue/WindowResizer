@@ -5,7 +5,6 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using WindowResizer.Configuration;
 
-
 // ReSharper disable once CheckNamespace
 namespace WindowResizer
 {
@@ -71,9 +70,7 @@ namespace WindowResizer
 
                 ConfigLoader.Config = config;
                 ConfigLoader.Save();
-
-                App.ShowMessageBox("Restart app to take effect.");
-                Application.Exit();
+                ReloadConfig();
             }
             catch (Exception)
             {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace WindowResizer
+namespace WindowResizer.Utils
 {
     public static class Log
     {

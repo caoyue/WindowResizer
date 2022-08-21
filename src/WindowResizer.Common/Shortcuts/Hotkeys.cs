@@ -6,7 +6,7 @@ namespace WindowResizer.Common.Shortcuts
 {
     public class Hotkeys
     {
-        public List<string> ModifierKeys { get; set; } = new();
+        public HashSet<string> ModifierKeys { get; set; } = new();
 
         public string? Key { get; set; }
 
@@ -18,7 +18,7 @@ namespace WindowResizer.Common.Shortcuts
 
         public string ToKeysString()
         {
-            return string.Join("+", GetAllKeys());
+            return string.Join(" + ", GetAllKeys());
         }
 
         public override bool Equals(object? obj)

@@ -12,22 +12,25 @@ namespace WindowResizer
 
         public SettingForm(KeyboardHook hook)
         {
-            InitializeComponent();
-
             _hook = hook;
 
+            InitializeComponent();
             InitWindow();
+
+            StartPosition = FormStartPosition.CenterScreen;
         }
 
         private void InitWindow()
         {
+            Font = new System.Drawing.Font(App.DefaultFontFamilyName, 9F);
+
             FormBorderStyle = FormBorderStyle.FixedSingle;
 
             FormClosing += SettingForm_Closing;
             Text = "WindowResizer - Setting";
 
-            ShortcutPageInit();
-            ConfigPageInit();
+            HotkeysPageInit();
+            ProcessesPageInit();
             AboutPageInit();
         }
 
@@ -42,13 +45,15 @@ namespace WindowResizer
             Hide();
         }
 
-        private void InitConfig(Config config)
+        public delegate void ConfigReloadEvent();
+
+        public ConfigReloadEvent ConfigReload;
+
+        private void ReloadConfig()
         {
-            WindowsGrid.DataSource = config.WindowSizes;
-            SaveKeyLabel.Text = config.SaveKey.ToKeysString();
-            RestoreKeyLabel.Text = config.RestoreKey.ToKeysString();
-            RestoreAllKeyLabel.Text = config.RestoreAllKey.ToKeysString();
-            DisableInFullScreenCheckBox.Checked = config.DisableInFullScreen;
+            HotkeysPageInit();
+            ConfigReload();
+            ProcessesGrid.DataSource = ConfigLoader.Config.WindowSizes;
         }
     }
 }

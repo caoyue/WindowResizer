@@ -4,9 +4,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using WindowResizer.Common.Shortcuts;
 using WindowResizer.Configuration;
 using WindowResizer.Core.Shortcuts;
 using WindowResizer.Core.WindowControl;
+using WindowResizer.Utils;
 
 namespace WindowResizer
 {
@@ -37,19 +39,10 @@ namespace WindowResizer
             {
                 var message = $"Config file load failed.\nPath: {ConfigLoader.ConfigPath}";
                 Log.Append($"{message}\nException: {e}");
-                App.ShowMessageBox(message);
+                Helper.ShowMessageBox(message);
             }
 
-            try
-            {
-                RegisterHotkey();
-            }
-            catch (Exception e)
-            {
-                var message = "Register hotkey failed.";
-                Log.Append($"{message}\nException: {e}");
-                App.ShowMessageBox(message);
-            }
+            RegisterHotkey();
 
             _trayIcon = new NotifyIcon
             {
@@ -69,7 +62,10 @@ namespace WindowResizer
             _windowEventHandler = new WindowEventHandler(OnWindowCreated);
             _windowEventHandler.AddWindowCreateHandle();
 
-            _updater = new SquirrelUpdater(ConfirmUpdate, ShowTooltips);
+            _updater = new SquirrelUpdater(ConfirmUpdate, (message, tipIcon, seconds) =>
+            {
+                ShowTooltips(message, (ToolTipIcon)tipIcon, seconds);
+            });
             Update();
         }
 
@@ -100,6 +96,7 @@ namespace WindowResizer
             if (_settingForm == null)
             {
                 _settingForm = new SettingForm(_hook);
+                _settingForm.ConfigReload += ReloadConfig;
             }
 
             _settingForm.Show();
@@ -109,24 +106,32 @@ namespace WindowResizer
         {
             if (!ConfigLoader.Config.SaveKey.ValidateKeys())
             {
-                App.ShowMessageBox("Save window hotkeys not valid.");
+                Helper.ShowMessageBox("Save window hotkeys not valid.");
             }
 
             if (!ConfigLoader.Config.RestoreKey.ValidateKeys())
             {
-                App.ShowMessageBox("Restore window hotkeys not valid.");
+                Helper.ShowMessageBox("Restore window hotkeys not valid.");
             }
 
-            int id = _hook.RegisterHotKey(ConfigLoader.Config.SaveKey.GetModifierKeys(), ConfigLoader.Config.SaveKey.GetKey());
-            App.RegisteredHotKeys[KeyBindType.Save] = id;
-
-            id = _hook.RegisterHotKey(ConfigLoader.Config.RestoreKey.GetModifierKeys(), ConfigLoader.Config.RestoreKey.GetKey());
-            App.RegisteredHotKeys[KeyBindType.Restore] = id;
-
-            _hook.RegisterHotKey(ConfigLoader.Config.RestoreAllKey.GetModifierKeys(), ConfigLoader.Config.RestoreAllKey.GetKey());
-            App.RegisteredHotKeys[KeyBindType.RestoreAll] = id;
+            RegisterHotkey(ConfigLoader.Config.SaveKey, KeyBindType.Save);
+            RegisterHotkey(ConfigLoader.Config.RestoreKey, KeyBindType.Restore);
+            RegisterHotkey(ConfigLoader.Config.RestoreAllKey, KeyBindType.RestoreAll);
 
             _hook.KeyPressed += OnKeyPressed;
+        }
+
+        private void RegisterHotkey(Hotkeys hotkeys, KeyBindType type)
+        {
+            try
+            {
+                var id = _hook.RegisterHotKey(hotkeys.GetModifierKeys(), hotkeys.GetKey());
+                App.RegisteredHotKeys[type] = id;
+            }
+            catch (Exception)
+            {
+                Helper.ShowMessageBox($"Register hotkey {hotkeys.ToKeysString()} failed.");
+            }
         }
 
         private void OnKeyPressed(object sender, KeyPressedEventArgs e)
@@ -166,8 +171,8 @@ namespace WindowResizer
             }
             catch (Exception exception)
             {
-                var message = "An error occurred, check the log file for more details.";
-                ShowTooltips(message, 2, 2000);
+                var message = "An error occurred.\nCheck the log file for more details.";
+                ShowTooltips(message, ToolTipIcon.Error, 2000);
                 Log.Append($"Exception: {exception}");
             }
         }
@@ -206,7 +211,7 @@ namespace WindowResizer
                 if (tips)
                 {
                     var titleStr = string.IsNullOrWhiteSpace(title) ? "" : $"({title})";
-                    ShowTooltips($"No saved settings for <{processName}>{titleStr}.", 1, 2000);
+                    ShowTooltips($"No saved settings for <{processName}>{titleStr}.", ToolTipIcon.Info, 2000);
                 }
             }
         }
@@ -237,7 +242,7 @@ namespace WindowResizer
                 if (tips)
                 {
                     var message = $"Unable to resize process <{process.ProcessName}>, elevated privileges may be required.";
-                    ShowTooltips(message, 2, 1500);
+                    ShowTooltips(message, ToolTipIcon.Warning, 1500);
                     Log.Append($"{message}\nException: {e}");
                 }
 
@@ -384,7 +389,14 @@ namespace WindowResizer
             list.Insert(index, item);
         }
 
-        private void ShowTooltips(string message, int tipIcon, int mSeconds) =>
-            _trayIcon.ShowBalloonTip(mSeconds, nameof(WindowResizer), message, (ToolTipIcon)tipIcon);
+        private void ReloadConfig()
+        {
+            _hook.UnRegisterHotKey();
+            RegisterHotkey();
+            ShowTooltips("Config reloaded.", ToolTipIcon.Info, 2000);
+        }
+
+        private void ShowTooltips(string message, ToolTipIcon tipIcon, int mSeconds) =>
+            _trayIcon.ShowBalloonTip(mSeconds, nameof(WindowResizer), message, tipIcon);
     }
 }

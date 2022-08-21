@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using WindowResizer.Common.Shortcuts;
 using WindowResizer.Configuration;
 using WindowResizer.Core.Shortcuts;
+using WindowResizer.Utils;
 
 // ReSharper disable once CheckNamespace
 namespace WindowResizer
@@ -16,7 +18,7 @@ namespace WindowResizer
         private readonly Hotkeys _hotKeys = new Hotkeys();
 
         private readonly GlobalKeyboardHook _globalHook = new GlobalKeyboardHook();
-        private readonly List<Keys> _pressedKeys = new List<Keys>();
+        private readonly HashSet<Keys> _pressedKeys = new HashSet<Keys>();
 
         private class KeyBindControl
         {
@@ -36,41 +38,29 @@ namespace WindowResizer
 
         private readonly List<KeyBindControl> _keyBindControls = new List<KeyBindControl>();
 
-        private void ShortcutPageInit()
+        private void HotkeysPageInit()
         {
             _globalHook.KeyDown += HookOnKeyDown;
             _globalHook.KeyUp += HookOnKeyUp;
 
+            _keyBindControls.Clear();
             _keyBindControls.Add(new KeyBindControl(KeyBindType.Save, SaveKeyBtn, SaveKeyLabel));
             _keyBindControls.Add(new KeyBindControl(KeyBindType.Restore, RestoreKeyBtn, RestoreKeyLabel));
             _keyBindControls.Add(new KeyBindControl(KeyBindType.RestoreAll, RestoreAllKeyBtn, RestoreAllKeyLabel));
+
+            Helper.SetToolTip(SaveLabel, "Save foreground window size and position.");
+            Helper.SetToolTip(RestoreLabel, "Restore foreground window size and position.");
+            Helper.SetToolTip(RestoreAllLabel, "Restore all saved windows size and position.");
 
             foreach (var control in _keyBindControls)
             {
                 control.Button.Click += (sender, e) => OnBindButtonClick(control, sender, e);
                 control.Label.Text = GetLabelByType(control.Type);
+                control.Label.Font = Helper.ChangeFontSize(SaveLabel.Font, 12F, FontStyle.Bold);
             }
 
             DisableInFullScreenCheckBox.Checked = ConfigLoader.Config.DisableInFullScreen;
             DisableInFullScreenCheckBox.CheckedChanged += DisableInFullScreen_CheckedChanged;
-        }
-
-        private string GetLabelByType(KeyBindType type)
-        {
-            switch (type)
-            {
-                case KeyBindType.Save:
-                    return ConfigLoader.Config.SaveKey.ToKeysString();
-
-                case KeyBindType.Restore:
-                    return ConfigLoader.Config.RestoreKey.ToKeysString();
-
-                case KeyBindType.RestoreAll:
-                    return ConfigLoader.Config.RestoreAllKey.ToKeysString();
-
-                default:
-                    return string.Empty;
-            }
         }
 
         private void OnBindButtonClick(KeyBindControl control, object sender, EventArgs e)
@@ -90,12 +80,11 @@ namespace WindowResizer
             args.Handled = true;
 
             var key = args.KeyCode;
-            if (_pressedKeys.Contains(key))
+
+            if (!_pressedKeys.Add(key))
             {
                 return;
             }
-
-            _pressedKeys.Add(key);
 
             if (key.IsModifierKey())
             {
@@ -114,10 +103,7 @@ namespace WindowResizer
             args.Handled = true;
 
             var key = args.KeyCode;
-            if (_pressedKeys.Contains(key))
-            {
-                _pressedKeys.Remove(key);
-            }
+            _pressedKeys.Remove(key);
 
             if (_pressedKeys.Count == 0)
             {
@@ -167,11 +153,11 @@ namespace WindowResizer
                 control.Button.Enabled = true;
             }
 
-            if (!IsKeyChanged(_bindingControl.Type))
+            if (!_hotKeys.ValidateKeys() || !IsKeyChanged(_bindingControl.Type))
             {
+                _bindingControl.Label.Text = GetLabelByType(_bindingControl.Type);
                 return;
             }
-
 
             DialogResult dr = MessageBox.Show($"Set {_bindingControl.Type.ToString()} key to {_hotKeys.ToKeysString()}?", "Hotkey",
                 MessageBoxButtons.OKCancel);
@@ -184,7 +170,7 @@ namespace WindowResizer
                 }
                 catch (Exception e)
                 {
-                    App.ShowMessageBox(e.Message);
+                    Helper.ShowMessageBox(e.Message);
                     _bindingControl.Label.Text = GetLabelByType(_bindingControl.Type);
                     return;
                 }
@@ -196,26 +182,31 @@ namespace WindowResizer
 
                 App.RegisteredHotKeys[_bindingControl.Type] = keyId;
 
-                switch (_bindingControl.Type)
-                {
-                    case KeyBindType.Save:
-                        ConfigLoader.Config.SaveKey = _hotKeys;
-                        break;
-
-                    case KeyBindType.Restore:
-                        ConfigLoader.Config.RestoreKey = _hotKeys;
-                        break;
-
-                    case KeyBindType.RestoreAll:
-                        ConfigLoader.Config.RestoreAllKey = _hotKeys;
-                        break;
-                }
+                SetKeys(_bindingControl.Type, _hotKeys);
 
                 ConfigLoader.Save();
             }
             else
             {
                 _bindingControl.Label.Text = GetLabelByType(_bindingControl.Type);
+            }
+        }
+
+        private string GetLabelByType(KeyBindType type)
+        {
+            switch (type)
+            {
+                case KeyBindType.Save:
+                    return ConfigLoader.Config.SaveKey.ToKeysString();
+
+                case KeyBindType.Restore:
+                    return ConfigLoader.Config.RestoreKey.ToKeysString();
+
+                case KeyBindType.RestoreAll:
+                    return ConfigLoader.Config.RestoreAllKey.ToKeysString();
+
+                default:
+                    return string.Empty;
             }
         }
 
@@ -241,6 +232,30 @@ namespace WindowResizer
         {
             ConfigLoader.Config.DisableInFullScreen = DisableInFullScreenCheckBox.Checked;
             ConfigLoader.Save();
+        }
+
+        private void SetKeys(KeyBindType type, Hotkeys hotkeys)
+        {
+            switch (type)
+            {
+                case KeyBindType.Save:
+                    SetKeys(ConfigLoader.Config.SaveKey, hotkeys);
+                    break;
+
+                case KeyBindType.Restore:
+                    SetKeys(ConfigLoader.Config.RestoreKey, hotkeys);
+                    break;
+
+                case KeyBindType.RestoreAll:
+                    SetKeys(ConfigLoader.Config.RestoreAllKey, hotkeys);
+                    break;
+            }
+        }
+
+        private void SetKeys(Hotkeys configKeys, Hotkeys hotkeys)
+        {
+            configKeys.ModifierKeys = hotkeys.ModifierKeys;
+            configKeys.Key = hotkeys.Key;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace WindowResizer.Configuration
 
         public static Hotkeys DefaultSaveKey => new()
         {
-            ModifierKeys = new List<string>
+            ModifierKeys = new HashSet<string>
             {
                 "Ctrl", "Alt"
             },
@@ -27,7 +27,7 @@ namespace WindowResizer.Configuration
 
         public static Hotkeys DefaultRestoreKey => new()
         {
-            ModifierKeys = new List<string>
+            ModifierKeys = new HashSet<string>
             {
                 "Ctrl", "Alt"
             },
@@ -36,7 +36,7 @@ namespace WindowResizer.Configuration
 
         public static Hotkeys DefaultRestoreAllKey => new()
         {
-            ModifierKeys = new List<string>
+            ModifierKeys = new HashSet<string>
             {
                 "Ctrl", "Alt"
             },

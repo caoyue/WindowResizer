@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
@@ -17,7 +17,12 @@
         <RepositoryUrl>https://github.com/caoyue/WindowResizer</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>windows;desktip;shortcuts</PackageTags>
+        <ApplicationIcon>Resources\AppIcon.ico</ApplicationIcon>
     </PropertyGroup>
+
+    <ItemGroup>
+      <Content Include="Resources\AppIcon.ico" />
+    </ItemGroup>
 
     <ItemGroup>
         <None Include="..\..\README.md">
