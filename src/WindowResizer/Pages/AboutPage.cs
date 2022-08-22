@@ -14,13 +14,22 @@ namespace WindowResizer
 
         private void AboutPageInit()
         {
-            PortableModeCheckBox.Checked = ConfigLoader.PortableMode;
-            PortableModeCheckBox.CheckedChanged += PortableModeCheckBox_CheckedChanged;
+            UpdateCheckBox.Checked = ConfigLoader.Config.CheckUpdate;
+            UpdateCheckBox.CheckedChanged += UpdateCheckBox_CheckedChanged;
 
-            GithubLabel.Text = $"WindowResizer {Application.ProductVersion}";
+            VersionLabel.Text = $"WindowResizer {Application.ProductVersion}";
 
             GithubLinkLabel.Text = ProjectLink;
             GithubLinkLabel.LinkClicked += LinkClicked;
+
+            PortableModeCheckBox.Checked = ConfigLoader.PortableMode;
+            PortableModeCheckBox.CheckedChanged += PortableModeCheckBox_CheckedChanged;
+        }
+
+        private void UpdateCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            ConfigLoader.Config.CheckUpdate = UpdateCheckBox.Checked;
+            ConfigLoader.Save();
         }
 
         private void LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

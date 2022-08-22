@@ -62,11 +62,14 @@ namespace WindowResizer
             _windowEventHandler = new WindowEventHandler(OnWindowCreated);
             _windowEventHandler.AddWindowCreateHandle();
 
-            _updater = new SquirrelUpdater(ConfirmUpdate, (message, tipIcon, seconds) =>
+            if (ConfigLoader.Config.CheckUpdate)
             {
-                ShowTooltips(message, (ToolTipIcon)tipIcon, seconds);
-            });
-            Update();
+                _updater = new SquirrelUpdater(ConfirmUpdate, (message, tipIcon, seconds) =>
+                {
+                    ShowTooltips(message, (ToolTipIcon)tipIcon, seconds);
+                });
+                Update();
+            }
         }
 
         private void Update()

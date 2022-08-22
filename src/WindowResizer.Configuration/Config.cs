@@ -8,6 +8,8 @@ namespace WindowResizer.Configuration
     {
         public bool DisableInFullScreen { get; set; } = true;
 
+        public bool CheckUpdate { get; set; } = true;
+
         public Hotkeys SaveKey { get; set; } = new();
 
         public Hotkeys RestoreKey { get; set; } = new();
