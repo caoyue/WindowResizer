@@ -48,5 +48,25 @@ namespace WindowResizer.Configuration
                 }
             }
         };
+
+        public void Migrate(Config migrateConfig)
+        {
+#pragma warning disable CS0612
+            if (migrateConfig.SaveKey is not null && migrateConfig.SaveKey.IsValid())
+            {
+                Keys.Add(HotkeysType.Save, migrateConfig.SaveKey);
+            }
+
+            if (migrateConfig.RestoreKey is not null && migrateConfig.RestoreKey.IsValid())
+            {
+                Keys.Add(HotkeysType.Restore, migrateConfig.RestoreKey);
+            }
+
+            if (migrateConfig.RestoreAllKey is not null && migrateConfig.RestoreAllKey.IsValid())
+            {
+                Keys.Add(HotkeysType.RestoreAll, migrateConfig.RestoreAllKey);
+            }
+#pragma warning restore CS0612
+        }
     }
 }

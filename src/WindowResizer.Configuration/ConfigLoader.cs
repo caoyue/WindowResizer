@@ -72,8 +72,7 @@ namespace WindowResizer.Configuration
             Config.WindowSizes = c.WindowSizes;
             Config.CheckUpdate = c.CheckUpdate;
 
-            Migrate();
-
+            Config.Migrate(c);
 
             if (!Config.WindowSizes.Any())
             {
@@ -122,26 +121,6 @@ namespace WindowResizer.Configuration
             configKeys.Key = hotkeys.Key;
             config.Keys[type] = configKeys;
             return configKeys;
-        }
-
-        private static void Migrate()
-        {
-#pragma warning disable CS0612
-            if (Config.SaveKey is not null && Config.SaveKey.IsValid())
-            {
-                Config.Keys.Add(HotkeysType.Save, Config.SaveKey);
-            }
-
-            if (Config.RestoreKey is not null && Config.RestoreKey.IsValid())
-            {
-                Config.Keys.Add(HotkeysType.Restore, Config.RestoreKey);
-            }
-
-            if (Config.RestoreAllKey is not null && Config.RestoreAllKey.IsValid())
-            {
-                Config.Keys.Add(HotkeysType.RestoreAll, Config.RestoreAllKey);
-            }
-#pragma warning restore CS0612
         }
     }
 }
