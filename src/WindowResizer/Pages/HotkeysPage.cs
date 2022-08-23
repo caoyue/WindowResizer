@@ -14,29 +14,30 @@ namespace WindowResizer
     public partial class SettingForm
     {
         private static bool _isBinding;
-        private static KeyBindControl _bindingControl;
+        private static HotkeysControl _bindingControl;
+
         private readonly Hotkeys _hotKeys = new Hotkeys();
+        private readonly List<HotkeysControl> _keyBindControls = new List<HotkeysControl>();
 
         private readonly GlobalKeyboardHook _globalHook = new GlobalKeyboardHook();
         private readonly HashSet<Keys> _pressedKeys = new HashSet<Keys>();
 
-        private class KeyBindControl
+        private class HotkeysControl
         {
-            public KeyBindControl(KeyBindType type, Button button, Label label)
+            public HotkeysControl(HotkeysType type, Button button, Label label)
             {
                 Type = type;
                 Button = button;
                 Label = label;
             }
 
-            public KeyBindType Type { get; }
+            public HotkeysType Type { get; }
 
             public Button Button { get; }
 
             public Label Label { get; }
         }
 
-        private readonly List<KeyBindControl> _keyBindControls = new List<KeyBindControl>();
 
         private void HotkeysPageInit()
         {
@@ -44,13 +45,12 @@ namespace WindowResizer
             _globalHook.KeyUp += HookOnKeyUp;
 
             _keyBindControls.Clear();
-            _keyBindControls.Add(new KeyBindControl(KeyBindType.Save, SaveKeyBtn, SaveKeyLabel));
-            _keyBindControls.Add(new KeyBindControl(KeyBindType.Restore, RestoreKeyBtn, RestoreKeyLabel));
-            _keyBindControls.Add(new KeyBindControl(KeyBindType.RestoreAll, RestoreAllKeyBtn, RestoreAllKeyLabel));
+            _keyBindControls.Add(new HotkeysControl(HotkeysType.Save, SaveKeyBtn, SaveKeyLabel));
+            _keyBindControls.Add(new HotkeysControl(HotkeysType.Restore, RestoreKeyBtn, RestoreKeyLabel));
+            _keyBindControls.Add(new HotkeysControl(HotkeysType.SaveAll, SaveAllKeyBtn, SaveAllKeyLabel));
+            _keyBindControls.Add(new HotkeysControl(HotkeysType.RestoreAll, RestoreAllKeyBtn, RestoreAllKeyLabel));
 
-            Helper.SetToolTip(SaveLabel, "Save foreground window size and position.");
-            Helper.SetToolTip(RestoreLabel, "Restore foreground window size and position.");
-            Helper.SetToolTip(RestoreAllLabel, "Restore all saved windows size and position.");
+            SetToolTips();
 
             foreach (var control in _keyBindControls)
             {
@@ -63,7 +63,7 @@ namespace WindowResizer
             DisableInFullScreenCheckBox.CheckedChanged += DisableInFullScreen_CheckedChanged;
         }
 
-        private void OnBindButtonClick(KeyBindControl control, object sender, EventArgs e)
+        private void OnBindButtonClick(HotkeysControl control, object sender, EventArgs e)
         {
             if (_isBinding && _bindingControl.Button != control.Button)
             {
@@ -74,6 +74,21 @@ namespace WindowResizer
 
             OnKeyBindButtonClick(sender, e);
         }
+
+        private void DisableInFullScreen_CheckedChanged(object sender, EventArgs e)
+        {
+            ConfigLoader.Config.DisableInFullScreen = DisableInFullScreenCheckBox.Checked;
+            ConfigLoader.Save();
+        }
+
+        private void SetToolTips()
+        {
+            Helper.SetToolTip(SaveLabel, "Save foreground window size and position.");
+            Helper.SetToolTip(RestoreLabel, "Restore foreground window size and position.");
+            Helper.SetToolTip(SaveAllLabel, "Save all window size and position.");
+            Helper.SetToolTip(RestoreAllLabel, "Restore all saved windows size and position.");
+        }
+
 
         private void HookOnKeyDown(object sender, KeyEventArgs args)
         {
@@ -128,7 +143,7 @@ namespace WindowResizer
             _isBinding = true;
             _hotKeys.Clear();
             _pressedKeys.Clear();
-            _bindingControl.Button.Text = "Binding...";
+            _bindingControl.Button.Text = "Recording...";
             _bindingControl.Label.Text = "Waiting...";
 
             foreach (var control in _keyBindControls.Where(control => _bindingControl.Button != control.Button))
@@ -145,7 +160,7 @@ namespace WindowResizer
             _globalHook.UnHook();
 
             _isBinding = false;
-            _bindingControl.Button.Text = "Change";
+            _bindingControl.Button.Text = "Edit";
             _bindingControl.Label.Text = _hotKeys.ToKeysString();
 
             foreach (var control in _keyBindControls)
@@ -153,7 +168,7 @@ namespace WindowResizer
                 control.Button.Enabled = true;
             }
 
-            if (!_hotKeys.ValidateKeys() || !IsKeyChanged(_bindingControl.Type))
+            if (!_hotKeys.IsValid() || !IsKeyChanged(_bindingControl.Type))
             {
                 _bindingControl.Label.Text = GetLabelByType(_bindingControl.Type);
                 return;
@@ -192,70 +207,16 @@ namespace WindowResizer
             }
         }
 
-        private string GetLabelByType(KeyBindType type)
-        {
-            switch (type)
-            {
-                case KeyBindType.Save:
-                    return ConfigLoader.Config.SaveKey.ToKeysString();
+        private static string GetLabelByType(HotkeysType type) =>
+            GetKeys(type)?.ToKeysString() ?? string.Empty;
 
-                case KeyBindType.Restore:
-                    return ConfigLoader.Config.RestoreKey.ToKeysString();
+        private bool IsKeyChanged(HotkeysType type) =>
+            !_hotKeys.Equals(GetKeys(type));
 
-                case KeyBindType.RestoreAll:
-                    return ConfigLoader.Config.RestoreAllKey.ToKeysString();
+        private static void SetKeys(HotkeysType type, Hotkeys hotkeys) =>
+            ConfigLoader.Config.SetKeys(type, hotkeys);
 
-                default:
-                    return string.Empty;
-            }
-        }
-
-        private bool IsKeyChanged(KeyBindType type)
-        {
-            switch (type)
-            {
-                case KeyBindType.Save:
-                    return !_hotKeys.Equals(ConfigLoader.Config.SaveKey);
-
-                case KeyBindType.Restore:
-                    return !_hotKeys.Equals(ConfigLoader.Config.RestoreKey);
-
-                case KeyBindType.RestoreAll:
-                    return !_hotKeys.Equals(ConfigLoader.Config.RestoreAllKey);
-
-                default:
-                    return true;
-            }
-        }
-
-        private void DisableInFullScreen_CheckedChanged(object sender, EventArgs e)
-        {
-            ConfigLoader.Config.DisableInFullScreen = DisableInFullScreenCheckBox.Checked;
-            ConfigLoader.Save();
-        }
-
-        private void SetKeys(KeyBindType type, Hotkeys hotkeys)
-        {
-            switch (type)
-            {
-                case KeyBindType.Save:
-                    SetKeys(ConfigLoader.Config.SaveKey, hotkeys);
-                    break;
-
-                case KeyBindType.Restore:
-                    SetKeys(ConfigLoader.Config.RestoreKey, hotkeys);
-                    break;
-
-                case KeyBindType.RestoreAll:
-                    SetKeys(ConfigLoader.Config.RestoreAllKey, hotkeys);
-                    break;
-            }
-        }
-
-        private void SetKeys(Hotkeys configKeys, Hotkeys hotkeys)
-        {
-            configKeys.ModifierKeys = hotkeys.ModifierKeys;
-            configKeys.Key = hotkeys.Key;
-        }
+        private static Hotkeys GetKeys(HotkeysType type) =>
+            ConfigLoader.Config.GetKeys(type);
     }
 }

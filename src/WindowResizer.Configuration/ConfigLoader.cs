@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using WindowResizer.Common.Shortcuts;
 
 namespace WindowResizer.Configuration
 {
@@ -27,25 +28,52 @@ namespace WindowResizer.Configuration
 
         public static string ConfigPath => PortableMode ? _portableConfigPath : _roamingConfigPath;
 
-        public static Config Config = new();
+        public static readonly Config Config = new();
+
 
         public static void Load()
         {
             if (!File.Exists(ConfigPath))
             {
-                Config.SaveKey = Config.DefaultSaveKey;
-                Config.RestoreKey = Config.DefaultRestoreKey;
-                Config.RestoreAllKey = Config.DefaultRestoreAllKey;
+                UseDefault();
+
                 Save();
                 return;
             }
 
-            var text = File.ReadAllText(ConfigPath);
-            var c = JsonConvert.DeserializeObject<Config>(text);
-            if (c != null)
+            Load(ConfigPath);
+        }
+
+        public static void UseDefault()
+        {
+            Config.Keys.Clear();
+            foreach (var key in Config.DefaultKeys)
             {
-                Config = c;
+                Config.Keys.Add(key.Key, key.Value);
             }
+
+
+            Config.DisableInFullScreen = true;
+            Config.WindowSizes.Clear();
+            Config.CheckUpdate = true;
+        }
+
+        public static void Load(string path)
+        {
+            var text = File.ReadAllText(path);
+            var c = JsonConvert.DeserializeObject<Config>(text);
+            if (c is null)
+            {
+                return;
+            }
+
+            Config.Keys = c.Keys;
+            Config.DisableInFullScreen = c.DisableInFullScreen;
+            Config.WindowSizes = c.WindowSizes;
+            Config.CheckUpdate = c.CheckUpdate;
+
+            Migrate();
+
 
             if (!Config.WindowSizes.Any())
             {
@@ -80,6 +108,40 @@ namespace WindowResizer.Configuration
                 new FileInfo(_roamingConfigPath).Directory?.Create();
                 File.Move(_portableConfigPath, _roamingConfigPath);
             }
+        }
+
+        public static Hotkeys? GetKeys(this Config config, HotkeysType type)
+        {
+            return config.Keys.TryGetValue(type, out var k) ? k : null;
+        }
+
+        public static Hotkeys SetKeys(this Config config, HotkeysType type, Hotkeys hotkeys)
+        {
+            var configKeys = config.GetKeys(type) ?? new Hotkeys();
+            configKeys.ModifierKeys = hotkeys.ModifierKeys;
+            configKeys.Key = hotkeys.Key;
+            config.Keys[type] = configKeys;
+            return configKeys;
+        }
+
+        private static void Migrate()
+        {
+#pragma warning disable CS0612
+            if (Config.SaveKey is not null && Config.SaveKey.IsValid())
+            {
+                Config.Keys.Add(HotkeysType.Save, Config.SaveKey);
+            }
+
+            if (Config.RestoreKey is not null && Config.RestoreKey.IsValid())
+            {
+                Config.Keys.Add(HotkeysType.Restore, Config.RestoreKey);
+            }
+
+            if (Config.RestoreAllKey is not null && Config.RestoreAllKey.IsValid())
+            {
+                Config.Keys.Add(HotkeysType.RestoreAll, Config.RestoreAllKey);
+            }
+#pragma warning restore CS0612
         }
     }
 }

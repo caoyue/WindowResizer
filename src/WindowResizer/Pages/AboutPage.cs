@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
-using Newtonsoft.Json;
 using WindowResizer.Configuration;
 
 // ReSharper disable once CheckNamespace
@@ -17,7 +16,7 @@ namespace WindowResizer
             UpdateCheckBox.Checked = ConfigLoader.Config.CheckUpdate;
             UpdateCheckBox.CheckedChanged += UpdateCheckBox_CheckedChanged;
 
-            VersionLabel.Text = $"WindowResizer {Application.ProductVersion}";
+            VersionLabel.Text = $"{nameof(WindowResizer)} {Application.ProductVersion}";
 
             GithubLinkLabel.Text = ProjectLink;
             GithubLinkLabel.LinkClicked += LinkClicked;
@@ -42,7 +41,7 @@ namespace WindowResizer
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
-                Title = "Export Config", AddExtension = true, DefaultExt = "json", FileName = Application.ProductName + "Config.json"
+                Title = "Export Config", AddExtension = true, DefaultExt = "json", FileName = $"{nameof(WindowResizer)}.config.json"
             };
             if (saveFileDialog.ShowDialog() != DialogResult.Cancel && saveFileDialog.FileName != "")
             {
@@ -59,7 +58,7 @@ namespace WindowResizer
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Title = "Import Config",
+                Title = "Import Config", AddExtension = true, DefaultExt = "json",
             };
 
             if (openFileDialog.ShowDialog() == DialogResult.Cancel || openFileDialog.FileName == "")
@@ -67,24 +66,25 @@ namespace WindowResizer
                 return;
             }
 
+            var filePath = openFileDialog.FileName;
+            if (!File.Exists(filePath))
+            {
+                MessageBox.Show("Import failed, config file not found or deleted.");
+                return;
+            }
+
             try
             {
-                var text = File.ReadAllText(openFileDialog.FileName);
-                var config = JsonConvert.DeserializeObject<Config>(text);
-                if (config == null)
-                {
-                    MessageBox.Show("Import failed, config file is not valid json.");
-                    return;
-                }
-
-                ConfigLoader.Config = config;
+                ConfigLoader.Load(filePath);
                 ConfigLoader.Save();
+
                 ReloadConfig();
             }
             catch (Exception)
             {
                 MessageBox.Show("Import failed, config file is not valid json.");
             }
+
         }
 
         private void PortableModeCheckBox_CheckedChanged(object sender, EventArgs e)

@@ -6,6 +6,11 @@ namespace WindowResizer.Core.Shortcuts
 {
     public static class KeyHelper
     {
+        public static bool KeysEqual(this Hotkeys? keys, ModifierKeys modifier, Keys key)
+        {
+            return keys != null && modifier == keys.GetModifierKeys() && key == keys.GetKey();
+        }
+
         public static ModifierKeys GetModifierKeys(this Hotkeys hotKeys)
         {
             ModifierKeys keys = 0;
@@ -44,8 +49,5 @@ namespace WindowResizer.Core.Shortcuts
                 _ => key.ToString()
             };
         }
-
-        public static bool ValidateKeys(this Hotkeys hotKeys) =>
-            hotKeys.ModifierKeys.Count > 0 && !string.IsNullOrEmpty(hotKeys.Key);
     }
 }

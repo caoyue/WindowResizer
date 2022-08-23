@@ -1,4 +1,4 @@
-﻿namespace WindowResizer.Core.WindowControl
+﻿namespace WindowResizer.Common.Windows
 {
     public enum WindowState
     {

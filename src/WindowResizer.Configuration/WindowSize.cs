@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using WindowResizer.Common.Windows;
 using WindowResizer.Core.WindowControl;
 
 namespace WindowResizer.Configuration

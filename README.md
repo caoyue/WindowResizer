@@ -2,22 +2,24 @@
 
 [![WindowResizer](https://github.com/caoyue/WindowResizer/actions/workflows/WindowsResizer.yml/badge.svg)](https://github.com/caoyue/WindowResizer/actions) [![GitHub all releases](https://img.shields.io/github/downloads/caoyue/WindowResizer/total)](https://github.com/caoyue/WindowResizer/releases)  [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/caoyue/WindowResizer?sort=semver)](https://github.com/caoyue/WindowResizer/releases/latest)
 
-a simple tool gives you a way to quickly reset window size and position with a hotkey.
+A simple tool gives you a way to quickly reset window size and position with a hotkey.
 
-you can save and restore window position for different process.
+You can save and restore window position for different process.
 
 ## require
 
--   Windows 7+ 
+-   Windows 7+ (x64)
 -   .NET Framework 4.7.2+
 
-## hotkey
+## hotkeys
 
-you can change hotkeys in setting window
+Change hotkeys in setting window.
 
 -   save window position
 
     default hotkey: `ctrl+alt+s`
+
+-   save all opened window position
 
 -   restore window position
 
@@ -27,15 +29,13 @@ you can change hotkeys in setting window
 
 -   restore all opened window position
 
-    default hotkey: `ctrl+alt+t`
-
     ![restore-all.gif](https://i.imgur.com/3558lKS.gif)
 
 ## usage
 
 -   how to add an config entry
 
-    Focus on the window (eg. Chrome), then press the save window hotkey (ctrl+alt+s by default), an entry will be added to the configuration file.
+    Focus on the window (eg. Chrome), then press the save window hotkey (`ctrl+alt+s`by default), an entry will be added to the configuration file.
 
 -   How does the window matching work?
 
@@ -45,7 +45,7 @@ you can change hotkeys in setting window
 
 -   restore window position automatically
 
-    check the checkbox on `Auto` column and `Save` configs.
+    check the checkbox on `Auto` column.
 
     ![auto-restore](https://i.imgur.com/LeNyJQu.gif)
 

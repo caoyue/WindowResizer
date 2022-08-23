@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using WindowResizer.Common.Shortcuts;
+using WindowResizer.Common.Windows;
 using WindowResizer.Configuration;
 using WindowResizer.Core.Shortcuts;
 using WindowResizer.Core.WindowControl;
@@ -37,9 +38,12 @@ namespace WindowResizer
             }
             catch (Exception e)
             {
-                var message = $"Config file load failed.\nPath: {ConfigLoader.ConfigPath}";
+                var message = $"Config file {ConfigLoader.ConfigPath} load failed, use default configs.";
                 Log.Append($"{message}\nException: {e}");
-                Helper.ShowMessageBox(message);
+                Helper.ShowMessageBox(message, MessageBoxIcon.Warning);
+
+                ConfigLoader.UseDefault();
+                ConfigLoader.Save();
             }
 
             RegisterHotkey();
@@ -77,7 +81,7 @@ namespace WindowResizer
             _ = _updater.Update();
         }
 
-        private bool ConfirmUpdate(string message)
+        private static bool ConfirmUpdate(string message)
         {
             var res = MessageBox.Show(message, "WindowResizer Update",
                 MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
@@ -107,25 +111,27 @@ namespace WindowResizer
 
         private void RegisterHotkey()
         {
-            if (!ConfigLoader.Config.SaveKey.ValidateKeys())
+            foreach (var type in Enum.GetValues(typeof(HotkeysType)).Cast<HotkeysType>())
             {
-                Helper.ShowMessageBox("Save window hotkeys not valid.");
+                RegisterHotkey(type);
             }
-
-            if (!ConfigLoader.Config.RestoreKey.ValidateKeys())
-            {
-                Helper.ShowMessageBox("Restore window hotkeys not valid.");
-            }
-
-            RegisterHotkey(ConfigLoader.Config.SaveKey, KeyBindType.Save);
-            RegisterHotkey(ConfigLoader.Config.RestoreKey, KeyBindType.Restore);
-            RegisterHotkey(ConfigLoader.Config.RestoreAllKey, KeyBindType.RestoreAll);
 
             _hook.KeyPressed += OnKeyPressed;
         }
 
-        private void RegisterHotkey(Hotkeys hotkeys, KeyBindType type)
+        private void RegisterHotkey(HotkeysType type)
         {
+            var hotkeys = GetKeys(type);
+            if (hotkeys is null)
+            {
+                return;
+            }
+
+            if (!hotkeys.IsValid())
+            {
+                Helper.ShowMessageBox($"{type.ToString()} window hotkeys not valid.");
+            }
+
             try
             {
                 var id = _hook.RegisterHotKey(hotkeys.GetModifierKeys(), hotkeys.GetKey());
@@ -146,30 +152,54 @@ namespace WindowResizer
                     return;
                 }
 
-                if (e.Modifier == ConfigLoader.Config.RestoreAllKey.GetModifierKeys()
-                    && e.Key == ConfigLoader.Config.RestoreAllKey.GetKey())
+                var keys = GetKeys(HotkeysType.RestoreAll);
+                if (keys.KeysEqual(e.Modifier, e.Key))
                 {
                     var windows = Resizer.GetOpenWindows();
                     windows.Reverse();
                     foreach (var window in windows)
                     {
-                        ResizeWindow(window);
+                        if (Resizer.IsWindowVisible(window)
+                            && !Resizer.IsChildWindow(window)
+                            && Resizer.GetWindowState(window) != WindowState.Minimized)
+                        {
+                            ResizeWindow(window);
+                        }
                     }
-                }
-                else
-                {
-                    var handle = Resizer.GetForegroundHandle();
 
-                    if (e.Modifier == ConfigLoader.Config.SaveKey.GetModifierKeys() &&
-                        e.Key == ConfigLoader.Config.SaveKey.GetKey())
+                    return;
+                }
+
+                keys = GetKeys(HotkeysType.SaveAll);
+                if (keys.KeysEqual(e.Modifier, e.Key))
+                {
+                    var windows = Resizer.GetOpenWindows();
+                    foreach (var window in windows)
                     {
-                        UpdateOrSaveWindowSize(handle);
+                        if (Resizer.IsWindowVisible(window)
+                            && !Resizer.IsChildWindow(window)
+                            && Resizer.GetWindowState(window) != WindowState.Minimized)
+                        {
+                            UpdateOrSaveWindowSize(window);
+                        }
                     }
-                    else if (e.Modifier == ConfigLoader.Config.RestoreKey.GetModifierKeys() &&
-                             e.Key == ConfigLoader.Config.RestoreKey.GetKey())
-                    {
-                        ResizeWindow(handle, true);
-                    }
+
+                    return;
+                }
+
+                keys = GetKeys(HotkeysType.Save);
+                if (keys.KeysEqual(e.Modifier, e.Key))
+                {
+                    var window = Resizer.GetForegroundHandle();
+                    UpdateOrSaveWindowSize(window);
+                    return;
+                }
+
+                keys = GetKeys(HotkeysType.Restore);
+                if (keys.KeysEqual(e.Modifier, e.Key))
+                {
+                    var window = Resizer.GetForegroundHandle();
+                    ResizeWindow(window, true);
                 }
             }
             catch (Exception exception)
@@ -188,7 +218,7 @@ namespace WindowResizer
             }
         }
 
-        private void ResizeWindow(IntPtr handle, bool tips = false, bool auto = false)
+        private void ResizeWindow(IntPtr handle, bool showTips = false, bool onlyAuto = false)
         {
             if (Resizer.IsChildWindow(handle))
             {
@@ -196,7 +226,7 @@ namespace WindowResizer
             }
 
             var process = Resizer.GetRealProcess(handle);
-            if (process == null || !TryGetProcessName(process, out string processName, tips))
+            if (process == null || !TryGetProcessName(process, out string processName, showTips))
             {
                 return;
             }
@@ -204,14 +234,14 @@ namespace WindowResizer
             if (string.IsNullOrWhiteSpace(processName)) return;
 
             var title = process.MainWindowTitle;
-            var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, title, auto);
+            var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, title, onlyAuto);
             if (!match.NoMatch)
             {
                 MoveMatchWindow(match, handle);
             }
             else
             {
-                if (tips)
+                if (showTips)
                 {
                     var titleStr = string.IsNullOrWhiteSpace(title) ? "" : $"({title})";
                     ShowTooltips($"No saved settings for <{processName}>{titleStr}.", ToolTipIcon.Info, 2000);
@@ -227,13 +257,18 @@ namespace WindowResizer
                 return;
             }
 
+            if (Resizer.IsInvisibleProcess(processName))
+            {
+                return;
+            }
+
             var title = process.MainWindowTitle;
             var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, title);
             var state = Resizer.GetWindowState(handle);
             UpdateOrSaveConfig(match, processName, title, Resizer.GetRect(handle), state);
         }
 
-        private bool TryGetProcessName(Process process, out string processName, bool tips = true)
+        private bool TryGetProcessName(Process process, out string processName, bool showTips = true)
         {
             try
             {
@@ -242,7 +277,7 @@ namespace WindowResizer
             }
             catch (Exception e)
             {
-                if (tips)
+                if (showTips)
                 {
                     var message = $"Unable to resize process <{process.ProcessName}>, elevated privileges may be required.";
                     ShowTooltips(message, ToolTipIcon.Warning, 1500);
@@ -258,13 +293,13 @@ namespace WindowResizer
             BindingList<WindowSize> windowSizes,
             string processName,
             string title,
-            bool auto = false)
+            bool onlyAuto = false)
         {
             var windows = windowSizes.Where(w =>
                                          w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase))
                                      .ToList();
 
-            if (auto)
+            if (onlyAuto)
             {
                 windows = windows.Where(w => w.AutoResize).ToList();
             }
@@ -391,6 +426,10 @@ namespace WindowResizer
             var index = backing.OrderBy(l => l.Name).ThenBy(l => l.Title).ToList().IndexOf(item);
             list.Insert(index, item);
         }
+
+
+        private static Hotkeys GetKeys(HotkeysType type) =>
+            ConfigLoader.Config.GetKeys(type);
 
         private void ReloadConfig()
         {

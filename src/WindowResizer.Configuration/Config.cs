@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using WindowResizer.Common.Shortcuts;
@@ -10,39 +11,42 @@ namespace WindowResizer.Configuration
 
         public bool CheckUpdate { get; set; } = true;
 
-        public Hotkeys SaveKey { get; set; } = new();
+        public Dictionary<HotkeysType, Hotkeys> Keys { get; set; } = new();
 
-        public Hotkeys RestoreKey { get; set; } = new();
-
-        public Hotkeys RestoreAllKey { get; set; } = new();
 
         public BindingList<WindowSize> WindowSizes { get; set; } = new();
 
-        public static Hotkeys DefaultSaveKey => new()
-        {
-            ModifierKeys = new HashSet<string>
-            {
-                "Ctrl", "Alt"
-            },
-            Key = "S"
-        };
+        [Obsolete]
+        public Hotkeys? SaveKey { internal get; set; }
 
-        public static Hotkeys DefaultRestoreKey => new()
-        {
-            ModifierKeys = new HashSet<string>
-            {
-                "Ctrl", "Alt"
-            },
-            Key = "R"
-        };
+        [Obsolete]
+        public Hotkeys? RestoreKey { internal get; set; }
 
-        public static Hotkeys DefaultRestoreAllKey => new()
+        [Obsolete]
+        public Hotkeys? RestoreAllKey { internal get; set; }
+
+        public static Dictionary<HotkeysType, Hotkeys> DefaultKeys => new()
         {
-            ModifierKeys = new HashSet<string>
             {
-                "Ctrl", "Alt"
+                HotkeysType.Save, new()
+                {
+                    ModifierKeys = new HashSet<string>
+                    {
+                        "Ctrl", "Alt"
+                    },
+                    Key = "S"
+                }
             },
-            Key = "T"
+            {
+                HotkeysType.Restore, new()
+                {
+                    ModifierKeys = new HashSet<string>
+                    {
+                        "Ctrl", "Alt"
+                    },
+                    Key = "R"
+                }
+            }
         };
     }
 }

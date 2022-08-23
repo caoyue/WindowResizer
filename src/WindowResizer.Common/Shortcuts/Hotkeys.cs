@@ -21,6 +21,11 @@ namespace WindowResizer.Common.Shortcuts
             return string.Join(" + ", GetAllKeys());
         }
 
+        public bool IsValid()
+        {
+            return this.ModifierKeys.Count > 0 && !string.IsNullOrEmpty(this.Key);
+        }
+
         public override bool Equals(object? obj)
         {
             return obj is Hotkeys other && this.GetAllKeys().SequenceEqual(other.GetAllKeys());

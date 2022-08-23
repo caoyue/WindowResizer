@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Windows.Forms;
+using WindowResizer.Common.Windows;
 using static WindowResizer.Core.WindowControl.NativeMethods;
 
 namespace WindowResizer.Core.WindowControl
@@ -18,7 +19,7 @@ namespace WindowResizer.Core.WindowControl
             var shellWindow = GetShellWindow();
             var windows = new List<IntPtr>();
 
-            EnumWindows(delegate (IntPtr hWnd, int _)
+            EnumWindows(delegate(IntPtr hWnd, int _)
             {
                 if (hWnd == shellWindow) return true;
                 if (!IsWindowVisible(hWnd)) return true;
@@ -176,5 +177,15 @@ namespace WindowResizer.Core.WindowControl
             return screen.Bounds.Width == rect.Right - rect.Left
                 && screen.Bounds.Height == rect.Bottom - rect.Top;
         }
+
+        public static bool IsInvisibleProcess(string processName)
+        {
+            return InvisibleProcesses.Contains(processName.ToUpper());
+        }
+
+        private static HashSet<string> InvisibleProcesses => new()
+        {
+            "TEXTINPUTHOST.EXE"
+        };
     }
 }

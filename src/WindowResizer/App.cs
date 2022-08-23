@@ -1,6 +1,5 @@
 using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
+using WindowResizer.Configuration;
 
 namespace WindowResizer
 {
@@ -8,15 +7,6 @@ namespace WindowResizer
     {
         public const string DefaultFontFamilyName = "Tahoma";
 
-        public static Dictionary<KeyBindType, int> RegisteredHotKeys { get; } = new Dictionary<KeyBindType, int>();
-
-
-    }
-
-    public enum KeyBindType
-    {
-        Save,
-        Restore,
-        RestoreAll
+        public static Dictionary<HotkeysType, int> RegisteredHotKeys { get; } = new Dictionary<HotkeysType, int>();
     }
 }
