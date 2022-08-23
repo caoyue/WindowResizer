@@ -89,7 +89,7 @@ namespace WindowResizer
                 FlatStyle = FlatStyle.Standard,
                 DefaultCellStyle =
                 {
-                    ForeColor = SystemColors.Highlight, SelectionBackColor = SystemColors.Window,
+                    SelectionBackColor = SystemColors.Window,
                 },
             });
 
@@ -99,10 +99,13 @@ namespace WindowResizer
                 Text = "Remove",
                 Name = "Remove",
                 HeaderText = "",
-                FlatStyle = FlatStyle.System,
+                FlatStyle = FlatStyle.Standard,
                 DefaultCellStyle =
                 {
-                    SelectionBackColor = SystemColors.Window, Padding = new Padding(5)
+                    ForeColor = SystemColors.ControlText,
+                    BackColor = SystemColors.Window,
+                    SelectionBackColor = SystemColors.Window,
+                    Padding = new Padding(5)
                 },
                 FillWeight = 10,
                 DisplayIndex = 7,

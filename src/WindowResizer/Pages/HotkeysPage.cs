@@ -13,11 +13,11 @@ namespace WindowResizer
 {
     public partial class SettingForm
     {
-        private static bool _isBinding;
-        private static HotkeysControl _bindingControl;
+        private static bool _isRecording;
+        private static HotkeysControl _recordingControl;
 
         private readonly Hotkeys _hotKeys = new Hotkeys();
-        private readonly List<HotkeysControl> _keyBindControls = new List<HotkeysControl>();
+        private readonly List<HotkeysControl> _keyRecordingControls = new List<HotkeysControl>();
 
         private readonly GlobalKeyboardHook _globalHook = new GlobalKeyboardHook();
         private readonly HashSet<Keys> _pressedKeys = new HashSet<Keys>();
@@ -44,17 +44,18 @@ namespace WindowResizer
             _globalHook.KeyDown += HookOnKeyDown;
             _globalHook.KeyUp += HookOnKeyUp;
 
-            _keyBindControls.Clear();
-            _keyBindControls.Add(new HotkeysControl(HotkeysType.Save, SaveKeyBtn, SaveKeyLabel));
-            _keyBindControls.Add(new HotkeysControl(HotkeysType.Restore, RestoreKeyBtn, RestoreKeyLabel));
-            _keyBindControls.Add(new HotkeysControl(HotkeysType.SaveAll, SaveAllKeyBtn, SaveAllKeyLabel));
-            _keyBindControls.Add(new HotkeysControl(HotkeysType.RestoreAll, RestoreAllKeyBtn, RestoreAllKeyLabel));
+            _keyRecordingControls.Clear();
+            _keyRecordingControls.Add(new HotkeysControl(HotkeysType.Save, SaveKeyBtn, SaveKeyLabel));
+            _keyRecordingControls.Add(new HotkeysControl(HotkeysType.Restore, RestoreKeyBtn, RestoreKeyLabel));
+            _keyRecordingControls.Add(new HotkeysControl(HotkeysType.SaveAll, SaveAllKeyBtn, SaveAllKeyLabel));
+            _keyRecordingControls.Add(new HotkeysControl(HotkeysType.RestoreAll, RestoreAllKeyBtn, RestoreAllKeyLabel));
 
             SetToolTips();
 
-            foreach (var control in _keyBindControls)
+            foreach (var control in _keyRecordingControls)
             {
-                control.Button.Click += (sender, e) => OnBindButtonClick(control, sender, e);
+                control.Button.Click += (sender, e) => OnRecordButtonClick(control, sender, e);
+                control.Button.LostFocus += Stop_Recording;
                 control.Label.Text = GetLabelByType(control.Type);
                 control.Label.Font = Helper.ChangeFontSize(SaveLabel.Font, 12F, FontStyle.Bold);
             }
@@ -63,16 +64,24 @@ namespace WindowResizer
             DisableInFullScreenCheckBox.CheckedChanged += DisableInFullScreen_CheckedChanged;
         }
 
-        private void OnBindButtonClick(HotkeysControl control, object sender, EventArgs e)
+        private void Stop_Recording(object sender, EventArgs e)
         {
-            if (_isBinding && _bindingControl.Button != control.Button)
+            if (_isRecording)
             {
-                _bindingControl.Button.PerformClick();
+                OnKeyRecordEnd();
+            }
+        }
+
+        private void OnRecordButtonClick(HotkeysControl control, object sender, EventArgs e)
+        {
+            if (_isRecording && _recordingControl.Button != control.Button)
+            {
+                _recordingControl.Button.PerformClick();
             }
 
-            _bindingControl = control;
+            _recordingControl = control;
 
-            OnKeyBindButtonClick(sender, e);
+            OnKeyRecordButtonClick(sender, e);
         }
 
         private void DisableInFullScreen_CheckedChanged(object sender, EventArgs e)
@@ -110,7 +119,7 @@ namespace WindowResizer
                 _hotKeys.Key = key.ToKeyString();
             }
 
-            _bindingControl.Label.Text = $"{_hotKeys.ToKeysString()} ...";
+            _recordingControl.Label.Text = $"{_hotKeys.ToKeysString()} ...";
         }
 
         private void HookOnKeyUp(object sender, KeyEventArgs args)
@@ -122,31 +131,34 @@ namespace WindowResizer
 
             if (_pressedKeys.Count == 0)
             {
-                _bindingControl.Button.PerformClick();
+                _recordingControl.Button.PerformClick();
             }
         }
 
-        private void OnKeyBindButtonClick(object sender, EventArgs _)
+        private void OnKeyRecordButtonClick(object sender, EventArgs _)
         {
-            if (_isBinding)
+            if (_isRecording)
             {
-                OnKeyBindEnd();
+                OnKeyRecordEnd();
             }
             else
             {
-                OnKeyBindStart();
+                OnKeyRecordStart();
             }
         }
 
-        private void OnKeyBindStart()
+        private void OnKeyRecordStart()
         {
-            _isBinding = true;
+            _isRecording = true;
             _hotKeys.Clear();
             _pressedKeys.Clear();
-            _bindingControl.Button.Text = "Recording...";
-            _bindingControl.Label.Text = "Waiting...";
+            _recordingControl.Button.Text = "Recording...";
+            _recordingControl.Button.ForeColor = SystemColors.ControlLight;
+            _recordingControl.Button.BackColor = Color.Brown;
+            _recordingControl.Label.Text = "Waiting...";
 
-            foreach (var control in _keyBindControls.Where(control => _bindingControl.Button != control.Button))
+
+            foreach (var control in _keyRecordingControls.Where(control => _recordingControl.Button != control.Button))
             {
                 control.Button.Enabled = false;
             }
@@ -155,26 +167,31 @@ namespace WindowResizer
         }
 
 
-        private void OnKeyBindEnd()
+        private void OnKeyRecordEnd()
         {
             _globalHook.UnHook();
 
-            _isBinding = false;
-            _bindingControl.Button.Text = "Edit";
-            _bindingControl.Label.Text = _hotKeys.ToKeysString();
+            this.BringToFront();
 
-            foreach (var control in _keyBindControls)
+            _isRecording = false;
+            _recordingControl.Button.Text = "Edit";
+            _recordingControl.Button.BackColor = SystemColors.ButtonFace;
+            _recordingControl.Button.ForeColor = SystemColors.ControlText;
+            _recordingControl.Label.Text = _hotKeys.ToKeysString();
+
+
+            foreach (var control in _keyRecordingControls)
             {
                 control.Button.Enabled = true;
             }
 
-            if (!_hotKeys.IsValid() || !IsKeyChanged(_bindingControl.Type))
+            if (!_hotKeys.IsValid() || !IsKeyChanged(_recordingControl.Type))
             {
-                _bindingControl.Label.Text = GetLabelByType(_bindingControl.Type);
+                _recordingControl.Label.Text = GetLabelByType(_recordingControl.Type);
                 return;
             }
 
-            DialogResult dr = MessageBox.Show($"Set {_bindingControl.Type.ToString()} key to {_hotKeys.ToKeysString()}?", "Hotkey",
+            DialogResult dr = MessageBox.Show($"Set {_recordingControl.Type.ToString()} key to {_hotKeys.ToKeysString()}?", "Hotkey",
                 MessageBoxButtons.OKCancel);
             if (dr == DialogResult.OK)
             {
@@ -186,24 +203,24 @@ namespace WindowResizer
                 catch (Exception e)
                 {
                     Helper.ShowMessageBox(e.Message);
-                    _bindingControl.Label.Text = GetLabelByType(_bindingControl.Type);
+                    _recordingControl.Label.Text = GetLabelByType(_recordingControl.Type);
                     return;
                 }
 
-                if (App.RegisteredHotKeys.TryGetValue(_bindingControl.Type, out var oldKeyId))
+                if (App.RegisteredHotKeys.TryGetValue(_recordingControl.Type, out var oldKeyId))
                 {
                     _hook.UnRegisterHotKey(oldKeyId);
                 }
 
-                App.RegisteredHotKeys[_bindingControl.Type] = keyId;
+                App.RegisteredHotKeys[_recordingControl.Type] = keyId;
 
-                SetKeys(_bindingControl.Type, _hotKeys);
+                SetKeys(_recordingControl.Type, _hotKeys);
 
                 ConfigLoader.Save();
             }
             else
             {
-                _bindingControl.Label.Text = GetLabelByType(_bindingControl.Type);
+                _recordingControl.Label.Text = GetLabelByType(_recordingControl.Type);
             }
         }
 

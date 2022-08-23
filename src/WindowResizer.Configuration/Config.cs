@@ -11,8 +11,7 @@ namespace WindowResizer.Configuration
 
         public bool CheckUpdate { get; set; } = true;
 
-        public Dictionary<HotkeysType, Hotkeys> Keys { get; set; } = new();
-
+        public Dictionary<HotkeysType, Hotkeys> Keys { get; } = new();
 
         public BindingList<WindowSize> WindowSizes { get; set; } = new();
 
@@ -28,7 +27,7 @@ namespace WindowResizer.Configuration
         public static Dictionary<HotkeysType, Hotkeys> DefaultKeys => new()
         {
             {
-                HotkeysType.Save, new()
+                HotkeysType.Save, new Hotkeys
                 {
                     ModifierKeys = new HashSet<string>
                     {
@@ -38,7 +37,7 @@ namespace WindowResizer.Configuration
                 }
             },
             {
-                HotkeysType.Restore, new()
+                HotkeysType.Restore, new Hotkeys
                 {
                     ModifierKeys = new HashSet<string>
                     {

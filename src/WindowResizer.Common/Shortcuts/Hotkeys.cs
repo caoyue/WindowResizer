@@ -12,29 +12,21 @@ namespace WindowResizer.Common.Shortcuts
 
         public void Clear()
         {
-            this.ModifierKeys.Clear();
+            ModifierKeys.Clear();
             Key = null;
         }
 
-        public string ToKeysString()
-        {
-            return string.Join(" + ", GetAllKeys());
-        }
+        public string ToKeysString() =>
+            string.Join(" + ", GetAllKeys());
 
-        public bool IsValid()
-        {
-            return this.ModifierKeys.Count > 0 && !string.IsNullOrEmpty(this.Key);
-        }
+        public bool IsValid() =>
+            this.ModifierKeys.Count > 0 && !string.IsNullOrEmpty(this.Key);
 
-        public override bool Equals(object? obj)
-        {
-            return obj is Hotkeys other && this.GetAllKeys().SequenceEqual(other.GetAllKeys());
-        }
+        public override bool Equals(object? obj) =>
+            obj is Hotkeys other && this.GetAllKeys().SequenceEqual(other.GetAllKeys());
 
-        public override int GetHashCode()
-        {
-            return this.ToKeysString().GetHashCode();
-        }
+        public override int GetHashCode() =>
+            ToKeysString().GetHashCode();
 
         private IEnumerable<string> GetAllKeys()
         {

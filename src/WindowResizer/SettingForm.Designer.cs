@@ -41,6 +41,9 @@
             this.SettingTab = new System.Windows.Forms.TabControl();
             this.HotkeysPage = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.SaveAllKeyBtn = new System.Windows.Forms.Button();
+            this.SaveAllKeyLabel = new System.Windows.Forms.Label();
+            this.SaveAllLabel = new System.Windows.Forms.Label();
             this.SaveLabel = new System.Windows.Forms.Label();
             this.RestoreAllKeyLabel = new System.Windows.Forms.Label();
             this.RestoreLabel = new System.Windows.Forms.Label();
@@ -55,9 +58,6 @@
             this.AboutPage = new System.Windows.Forms.TabPage();
             this.AboutGroup = new System.Windows.Forms.GroupBox();
             this.UpdateCheckBox = new System.Windows.Forms.CheckBox();
-            this.SaveAllLabel = new System.Windows.Forms.Label();
-            this.SaveAllKeyLabel = new System.Windows.Forms.Label();
-            this.SaveAllKeyBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.ProcessesGrid)).BeginInit();
             this.ConfigExportGroup.SuspendLayout();
             this.SettingTab.SuspendLayout();
@@ -107,34 +107,33 @@
             // 
             // ConfigExportBtn
             // 
-            this.ConfigExportBtn.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.ConfigExportBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.ConfigExportBtn.Location = new System.Drawing.Point(148, 89);
             this.ConfigExportBtn.Name = "ConfigExportBtn";
             this.ConfigExportBtn.Size = new System.Drawing.Size(90, 40);
             this.ConfigExportBtn.TabIndex = 9;
             this.ConfigExportBtn.Text = "Export";
-            this.ConfigExportBtn.UseVisualStyleBackColor = true;
+            this.ConfigExportBtn.UseVisualStyleBackColor = false;
             this.ConfigExportBtn.Click += new System.EventHandler(this.ConfigExportBtn_Click);
             // 
             // ConfigImportBtn
             // 
-            this.ConfigImportBtn.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.ConfigImportBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.ConfigImportBtn.Location = new System.Drawing.Point(26, 89);
             this.ConfigImportBtn.Name = "ConfigImportBtn";
             this.ConfigImportBtn.Size = new System.Drawing.Size(90, 40);
             this.ConfigImportBtn.TabIndex = 10;
             this.ConfigImportBtn.Text = "Import";
-            this.ConfigImportBtn.UseVisualStyleBackColor = true;
+            this.ConfigImportBtn.UseVisualStyleBackColor = false;
             this.ConfigImportBtn.Click += new System.EventHandler(this.ConfigImportBtn_Click);
             // 
             // PortableModeCheckBox
             // 
             this.PortableModeCheckBox.AutoSize = true;
             this.PortableModeCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.PortableModeCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.PortableModeCheckBox.Location = new System.Drawing.Point(26, 46);
             this.PortableModeCheckBox.Name = "PortableModeCheckBox";
-            this.PortableModeCheckBox.Size = new System.Drawing.Size(136, 20);
+            this.PortableModeCheckBox.Size = new System.Drawing.Size(133, 19);
             this.PortableModeCheckBox.TabIndex = 11;
             this.PortableModeCheckBox.Text = "Portable Mode";
             this.PortableModeCheckBox.UseVisualStyleBackColor = true;
@@ -217,6 +216,38 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Hotkeys ";
             // 
+            // SaveAllKeyBtn
+            // 
+            this.SaveAllKeyBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.SaveAllKeyBtn.Location = new System.Drawing.Point(507, 179);
+            this.SaveAllKeyBtn.Name = "SaveAllKeyBtn";
+            this.SaveAllKeyBtn.Size = new System.Drawing.Size(120, 40);
+            this.SaveAllKeyBtn.TabIndex = 18;
+            this.SaveAllKeyBtn.Text = "Edit";
+            this.SaveAllKeyBtn.UseVisualStyleBackColor = false;
+            // 
+            // SaveAllKeyLabel
+            // 
+            this.SaveAllKeyLabel.AutoSize = true;
+            this.SaveAllKeyLabel.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.SaveAllKeyLabel.Location = new System.Drawing.Point(204, 192);
+            this.SaveAllKeyLabel.Name = "SaveAllKeyLabel";
+            this.SaveAllKeyLabel.Size = new System.Drawing.Size(127, 15);
+            this.SaveAllKeyLabel.TabIndex = 17;
+            this.SaveAllKeyLabel.Text = "SaveAllKeyLabel";
+            // 
+            // SaveAllLabel
+            // 
+            this.SaveAllLabel.AutoSize = true;
+            this.SaveAllLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.SaveAllLabel.Location = new System.Drawing.Point(32, 192);
+            this.SaveAllLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.SaveAllLabel.Name = "SaveAllLabel";
+            this.SaveAllLabel.Size = new System.Drawing.Size(71, 15);
+            this.SaveAllLabel.TabIndex = 16;
+            this.SaveAllLabel.Text = "Save All";
+            this.SaveAllLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // SaveLabel
             // 
             this.SaveLabel.AutoSize = true;
@@ -226,7 +257,7 @@
             this.SaveLabel.Name = "SaveLabel";
             this.SaveLabel.Size = new System.Drawing.Size(39, 15);
             this.SaveLabel.TabIndex = 2;
-            this.SaveLabel.Text = "SAVE";
+            this.SaveLabel.Text = "Save";
             this.SaveLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // RestoreAllKeyLabel
@@ -247,7 +278,7 @@
             this.RestoreLabel.Name = "RestoreLabel";
             this.RestoreLabel.Size = new System.Drawing.Size(63, 15);
             this.RestoreLabel.TabIndex = 5;
-            this.RestoreLabel.Text = "RESTORE";
+            this.RestoreLabel.Text = "Restore";
             this.RestoreLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // RestoreKeyLabel
@@ -262,13 +293,13 @@
             // 
             // RestoreKeyBtn
             // 
-            this.RestoreKeyBtn.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.RestoreKeyBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.RestoreKeyBtn.Location = new System.Drawing.Point(507, 105);
             this.RestoreKeyBtn.Name = "RestoreKeyBtn";
-            this.RestoreKeyBtn.Size = new System.Drawing.Size(90, 40);
+            this.RestoreKeyBtn.Size = new System.Drawing.Size(120, 40);
             this.RestoreKeyBtn.TabIndex = 12;
             this.RestoreKeyBtn.Text = "Edit";
-            this.RestoreKeyBtn.UseVisualStyleBackColor = true;
+            this.RestoreKeyBtn.UseVisualStyleBackColor = false;
             // 
             // SaveKeyLabel
             // 
@@ -282,37 +313,37 @@
             // 
             // SaveKeyBtn
             // 
-            this.SaveKeyBtn.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.SaveKeyBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.SaveKeyBtn.Location = new System.Drawing.Point(507, 38);
             this.SaveKeyBtn.Name = "SaveKeyBtn";
-            this.SaveKeyBtn.Size = new System.Drawing.Size(90, 40);
+            this.SaveKeyBtn.Size = new System.Drawing.Size(120, 40);
             this.SaveKeyBtn.TabIndex = 10;
             this.SaveKeyBtn.Text = "Edit";
-            this.SaveKeyBtn.UseVisualStyleBackColor = true;
+            this.SaveKeyBtn.UseVisualStyleBackColor = false;
             // 
             // DisableInFullScreenCheckBox
             // 
             this.DisableInFullScreenCheckBox.AutoSize = true;
+            this.DisableInFullScreenCheckBox.BackColor = System.Drawing.SystemColors.Window;
             this.DisableInFullScreenCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.DisableInFullScreenCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.DisableInFullScreenCheckBox.Location = new System.Drawing.Point(32, 350);
             this.DisableInFullScreenCheckBox.Margin = new System.Windows.Forms.Padding(2);
             this.DisableInFullScreenCheckBox.Name = "DisableInFullScreenCheckBox";
-            this.DisableInFullScreenCheckBox.Size = new System.Drawing.Size(240, 20);
+            this.DisableInFullScreenCheckBox.Size = new System.Drawing.Size(237, 19);
             this.DisableInFullScreenCheckBox.TabIndex = 6;
             this.DisableInFullScreenCheckBox.TabStop = false;
             this.DisableInFullScreenCheckBox.Text = "Disable in FullScreen Mode";
-            this.DisableInFullScreenCheckBox.UseVisualStyleBackColor = true;
+            this.DisableInFullScreenCheckBox.UseVisualStyleBackColor = false;
             // 
             // RestoreAllKeyBtn
             // 
-            this.RestoreAllKeyBtn.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.RestoreAllKeyBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.RestoreAllKeyBtn.Location = new System.Drawing.Point(507, 256);
             this.RestoreAllKeyBtn.Name = "RestoreAllKeyBtn";
-            this.RestoreAllKeyBtn.Size = new System.Drawing.Size(90, 40);
+            this.RestoreAllKeyBtn.Size = new System.Drawing.Size(120, 40);
             this.RestoreAllKeyBtn.TabIndex = 13;
             this.RestoreAllKeyBtn.Text = "Edit";
-            this.RestoreAllKeyBtn.UseVisualStyleBackColor = true;
+            this.RestoreAllKeyBtn.UseVisualStyleBackColor = false;
             // 
             // RestoreAllLabel
             // 
@@ -322,7 +353,7 @@
             this.RestoreAllLabel.Name = "RestoreAllLabel";
             this.RestoreAllLabel.Size = new System.Drawing.Size(95, 15);
             this.RestoreAllLabel.TabIndex = 9;
-            this.RestoreAllLabel.Text = "RESTORE ALL";
+            this.RestoreAllLabel.Text = "Restore All";
             this.RestoreAllLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // ProcessesPage
@@ -365,45 +396,12 @@
             // 
             this.UpdateCheckBox.AutoSize = true;
             this.UpdateCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.UpdateCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.UpdateCheckBox.Location = new System.Drawing.Point(26, 160);
             this.UpdateCheckBox.Name = "UpdateCheckBox";
-            this.UpdateCheckBox.Size = new System.Drawing.Size(280, 20);
+            this.UpdateCheckBox.Size = new System.Drawing.Size(277, 19);
             this.UpdateCheckBox.TabIndex = 12;
             this.UpdateCheckBox.Text = "Checking for updates at startup";
             this.UpdateCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // SaveAllLabel
-            // 
-            this.SaveAllLabel.AutoSize = true;
-            this.SaveAllLabel.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.SaveAllLabel.Location = new System.Drawing.Point(32, 192);
-            this.SaveAllLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.SaveAllLabel.Name = "SaveAllLabel";
-            this.SaveAllLabel.Size = new System.Drawing.Size(71, 15);
-            this.SaveAllLabel.TabIndex = 16;
-            this.SaveAllLabel.Text = "SAVE ALL";
-            this.SaveAllLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // SaveAllKeyLabel
-            // 
-            this.SaveAllKeyLabel.AutoSize = true;
-            this.SaveAllKeyLabel.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.SaveAllKeyLabel.Location = new System.Drawing.Point(204, 192);
-            this.SaveAllKeyLabel.Name = "SaveAllKeyLabel";
-            this.SaveAllKeyLabel.Size = new System.Drawing.Size(127, 15);
-            this.SaveAllKeyLabel.TabIndex = 17;
-            this.SaveAllKeyLabel.Text = "SaveAllKeyLabel";
-            // 
-            // SaveAllKeyBtn
-            // 
-            this.SaveAllKeyBtn.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.SaveAllKeyBtn.Location = new System.Drawing.Point(507, 179);
-            this.SaveAllKeyBtn.Name = "SaveAllKeyBtn";
-            this.SaveAllKeyBtn.Size = new System.Drawing.Size(90, 40);
-            this.SaveAllKeyBtn.TabIndex = 18;
-            this.SaveAllKeyBtn.Text = "Edit";
-            this.SaveAllKeyBtn.UseVisualStyleBackColor = true;
             // 
             // SettingForm
             // 

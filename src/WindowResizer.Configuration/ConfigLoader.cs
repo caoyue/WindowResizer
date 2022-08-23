@@ -9,10 +9,10 @@ namespace WindowResizer.Configuration
 {
     public static class ConfigLoader
     {
-        private const string ConfigFile = "WindowResizer.config.json";
+        private const string ConfigFile = $"{nameof(WindowResizer)}.config.json";
 
         private static readonly string RoamingPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WindowResizer");
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(WindowResizer));
 
         private static string _roamingConfigPath = Path.Combine(RoamingPath, ConfigFile);
 
@@ -67,7 +67,12 @@ namespace WindowResizer.Configuration
                 return;
             }
 
-            Config.Keys = c.Keys;
+            Config.Keys.Clear();
+            foreach (var key in c.Keys)
+            {
+                Config.SetKeys(key.Key, key.Value);
+            }
+
             Config.DisableInFullScreen = c.DisableInFullScreen;
             Config.WindowSizes = c.WindowSizes;
             Config.CheckUpdate = c.CheckUpdate;
@@ -117,7 +122,12 @@ namespace WindowResizer.Configuration
         public static Hotkeys SetKeys(this Config config, HotkeysType type, Hotkeys hotkeys)
         {
             var configKeys = config.GetKeys(type) ?? new Hotkeys();
-            configKeys.ModifierKeys = hotkeys.ModifierKeys;
+            configKeys.ModifierKeys.Clear();
+            foreach (var key in hotkeys.ModifierKeys)
+            {
+                configKeys.ModifierKeys.Add(key);
+            }
+
             configKeys.Key = hotkeys.Key;
             config.Keys[type] = configKeys;
             return configKeys;
