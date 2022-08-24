@@ -1,9 +1,8 @@
-﻿namespace WindowResizer.Common.Windows
+﻿namespace WindowResizer.Common.Windows;
+
+public enum WindowState
 {
-    public enum WindowState
-    {
-        Normal = 0,
-        Minimized = 1,
-        Maximized = 2,
-    }
+    Normal = 0,
+    Minimized = 1,
+    Maximized = 2,
 }

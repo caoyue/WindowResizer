@@ -153,8 +153,8 @@ namespace WindowResizer
             _hotKeys.Clear();
             _pressedKeys.Clear();
             _recordingControl.Button.Text = "Recording...";
-            _recordingControl.Button.ForeColor = SystemColors.ControlLight;
-            _recordingControl.Button.BackColor = Color.Brown;
+            _recordingControl.Button.ForeColor = Color.White;
+            _recordingControl.Button.BackColor = Color.Red;
             _recordingControl.Label.Text = "Waiting...";
 
 

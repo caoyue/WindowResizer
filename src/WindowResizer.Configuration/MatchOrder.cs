@@ -1,10 +1,9 @@
-namespace WindowResizer.Configuration
+namespace WindowResizer.Configuration;
+
+public enum MatchOrder
 {
-    public enum MatchOrder
-    {
-        FullMatch = 1,
-        PrefixMatch = 2,
-        SuffixMatch = 3,
-        WildcardMatch = 4,
-    }
+    FullMatch = 1,
+    PrefixMatch = 2,
+    SuffixMatch = 3,
+    WildcardMatch = 4,
 }

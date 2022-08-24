@@ -5,132 +5,131 @@ using System.Linq;
 using Newtonsoft.Json;
 using WindowResizer.Common.Shortcuts;
 
-namespace WindowResizer.Configuration
+namespace WindowResizer.Configuration;
+
+public static class ConfigLoader
 {
-    public static class ConfigLoader
+    private const string ConfigFile = $"{nameof(WindowResizer)}.config.json";
+
+    private static readonly string RoamingPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(WindowResizer));
+
+    private static string _roamingConfigPath = Path.Combine(RoamingPath, ConfigFile);
+
+    private static string _portableConfigPath = string.Empty;
+
+    public static bool PortableMode => File.Exists(RoamingPath);
+
+    public static void SetPath(string roamingPath, string portablePath)
     {
-        private const string ConfigFile = $"{nameof(WindowResizer)}.config.json";
+        _roamingConfigPath = roamingPath;
+        _portableConfigPath = portablePath;
+    }
 
-        private static readonly string RoamingPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(WindowResizer));
+    public static string ConfigPath => PortableMode ? _portableConfigPath : _roamingConfigPath;
 
-        private static string _roamingConfigPath = Path.Combine(RoamingPath, ConfigFile);
+    public static readonly Config Config = new();
 
-        private static string _portableConfigPath = string.Empty;
 
-        public static bool PortableMode => File.Exists(RoamingPath);
-
-        public static void SetPath(string roamingPath, string portablePath)
+    public static void Load()
+    {
+        if (!File.Exists(ConfigPath))
         {
-            _roamingConfigPath = roamingPath;
-            _portableConfigPath = portablePath;
+            UseDefault();
+
+            Save();
+            return;
         }
 
-        public static string ConfigPath => PortableMode ? _portableConfigPath : _roamingConfigPath;
+        Load(ConfigPath);
+    }
 
-        public static readonly Config Config = new();
-
-
-        public static void Load()
+    public static void UseDefault()
+    {
+        Config.Keys.Clear();
+        foreach (var key in Config.DefaultKeys)
         {
-            if (!File.Exists(ConfigPath))
-            {
-                UseDefault();
-
-                Save();
-                return;
-            }
-
-            Load(ConfigPath);
+            Config.Keys.Add(key.Key, key.Value);
         }
 
-        public static void UseDefault()
+
+        Config.DisableInFullScreen = true;
+        Config.WindowSizes.Clear();
+        Config.CheckUpdate = true;
+    }
+
+    public static void Load(string path)
+    {
+        var text = File.ReadAllText(path);
+        var c = JsonConvert.DeserializeObject<Config>(text);
+        if (c is null)
         {
-            Config.Keys.Clear();
-            foreach (var key in Config.DefaultKeys)
-            {
-                Config.Keys.Add(key.Key, key.Value);
-            }
-
-
-            Config.DisableInFullScreen = true;
-            Config.WindowSizes.Clear();
-            Config.CheckUpdate = true;
+            return;
         }
 
-        public static void Load(string path)
+        Config.Keys.Clear();
+        foreach (var key in c.Keys)
         {
-            var text = File.ReadAllText(path);
-            var c = JsonConvert.DeserializeObject<Config>(text);
-            if (c is null)
-            {
-                return;
-            }
-
-            Config.Keys.Clear();
-            foreach (var key in c.Keys)
-            {
-                Config.SetKeys(key.Key, key.Value);
-            }
-
-            Config.DisableInFullScreen = c.DisableInFullScreen;
-            Config.WindowSizes = c.WindowSizes;
-            Config.CheckUpdate = c.CheckUpdate;
-
-            Config.Migrate(c);
-
-            if (!Config.WindowSizes.Any())
-            {
-                return;
-            }
-
-            var sortedInstance = new BindingList<WindowSize>(
-                Config.WindowSizes
-                      .OrderBy(w => w.Name)
-                      .ThenBy(w => w.Title)
-                      .ToList()
-            );
-            Config.WindowSizes = sortedInstance;
+            Config.SetKeys(key.Key, key.Value);
         }
 
-        public static void Save()
+        Config.DisableInFullScreen = c.DisableInFullScreen;
+        Config.WindowSizes = c.WindowSizes;
+        Config.CheckUpdate = c.CheckUpdate;
+
+        Config.Migrate(c);
+
+        if (!Config.WindowSizes.Any())
         {
-            var json = JsonConvert.SerializeObject(Config);
-            new FileInfo(ConfigPath).Directory?.Create();
-            File.WriteAllText(ConfigPath, json);
+            return;
         }
 
-        public static void Move(bool portable)
-        {
-            if (portable && !PortableMode)
-            {
-                File.Move(_roamingConfigPath, _portableConfigPath);
-            }
+        var sortedInstance = new BindingList<WindowSize>(
+            Config.WindowSizes
+                  .OrderBy(w => w.Name)
+                  .ThenBy(w => w.Title)
+                  .ToList()
+        );
+        Config.WindowSizes = sortedInstance;
+    }
 
-            if (!portable && PortableMode)
-            {
-                new FileInfo(_roamingConfigPath).Directory?.Create();
-                File.Move(_portableConfigPath, _roamingConfigPath);
-            }
+    public static void Save()
+    {
+        var json = JsonConvert.SerializeObject(Config);
+        new FileInfo(ConfigPath).Directory?.Create();
+        File.WriteAllText(ConfigPath, json);
+    }
+
+    public static void Move(bool portable)
+    {
+        if (portable && !PortableMode)
+        {
+            File.Move(_roamingConfigPath, _portableConfigPath);
         }
 
-        public static Hotkeys? GetKeys(this Config config, HotkeysType type)
+        if (!portable && PortableMode)
         {
-            return config.Keys.TryGetValue(type, out var k) ? k : null;
+            new FileInfo(_roamingConfigPath).Directory?.Create();
+            File.Move(_portableConfigPath, _roamingConfigPath);
+        }
+    }
+
+    public static Hotkeys? GetKeys(this Config config, HotkeysType type)
+    {
+        return config.Keys.TryGetValue(type, out var k) ? k : null;
+    }
+
+    public static Hotkeys SetKeys(this Config config, HotkeysType type, Hotkeys hotkeys)
+    {
+        var configKeys = config.GetKeys(type) ?? new Hotkeys();
+        configKeys.ModifierKeys.Clear();
+        foreach (var key in hotkeys.ModifierKeys)
+        {
+            configKeys.ModifierKeys.Add(key);
         }
 
-        public static Hotkeys SetKeys(this Config config, HotkeysType type, Hotkeys hotkeys)
-        {
-            var configKeys = config.GetKeys(type) ?? new Hotkeys();
-            configKeys.ModifierKeys.Clear();
-            foreach (var key in hotkeys.ModifierKeys)
-            {
-                configKeys.ModifierKeys.Add(key);
-            }
-
-            configKeys.Key = hotkeys.Key;
-            config.Keys[type] = configKeys;
-            return configKeys;
-        }
+        configKeys.Key = hotkeys.Key;
+        config.Keys[type] = configKeys;
+        return configKeys;
     }
 }
