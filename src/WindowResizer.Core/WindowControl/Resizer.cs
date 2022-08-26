@@ -64,7 +64,7 @@ public static class Resizer
         return NativeMethods.IsWindowVisible(handle);
     }
 
-    public static string? GetActiveWindowTitle(IntPtr handle)
+    public static string? GetWindowTitle(IntPtr handle)
     {
         const int nChars = 256;
         var buff = new StringBuilder(nChars);

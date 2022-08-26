@@ -23,7 +23,7 @@ namespace WindowResizer
 
         private static WindowEventHandler _windowEventHandler;
 
-        private const string ConfigFile = "WindowResizer.config.json";
+        private static readonly string ConfigFile = $"{nameof(WindowResizer)}.config.json";
 
         public TrayContext()
         {
@@ -159,9 +159,7 @@ namespace WindowResizer
                     windows.Reverse();
                     foreach (var window in windows)
                     {
-                        if (Resizer.IsWindowVisible(window)
-                            && !Resizer.IsChildWindow(window)
-                            && Resizer.GetWindowState(window) != WindowState.Minimized)
+                        if (Resizer.GetWindowState(window) != WindowState.Minimized)
                         {
                             ResizeWindow(window);
                         }
@@ -176,9 +174,7 @@ namespace WindowResizer
                     var windows = Resizer.GetOpenWindows();
                     foreach (var window in windows)
                     {
-                        if (Resizer.IsWindowVisible(window)
-                            && !Resizer.IsChildWindow(window)
-                            && Resizer.GetWindowState(window) != WindowState.Minimized)
+                        if (Resizer.GetWindowState(window) != WindowState.Minimized)
                         {
                             UpdateOrSaveWindowSize(window);
                         }
@@ -220,21 +216,15 @@ namespace WindowResizer
 
         private void ResizeWindow(IntPtr handle, bool showTips = false, bool onlyAuto = false)
         {
-            if (Resizer.IsChildWindow(handle))
-            {
-                return;
-            }
-
-            var process = Resizer.GetRealProcess(handle);
-            if (process == null || !TryGetProcessName(process, out string processName, showTips))
+            if (!IsProcessAvailable(handle, out string processName))
             {
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(processName)) return;
 
-            var title = process.MainWindowTitle;
-            var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, title, onlyAuto);
+            var windowTitle = Resizer.GetWindowTitle(handle) ?? string.Empty;
+            var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, windowTitle, onlyAuto);
             if (!match.NoMatch)
             {
                 MoveMatchWindow(match, handle);
@@ -243,7 +233,7 @@ namespace WindowResizer
             {
                 if (showTips)
                 {
-                    var titleStr = string.IsNullOrWhiteSpace(title) ? "" : $"({title})";
+                    var titleStr = string.IsNullOrWhiteSpace(windowTitle) ? "" : $"[{windowTitle}]";
                     ShowTooltips($"No saved settings for <{processName}>{titleStr}.", ToolTipIcon.Info, 2000);
                 }
             }
@@ -251,21 +241,32 @@ namespace WindowResizer
 
         private void UpdateOrSaveWindowSize(IntPtr handle)
         {
-            var process = Resizer.GetRealProcess(handle);
-            if (process is null || !TryGetProcessName(process, out string processName))
+            if (!IsProcessAvailable(handle, out string processName))
             {
                 return;
             }
 
-            if (Resizer.IsInvisibleProcess(processName))
-            {
-                return;
-            }
-
-            var title = process.MainWindowTitle;
-            var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, title);
+            var windowTitle = Resizer.GetWindowTitle(handle);
+            var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, windowTitle);
             var state = Resizer.GetWindowState(handle);
-            UpdateOrSaveConfig(match, processName, title, Resizer.GetRect(handle), state);
+            UpdateOrSaveConfig(match, processName, windowTitle, Resizer.GetRect(handle), state);
+        }
+
+        private bool IsProcessAvailable(IntPtr handle, out string processName)
+        {
+            processName = string.Empty;
+            if (Resizer.IsChildWindow(handle))
+            {
+                return false;
+            }
+
+            var process = Resizer.GetRealProcess(handle);
+            if (process is null || !TryGetProcessName(process, out processName))
+            {
+                return false;
+            }
+
+            return !Resizer.IsInvisibleProcess(processName);
         }
 
         private bool TryGetProcessName(Process process, out string processName, bool showTips = true)
