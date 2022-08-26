@@ -149,11 +149,22 @@ namespace WindowResizer
         private void PrecessesGrid_CellFormatting(object sender,
             DataGridViewCellFormattingEventArgs e)
         {
+            DataGridViewCell cell = ProcessesGrid.Rows[e.RowIndex].Cells[e.ColumnIndex];
             if ((e.ColumnIndex == ProcessesGrid.Columns["Name"]?.Index ||
                     e.ColumnIndex == ProcessesGrid.Columns["Title"]?.Index) && e.Value != null && e.Value.ToString().Length > 20)
             {
-                DataGridViewCell cell = ProcessesGrid.Rows[e.RowIndex].Cells[e.ColumnIndex];
                 cell.ToolTipText = cell.Value.ToString();
+            }
+
+            if ((e.ColumnIndex >= ProcessesGrid.Columns["Top"]?.Index && e.ColumnIndex <= ProcessesGrid.Columns["Bottom"]?.Index))
+            {
+                var r = ConfigLoader.Config.WindowSizes[e.RowIndex];
+                if (r.State == Common.Windows.WindowState.Maximized)
+                {
+                    cell.Style.ForeColor = SystemColors.GradientInactiveCaption;
+                    cell.ToolTipText = "window Maximized";
+                    cell.ReadOnly = true;
+                }
             }
         }
 

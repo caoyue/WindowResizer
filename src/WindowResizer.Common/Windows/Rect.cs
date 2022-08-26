@@ -12,6 +12,6 @@ public struct Rect
 
     public override string ToString()
     {
-        return $"{this.Left},{this.Top},{this.Right},{this.Bottom}";
+        return $"{this.Top},{this.Left},{this.Right},{this.Bottom}";
     }
 }
