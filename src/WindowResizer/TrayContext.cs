@@ -30,7 +30,8 @@ namespace WindowResizer
             try
             {
                 var roamingPath = Path.Combine(Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(WindowResizer)), ConfigFile);
+                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(WindowResizer)),
+                    ConfigFile);
                 var portablePath = Path.Combine(
                     Application.StartupPath, ConfigFile);
                 ConfigLoader.SetPath(roamingPath, portablePath);
@@ -52,11 +53,7 @@ namespace WindowResizer
             {
                 Icon = Resources.AppIcon,
                 ContextMenu =
-                    new ContextMenu(new[]
-                    {
-                        new MenuItem("Setting", OnSetting),
-                        new MenuItem("Exit", OnExit),
-                    }),
+                    new ContextMenu(new[] { new MenuItem("Setting", OnSetting), new MenuItem("Exit", OnExit), }),
                 Visible = true,
                 Text = nameof(WindowResizer)
             };
@@ -187,7 +184,7 @@ namespace WindowResizer
                 if (keys.KeysEqual(e.Modifier, e.Key))
                 {
                     var window = Resizer.GetForegroundHandle();
-                    UpdateOrSaveWindowSize(window);
+                    UpdateOrSaveWindowSize(window, true);
                     return;
                 }
 
@@ -216,7 +213,7 @@ namespace WindowResizer
 
         private void ResizeWindow(IntPtr handle, bool showTips = false, bool onlyAuto = false)
         {
-            if (!IsProcessAvailable(handle, out string processName))
+            if (!IsProcessAvailable(handle, out string processName, showTips))
             {
                 return;
             }
@@ -239,9 +236,9 @@ namespace WindowResizer
             }
         }
 
-        private void UpdateOrSaveWindowSize(IntPtr handle)
+        private void UpdateOrSaveWindowSize(IntPtr handle, bool showTips = false)
         {
-            if (!IsProcessAvailable(handle, out string processName))
+            if (!IsProcessAvailable(handle, out string processName, showTips))
             {
                 return;
             }
@@ -252,7 +249,7 @@ namespace WindowResizer
             UpdateOrSaveConfig(match, processName, windowTitle, Resizer.GetRect(handle), state);
         }
 
-        private bool IsProcessAvailable(IntPtr handle, out string processName)
+        private bool IsProcessAvailable(IntPtr handle, out string processName, bool showTips = false)
         {
             processName = string.Empty;
             if (Resizer.IsChildWindow(handle))
@@ -261,7 +258,7 @@ namespace WindowResizer
             }
 
             var process = Resizer.GetRealProcess(handle);
-            if (process is null || !TryGetProcessName(process, out processName))
+            if (process is null || !TryGetProcessName(process, out processName, showTips))
             {
                 return false;
             }
@@ -280,7 +277,8 @@ namespace WindowResizer
             {
                 if (showTips)
                 {
-                    var message = $"Unable to resize process <{process.ProcessName}>, elevated privileges may be required.";
+                    var message =
+                        $"Unable to resize process <{process.ProcessName}>, elevated privileges may be required.";
                     ShowTooltips(message, ToolTipIcon.Warning, 1500);
                     Log.Append($"{message}\nException: {e}");
                 }
@@ -297,8 +295,8 @@ namespace WindowResizer
             bool onlyAuto = false)
         {
             var windows = windowSizes.Where(w =>
-                                         w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase))
-                                     .ToList();
+                    w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
             if (onlyAuto)
             {
@@ -362,16 +360,10 @@ namespace WindowResizer
             if (match.NoMatch)
             {
                 // Add a wildcard match for all titles
-                InsertOrder(new WindowSize
-                {
-                    Name = processName, Title = "*", Rect = rect, State = state
-                });
+                InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect, State = state });
                 if (!string.IsNullOrWhiteSpace(title))
                 {
-                    InsertOrder(new WindowSize
-                    {
-                        Name = processName, Title = title, Rect = rect, State = state
-                    });
+                    InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect, State = state });
                 }
 
                 ConfigLoader.Save();
@@ -385,10 +377,7 @@ namespace WindowResizer
             }
             else if (!string.IsNullOrWhiteSpace(title))
             {
-                InsertOrder(new WindowSize
-                {
-                    Name = processName, Title = title, Rect = rect, State = state
-                });
+                InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect, State = state });
             }
 
             if (match.SuffixMatch != null)
@@ -410,10 +399,7 @@ namespace WindowResizer
             }
             else
             {
-                InsertOrder(new WindowSize
-                {
-                    Name = processName, Title = "*", Rect = rect, State = state
-                });
+                InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect, State = state });
             }
 
             ConfigLoader.Save();

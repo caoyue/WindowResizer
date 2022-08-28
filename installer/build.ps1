@@ -25,7 +25,8 @@ Nuget pack .\installer\WindowResizer.nuspec -Version $version -Properties Config
 Write-Host '>> releasing...' -ForegroundColor Green
 squirrel  --setupIcon .\src\WindowResizer\Resources\AppIcon.ico --shortcut-locations 'StartMenu' --releasify .\pack\WindowResizer.$version.nupkg --no-msi
 
-Write-Host 'releases files:' -ForegroundColor Green
+Start-Sleep -Seconds 3
+Write-Host 'waiting for releases files...' -ForegroundColor Green
 tree .\Releases /F
 
 Write-Host '>> done.' -ForegroundColor Green
