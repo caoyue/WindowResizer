@@ -1,29 +1,31 @@
-$ErrorActionPreference = "Stop"
-New-Alias squirrel .\packages\squirrel.windows.2.0.1\tools\Squirrel.exe
+$ErrorActionPreference = 'Stop'
+New-Alias squirrel $env:USERPROFILE\.nuget\packages\squirrel.windows\2.0.1\tools\Squirrel.exe
 
-$version=$args[0]
+$version = $args[0]
 
-if ($version -notmatch '\d\.\d\.\d')
-{
-    Write-Output "Error: Version not set correctly."
+if ($version -notmatch '\d\.\d\.\d') {
+    Write-Output 'Error: Version not set correctly.'
     exit 1
 }
 
-Write-Output ">> current version: ", $version
+Write-Host '>> current version: ', $version -ForegroundColor Green
 
 # build
-Write-Output ">> building..."
+Write-Host '>> building...' -ForegroundColor Green
 dotnet restore
 dotnet build
-dotnet publish .\src\WindowResizer\ -o publish  /p:Version=$version
+dotnet publish .\src\WindowResizer\ -c Release -o publish  /p:Version=$version
 
 # nuget pack
-Write-Output ">> packing..."
+Write-Host '>> packing...' -ForegroundColor Green
 Copy-Item .\installer\AppIcon.png .\publish\AppIcon.png
 Nuget pack .\installer\WindowResizer.nuspec -Version $version -Properties Configuration=Release -BasePath .\publish -OutputDirectory  .\pack
 
 # squirrel release
-Write-Output ">> releasing..."
+Write-Host '>> releasing...' -ForegroundColor Green
 squirrel  --setupIcon .\src\WindowResizer\Resources\AppIcon.ico --shortcut-locations 'StartMenu' --releasify .\pack\WindowResizer.$version.nupkg --no-msi
 
-Write-Output ">> done."
+Write-Host 'releases files:' -ForegroundColor Green
+tree .\Releases /F
+
+Write-Host '>> done.' -ForegroundColor Green
