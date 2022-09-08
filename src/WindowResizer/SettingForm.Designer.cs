@@ -58,6 +58,7 @@
             this.AboutPage = new System.Windows.Forms.TabPage();
             this.AboutGroup = new System.Windows.Forms.GroupBox();
             this.UpdateCheckBox = new System.Windows.Forms.CheckBox();
+            this.ProfileLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.ProcessesGrid)).BeginInit();
             this.ConfigExportGroup.SuspendLayout();
             this.SettingTab.SuspendLayout();
@@ -67,9 +68,9 @@
             this.AboutPage.SuspendLayout();
             this.AboutGroup.SuspendLayout();
             this.SuspendLayout();
-            // 
+            //
             // ProcessesGrid
-            // 
+            //
             this.ProcessesGrid.AllowUserToResizeRows = false;
             this.ProcessesGrid.BackgroundColor = System.Drawing.SystemColors.Window;
             this.ProcessesGrid.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -84,7 +85,7 @@
             this.ProcessesGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ProcessesGrid.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.ProcessesGrid.GridColor = System.Drawing.SystemColors.Window;
-            this.ProcessesGrid.Location = new System.Drawing.Point(19, 16);
+            this.ProcessesGrid.Location = new System.Drawing.Point(17, 16);
             this.ProcessesGrid.Margin = new System.Windows.Forms.Padding(4);
             this.ProcessesGrid.MultiSelect = false;
             this.ProcessesGrid.Name = "ProcessesGrid";
@@ -101,12 +102,12 @@
             this.ProcessesGrid.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.ProcessesGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.ProcessesGrid.ShowCellToolTips = false;
-            this.ProcessesGrid.Size = new System.Drawing.Size(935, 616);
+            this.ProcessesGrid.Size = new System.Drawing.Size(950, 600);
             this.ProcessesGrid.TabIndex = 7;
             this.ProcessesGrid.TabStop = false;
-            // 
+            //
             // ConfigExportBtn
-            // 
+            //
             this.ConfigExportBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.ConfigExportBtn.Location = new System.Drawing.Point(148, 89);
             this.ConfigExportBtn.Name = "ConfigExportBtn";
@@ -115,9 +116,9 @@
             this.ConfigExportBtn.Text = "Export";
             this.ConfigExportBtn.UseVisualStyleBackColor = false;
             this.ConfigExportBtn.Click += new System.EventHandler(this.ConfigExportBtn_Click);
-            // 
+            //
             // ConfigImportBtn
-            // 
+            //
             this.ConfigImportBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.ConfigImportBtn.Location = new System.Drawing.Point(26, 89);
             this.ConfigImportBtn.Name = "ConfigImportBtn";
@@ -126,9 +127,9 @@
             this.ConfigImportBtn.Text = "Import";
             this.ConfigImportBtn.UseVisualStyleBackColor = false;
             this.ConfigImportBtn.Click += new System.EventHandler(this.ConfigImportBtn_Click);
-            // 
+            //
             // PortableModeCheckBox
-            // 
+            //
             this.PortableModeCheckBox.AutoSize = true;
             this.PortableModeCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.PortableModeCheckBox.Location = new System.Drawing.Point(26, 46);
@@ -137,9 +138,9 @@
             this.PortableModeCheckBox.TabIndex = 11;
             this.PortableModeCheckBox.Text = "Portable Mode";
             this.PortableModeCheckBox.UseVisualStyleBackColor = true;
-            // 
+            //
             // ConfigExportGroup
-            // 
+            //
             this.ConfigExportGroup.Controls.Add(this.PortableModeCheckBox);
             this.ConfigExportGroup.Controls.Add(this.ConfigImportBtn);
             this.ConfigExportGroup.Controls.Add(this.ConfigExportBtn);
@@ -149,9 +150,9 @@
             this.ConfigExportGroup.TabIndex = 12;
             this.ConfigExportGroup.TabStop = false;
             this.ConfigExportGroup.Text = "Import/Export Config";
-            // 
+            //
             // GithubLinkLabel
-            // 
+            //
             this.GithubLinkLabel.Location = new System.Drawing.Point(26, 100);
             this.GithubLinkLabel.Name = "GithubLinkLabel";
             this.GithubLinkLabel.Size = new System.Drawing.Size(500, 24);
@@ -159,18 +160,18 @@
             this.GithubLinkLabel.TabStop = true;
             this.GithubLinkLabel.Text = "GithubLinkLabel";
             this.GithubLinkLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
+            //
             // VersionLabel
-            // 
+            //
             this.VersionLabel.Location = new System.Drawing.Point(26, 48);
             this.VersionLabel.Name = "VersionLabel";
             this.VersionLabel.Size = new System.Drawing.Size(300, 24);
             this.VersionLabel.TabIndex = 15;
             this.VersionLabel.Text = "VersionLabel";
             this.VersionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
+            //
             // SettingTab
-            // 
+            //
             this.SettingTab.Controls.Add(this.HotkeysPage);
             this.SettingTab.Controls.Add(this.ProcessesPage);
             this.SettingTab.Controls.Add(this.AboutPage);
@@ -179,23 +180,23 @@
             this.SettingTab.Name = "SettingTab";
             this.SettingTab.Padding = new System.Drawing.Point(0, 0);
             this.SettingTab.SelectedIndex = 0;
-            this.SettingTab.Size = new System.Drawing.Size(982, 683);
+            this.SettingTab.Size = new System.Drawing.Size(982, 679);
             this.SettingTab.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.SettingTab.TabIndex = 18;
-            // 
+            //
             // HotkeysPage
-            // 
+            //
             this.HotkeysPage.BackColor = System.Drawing.SystemColors.Window;
             this.HotkeysPage.Controls.Add(this.groupBox1);
             this.HotkeysPage.Location = new System.Drawing.Point(4, 44);
             this.HotkeysPage.Name = "HotkeysPage";
             this.HotkeysPage.Padding = new System.Windows.Forms.Padding(3);
-            this.HotkeysPage.Size = new System.Drawing.Size(974, 635);
+            this.HotkeysPage.Size = new System.Drawing.Size(974, 631);
             this.HotkeysPage.TabIndex = 0;
             this.HotkeysPage.Text = "Hotkeys";
-            // 
+            //
             // groupBox1
-            // 
+            //
             this.groupBox1.Controls.Add(this.SaveAllKeyBtn);
             this.groupBox1.Controls.Add(this.SaveAllKeyLabel);
             this.groupBox1.Controls.Add(this.SaveAllLabel);
@@ -215,9 +216,9 @@
             this.groupBox1.TabIndex = 16;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Hotkeys ";
-            // 
+            //
             // SaveAllKeyBtn
-            // 
+            //
             this.SaveAllKeyBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.SaveAllKeyBtn.Location = new System.Drawing.Point(507, 179);
             this.SaveAllKeyBtn.Name = "SaveAllKeyBtn";
@@ -225,9 +226,9 @@
             this.SaveAllKeyBtn.TabIndex = 18;
             this.SaveAllKeyBtn.Text = "Edit";
             this.SaveAllKeyBtn.UseVisualStyleBackColor = false;
-            // 
+            //
             // SaveAllKeyLabel
-            // 
+            //
             this.SaveAllKeyLabel.AutoSize = true;
             this.SaveAllKeyLabel.ForeColor = System.Drawing.SystemColors.Highlight;
             this.SaveAllKeyLabel.Location = new System.Drawing.Point(204, 192);
@@ -235,9 +236,9 @@
             this.SaveAllKeyLabel.Size = new System.Drawing.Size(127, 15);
             this.SaveAllKeyLabel.TabIndex = 17;
             this.SaveAllKeyLabel.Text = "SaveAllKeyLabel";
-            // 
+            //
             // SaveAllLabel
-            // 
+            //
             this.SaveAllLabel.AutoSize = true;
             this.SaveAllLabel.ForeColor = System.Drawing.SystemColors.ControlText;
             this.SaveAllLabel.Location = new System.Drawing.Point(32, 192);
@@ -247,9 +248,9 @@
             this.SaveAllLabel.TabIndex = 16;
             this.SaveAllLabel.Text = "Save All";
             this.SaveAllLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
+            //
             // SaveLabel
-            // 
+            //
             this.SaveLabel.AutoSize = true;
             this.SaveLabel.ForeColor = System.Drawing.SystemColors.ControlText;
             this.SaveLabel.Location = new System.Drawing.Point(32, 51);
@@ -259,9 +260,9 @@
             this.SaveLabel.TabIndex = 2;
             this.SaveLabel.Text = "Save";
             this.SaveLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
+            //
             // RestoreAllKeyLabel
-            // 
+            //
             this.RestoreAllKeyLabel.AutoSize = true;
             this.RestoreAllKeyLabel.ForeColor = System.Drawing.SystemColors.Highlight;
             this.RestoreAllKeyLabel.Location = new System.Drawing.Point(204, 269);
@@ -269,9 +270,9 @@
             this.RestoreAllKeyLabel.Size = new System.Drawing.Size(151, 15);
             this.RestoreAllKeyLabel.TabIndex = 15;
             this.RestoreAllKeyLabel.Text = "RestoreAllKeyLabel";
-            // 
+            //
             // RestoreLabel
-            // 
+            //
             this.RestoreLabel.AutoSize = true;
             this.RestoreLabel.Location = new System.Drawing.Point(32, 118);
             this.RestoreLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
@@ -280,9 +281,9 @@
             this.RestoreLabel.TabIndex = 5;
             this.RestoreLabel.Text = "Restore";
             this.RestoreLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
+            //
             // RestoreKeyLabel
-            // 
+            //
             this.RestoreKeyLabel.AutoSize = true;
             this.RestoreKeyLabel.ForeColor = System.Drawing.SystemColors.Highlight;
             this.RestoreKeyLabel.Location = new System.Drawing.Point(204, 118);
@@ -290,9 +291,9 @@
             this.RestoreKeyLabel.Size = new System.Drawing.Size(127, 15);
             this.RestoreKeyLabel.TabIndex = 14;
             this.RestoreKeyLabel.Text = "RestoreKeyLabel";
-            // 
+            //
             // RestoreKeyBtn
-            // 
+            //
             this.RestoreKeyBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.RestoreKeyBtn.Location = new System.Drawing.Point(507, 105);
             this.RestoreKeyBtn.Name = "RestoreKeyBtn";
@@ -300,9 +301,9 @@
             this.RestoreKeyBtn.TabIndex = 12;
             this.RestoreKeyBtn.Text = "Edit";
             this.RestoreKeyBtn.UseVisualStyleBackColor = false;
-            // 
+            //
             // SaveKeyLabel
-            // 
+            //
             this.SaveKeyLabel.AutoSize = true;
             this.SaveKeyLabel.ForeColor = System.Drawing.SystemColors.Highlight;
             this.SaveKeyLabel.Location = new System.Drawing.Point(204, 51);
@@ -310,9 +311,9 @@
             this.SaveKeyLabel.Size = new System.Drawing.Size(103, 15);
             this.SaveKeyLabel.TabIndex = 11;
             this.SaveKeyLabel.Text = "SaveKeyLabel";
-            // 
+            //
             // SaveKeyBtn
-            // 
+            //
             this.SaveKeyBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.SaveKeyBtn.Location = new System.Drawing.Point(507, 38);
             this.SaveKeyBtn.Name = "SaveKeyBtn";
@@ -320,9 +321,9 @@
             this.SaveKeyBtn.TabIndex = 10;
             this.SaveKeyBtn.Text = "Edit";
             this.SaveKeyBtn.UseVisualStyleBackColor = false;
-            // 
+            //
             // DisableInFullScreenCheckBox
-            // 
+            //
             this.DisableInFullScreenCheckBox.AutoSize = true;
             this.DisableInFullScreenCheckBox.BackColor = System.Drawing.SystemColors.Window;
             this.DisableInFullScreenCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -334,9 +335,9 @@
             this.DisableInFullScreenCheckBox.TabStop = false;
             this.DisableInFullScreenCheckBox.Text = "Disable in FullScreen Mode";
             this.DisableInFullScreenCheckBox.UseVisualStyleBackColor = false;
-            // 
+            //
             // RestoreAllKeyBtn
-            // 
+            //
             this.RestoreAllKeyBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.RestoreAllKeyBtn.Location = new System.Drawing.Point(507, 256);
             this.RestoreAllKeyBtn.Name = "RestoreAllKeyBtn";
@@ -344,9 +345,9 @@
             this.RestoreAllKeyBtn.TabIndex = 13;
             this.RestoreAllKeyBtn.Text = "Edit";
             this.RestoreAllKeyBtn.UseVisualStyleBackColor = false;
-            // 
+            //
             // RestoreAllLabel
-            // 
+            //
             this.RestoreAllLabel.AutoSize = true;
             this.RestoreAllLabel.Location = new System.Drawing.Point(32, 269);
             this.RestoreAllLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
@@ -355,33 +356,33 @@
             this.RestoreAllLabel.TabIndex = 9;
             this.RestoreAllLabel.Text = "Restore All";
             this.RestoreAllLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
+            //
             // ProcessesPage
-            // 
+            //
             this.ProcessesPage.AutoScroll = true;
             this.ProcessesPage.BackColor = System.Drawing.SystemColors.Window;
             this.ProcessesPage.Controls.Add(this.ProcessesGrid);
             this.ProcessesPage.Location = new System.Drawing.Point(4, 44);
             this.ProcessesPage.Name = "ProcessesPage";
             this.ProcessesPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ProcessesPage.Size = new System.Drawing.Size(974, 635);
+            this.ProcessesPage.Size = new System.Drawing.Size(974, 631);
             this.ProcessesPage.TabIndex = 1;
             this.ProcessesPage.Text = "Processes";
-            // 
+            //
             // AboutPage
-            // 
+            //
             this.AboutPage.BackColor = System.Drawing.SystemColors.Window;
             this.AboutPage.Controls.Add(this.AboutGroup);
             this.AboutPage.Controls.Add(this.ConfigExportGroup);
             this.AboutPage.Location = new System.Drawing.Point(4, 44);
             this.AboutPage.Name = "AboutPage";
             this.AboutPage.Padding = new System.Windows.Forms.Padding(3);
-            this.AboutPage.Size = new System.Drawing.Size(974, 635);
+            this.AboutPage.Size = new System.Drawing.Size(974, 631);
             this.AboutPage.TabIndex = 2;
             this.AboutPage.Text = "About";
-            // 
+            //
             // AboutGroup
-            // 
+            //
             this.AboutGroup.Controls.Add(this.UpdateCheckBox);
             this.AboutGroup.Controls.Add(this.VersionLabel);
             this.AboutGroup.Controls.Add(this.GithubLinkLabel);
@@ -391,9 +392,9 @@
             this.AboutGroup.TabIndex = 16;
             this.AboutGroup.TabStop = false;
             this.AboutGroup.Text = "About";
-            // 
+            //
             // UpdateCheckBox
-            // 
+            //
             this.UpdateCheckBox.AutoSize = true;
             this.UpdateCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.UpdateCheckBox.Location = new System.Drawing.Point(26, 160);
@@ -402,13 +403,24 @@
             this.UpdateCheckBox.TabIndex = 12;
             this.UpdateCheckBox.Text = "Checking for updates at startup";
             this.UpdateCheckBox.UseVisualStyleBackColor = true;
-            // 
+            //
+            // ProfileLabel
+            //
+            this.ProfileLabel.ForeColor = System.Drawing.SystemColors.InactiveCaption;
+            this.ProfileLabel.Location = new System.Drawing.Point(690, 694);
+            this.ProfileLabel.Name = "ProfileLabel";
+            this.ProfileLabel.Size = new System.Drawing.Size(300, 24);
+            this.ProfileLabel.TabIndex = 16;
+            this.ProfileLabel.Text = "Profile:";
+            this.ProfileLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            //
             // SettingForm
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.BackColor = System.Drawing.SystemColors.InactiveBorder;
             this.ClientSize = new System.Drawing.Size(1006, 721);
+            this.Controls.Add(this.ProfileLabel);
             this.Controls.Add(this.SettingTab);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
@@ -429,6 +441,8 @@
             this.AboutGroup.PerformLayout();
             this.ResumeLayout(false);
         }
+
+        private System.Windows.Forms.Label ProfileLabel;
 
         private System.Windows.Forms.Label SaveAllLabel;
         private System.Windows.Forms.Label SaveAllKeyLabel;

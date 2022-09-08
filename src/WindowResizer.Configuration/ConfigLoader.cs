@@ -18,6 +18,8 @@ public static class ConfigLoader
 
     private static string _portableConfigPath = string.Empty;
 
+    private const string DefaultProfileName = "default";
+
     public static bool PortableMode => File.Exists(RoamingPath);
 
     public static void SetPath(string roamingPath, string portablePath)
@@ -30,6 +32,7 @@ public static class ConfigLoader
 
     public static readonly Config Config = new();
 
+    public static readonly Profiles Profiles = new();
 
     public static void Load()
     {
@@ -46,6 +49,8 @@ public static class ConfigLoader
 
     public static void UseDefault()
     {
+        Profiles.Configs.Clear();
+
         Config.Keys.Clear();
         foreach (var key in Config.DefaultKeys)
         {
@@ -56,46 +61,35 @@ public static class ConfigLoader
         Config.DisableInFullScreen = true;
         Config.WindowSizes.Clear();
         Config.CheckUpdate = true;
+
+        Config.ProfileName = DefaultProfileName;
+        Config.IsCurrent = true;
+        Profiles.Configs.Add(Config);
     }
 
     public static void Load(string path)
     {
+        Profiles.Configs.Clear();
+
         var text = File.ReadAllText(path);
-        var c = JsonConvert.DeserializeObject<Config>(text);
-        if (c is null)
+        var p = JsonConvert.DeserializeObject<Profiles>(text);
+        if (p?.Configs is null || !p.Configs.Any())
         {
+            MigrateToProfile(path);
             return;
         }
 
-        Config.Keys.Clear();
-        foreach (var key in c.Keys)
+        foreach (var config in p.Configs)
         {
-            Config.SetKeys(key.Key, key.Value);
+            Profiles.Configs.Add(config);
         }
 
-        Config.DisableInFullScreen = c.DisableInFullScreen;
-        Config.WindowSizes = c.WindowSizes;
-        Config.CheckUpdate = c.CheckUpdate;
-
-        Config.Migrate(c);
-
-        if (!Config.WindowSizes.Any())
-        {
-            return;
-        }
-
-        var sortedInstance = new BindingList<WindowSize>(
-            Config.WindowSizes
-                  .OrderBy(w => w.Name)
-                  .ThenBy(w => w.Title)
-                  .ToList()
-        );
-        Config.WindowSizes = sortedInstance;
+        UseConfig(Profiles.Current);
     }
 
     public static void Save()
     {
-        var json = JsonConvert.SerializeObject(Config);
+        var json = JsonConvert.SerializeObject(Profiles);
         new FileInfo(ConfigPath).Directory?.Create();
         File.WriteAllText(ConfigPath, json);
     }
@@ -132,4 +126,69 @@ public static class ConfigLoader
         config.Keys[type] = configKeys;
         return configKeys;
     }
+
+
+    private static void UseConfig(Config c)
+    {
+        Config.ProfileName = c.ProfileName;
+        Config.IsCurrent = c.IsCurrent;
+        Config.DisableInFullScreen = c.DisableInFullScreen;
+        Config.WindowSizes = c.WindowSizes;
+        Config.CheckUpdate = c.CheckUpdate;
+
+        Config.Keys.Clear();
+        foreach (var key in c.Keys)
+        {
+            Config.SetKeys(key.Key, key.Value);
+        }
+    }
+
+
+    #region migrate config(v1.1.0) to profiles(v1.2.0)
+
+    private static void MigrateToProfile(string path)
+    {
+        LoadOldConfig(path);
+        Config.ProfileName = DefaultProfileName;
+        Config.IsCurrent = true;
+        Profiles.Configs.Add(Config);
+        Save();
+    }
+
+    private static void LoadOldConfig(string path)
+    {
+        var text = File.ReadAllText(path);
+        var c = JsonConvert.DeserializeObject<Config>(text);
+        if (c is null)
+        {
+            return;
+        }
+
+        Config.Keys.Clear();
+        foreach (var key in c.Keys)
+        {
+            Config.SetKeys(key.Key, key.Value);
+        }
+
+        Config.DisableInFullScreen = c.DisableInFullScreen;
+        Config.WindowSizes = c.WindowSizes;
+        Config.CheckUpdate = c.CheckUpdate;
+
+        Config.Migrate(c);
+
+        if (!Config.WindowSizes.Any())
+        {
+            return;
+        }
+
+        var sortedInstance = new BindingList<WindowSize>(
+            Config.WindowSizes
+                  .OrderBy(w => w.Name)
+                  .ThenBy(w => w.Title)
+                  .ToList()
+        );
+        Config.WindowSizes = sortedInstance;
+    }
+
+    #endregion
 }
