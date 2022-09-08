@@ -29,6 +29,8 @@ namespace WindowResizer
             FormClosing += SettingForm_Closing;
             Text = "WindowResizer - Setting";
 
+            ProfileLabel.Text = $"Profile: {ConfigLoader.Config.ProfileName}";
+
             HotkeysPageInit();
             ProcessesPageInit();
             AboutPageInit();

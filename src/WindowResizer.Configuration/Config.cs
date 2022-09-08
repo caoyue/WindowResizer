@@ -7,6 +7,10 @@ namespace WindowResizer.Configuration;
 
 public class Config
 {
+    public string ProfileName { get; set; } = string.Empty;
+
+    public bool IsCurrent { get; set; }
+
     public bool DisableInFullScreen { get; set; } = true;
 
     public bool CheckUpdate { get; set; } = true;
