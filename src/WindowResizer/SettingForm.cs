@@ -2,7 +2,9 @@ using System;
 using System.ComponentModel;
 using System.Windows.Forms;
 using WindowResizer.Configuration;
+using WindowResizer.Controls;
 using WindowResizer.Core.Shortcuts;
+using WindowResizer.Utils;
 
 namespace WindowResizer
 {
@@ -30,6 +32,7 @@ namespace WindowResizer
             Text = "WindowResizer - Setting";
 
             ProfileLabel.Text = $"Profile: {ConfigLoader.Config.ProfileName}";
+            Helper.SetToolTip(ProfileLabel, "Click to rename profile.");
 
             HotkeysPageInit();
             ProcessesPageInit();
@@ -56,6 +59,26 @@ namespace WindowResizer
             HotkeysPageInit();
             ConfigReload();
             ProcessesGrid.DataSource = ConfigLoader.Config.WindowSizes;
+        }
+
+        private void ProfileLabel_Click(object sender, EventArgs e)
+        {
+            using (Prompt prompt = new Prompt("Enter new profile name:", "Rename profile", this.Font))
+            {
+                string result = prompt.Result;
+                if (string.IsNullOrWhiteSpace(result))
+                {
+                    return;
+                }
+
+                if (ConfigLoader.RenameCurrentProfile(result.Trim()))
+                {
+                    ProfileLabel.Text = $"Profile: {ConfigLoader.Config.ProfileName}";
+                    return;
+                }
+
+                Helper.ShowMessageBox("Name already taken.");
+            }
         }
     }
 }

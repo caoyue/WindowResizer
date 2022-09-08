@@ -9,7 +9,23 @@ public class Profiles
     public List<Config> Configs { get; private set; } = new();
 
     [JsonIgnore]
+    public const string DefaultProfileName = "default";
+
+    [JsonIgnore]
     public Config Current => GetCurrentConfig();
+
+    public void Rename(string name)
+    {
+        Current.ProfileName = name;
+    }
+
+    public Profiles UseDefaultProfile()
+    {
+        Configs.Clear();
+        var defaultConfig = Config.DefaultConfig();
+        Configs.Add(defaultConfig);
+        return this;
+    }
 
     private Config GetCurrentConfig()
     {
@@ -21,10 +37,8 @@ public class Profiles
         var first = Configs.FirstOrDefault();
         if (first is null)
         {
-            return new Config
-            {
-                ProfileName = "default", IsCurrent = true,
-            };
+            UseDefaultProfile();
+            return Configs.First();
         }
 
         first.IsCurrent = true;

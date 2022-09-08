@@ -52,6 +52,23 @@ public class Config
         }
     };
 
+    public static Config DefaultConfig()
+    {
+        var c = new Config();
+        foreach (var key in DefaultKeys)
+        {
+            c.Keys.Add(key.Key, key.Value);
+        }
+
+        c.DisableInFullScreen = true;
+        c.WindowSizes.Clear();
+        c.CheckUpdate = true;
+
+        c.ProfileName = Profiles.DefaultProfileName;
+        c.IsCurrent = true;
+        return c;
+    }
+
     public void Migrate(Config migrateConfig)
     {
 #pragma warning disable CS0612
