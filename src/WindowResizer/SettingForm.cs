@@ -2,9 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Windows.Forms;
 using WindowResizer.Configuration;
-using WindowResizer.Controls;
 using WindowResizer.Core.Shortcuts;
-using WindowResizer.Utils;
 
 namespace WindowResizer
 {
@@ -29,13 +27,12 @@ namespace WindowResizer
             FormBorderStyle = FormBorderStyle.FixedSingle;
 
             FormClosing += SettingForm_Closing;
-            Text = "WindowResizer - Setting";
 
-            ProfileLabel.Text = $"Profile: {ConfigLoader.Config.ProfileName}";
-            Helper.SetToolTip(ProfileLabel, "Click to rename profile.");
+            SetWindowTitle();
 
             HotkeysPageInit();
             ProcessesPageInit();
+            ProfilesPageInit();
             AboutPageInit();
         }
 
@@ -50,35 +47,20 @@ namespace WindowResizer
             Hide();
         }
 
-        public delegate void ConfigReloadEvent();
+        private void SetWindowTitle()
+        {
+            Text = $"{nameof(WindowResizer)} - Setting  ::  {ConfigLoader.Current.ProfileName}";
+        }
+
+        public delegate void ConfigReloadEvent(string message);
 
         public ConfigReloadEvent ConfigReload;
 
-        private void ReloadConfig()
+        private void ReloadConfig(string message)
         {
-            HotkeysPageInit();
-            ConfigReload();
-            ProcessesGrid.DataSource = ConfigLoader.Config.WindowSizes;
-        }
-
-        private void ProfileLabel_Click(object sender, EventArgs e)
-        {
-            using (Prompt prompt = new Prompt("Enter new profile name:", "Rename profile", this.Font))
-            {
-                string result = prompt.Result;
-                if (string.IsNullOrWhiteSpace(result))
-                {
-                    return;
-                }
-
-                if (ConfigLoader.RenameCurrentProfile(result.Trim()))
-                {
-                    ProfileLabel.Text = $"Profile: {ConfigLoader.Config.ProfileName}";
-                    return;
-                }
-
-                Helper.ShowMessageBox("Name already taken.");
-            }
+            HotkeysPageReload();
+            ConfigReload(message);
+            ProcessesGrid.DataSource = ConfigLoader.Current.WindowSizes;
         }
     }
 }

@@ -53,7 +53,11 @@ namespace WindowResizer
             {
                 Icon = Resources.AppIcon,
                 ContextMenu =
-                    new ContextMenu(new[] { new MenuItem("Setting", OnSetting), new MenuItem("Exit", OnExit), }),
+                    new ContextMenu(new[]
+                    {
+                        new MenuItem("Setting", OnSetting),
+                        new MenuItem("Exit", OnExit),
+                    }),
                 Visible = true,
                 Text = nameof(WindowResizer)
             };
@@ -63,7 +67,7 @@ namespace WindowResizer
             _windowEventHandler = new WindowEventHandler(OnWindowCreated);
             _windowEventHandler.AddWindowCreateHandle();
 
-            if (ConfigLoader.Config.CheckUpdate)
+            if (ConfigLoader.Current.CheckUpdate)
             {
                 _updater = new SquirrelUpdater(ConfirmUpdate, (message, tipIcon, seconds) =>
                 {
@@ -100,7 +104,7 @@ namespace WindowResizer
             if (_settingForm == null)
             {
                 _settingForm = new SettingForm(_hook);
-                _settingForm.ConfigReload += ReloadConfig;
+                _settingForm.ConfigReload += s => ReloadConfig(s);
             }
 
             _settingForm.Show();
@@ -144,7 +148,7 @@ namespace WindowResizer
         {
             try
             {
-                if (ConfigLoader.Config.DisableInFullScreen && Resizer.IsForegroundFullScreen())
+                if (ConfigLoader.Current.DisableInFullScreen && Resizer.IsForegroundFullScreen())
                 {
                     return;
                 }
@@ -221,7 +225,7 @@ namespace WindowResizer
             if (string.IsNullOrWhiteSpace(processName)) return;
 
             var windowTitle = Resizer.GetWindowTitle(handle) ?? string.Empty;
-            var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, windowTitle, onlyAuto);
+            var match = GetMatchWindowSize(ConfigLoader.Current.WindowSizes, processName, windowTitle, onlyAuto);
             if (!match.NoMatch)
             {
                 MoveMatchWindow(match, handle);
@@ -244,7 +248,7 @@ namespace WindowResizer
             }
 
             var windowTitle = Resizer.GetWindowTitle(handle);
-            var match = GetMatchWindowSize(ConfigLoader.Config.WindowSizes, processName, windowTitle);
+            var match = GetMatchWindowSize(ConfigLoader.Current.WindowSizes, processName, windowTitle);
             var state = Resizer.GetWindowState(handle);
             UpdateOrSaveConfig(match, processName, windowTitle, Resizer.GetRect(handle), state);
         }
@@ -295,8 +299,8 @@ namespace WindowResizer
             bool onlyAuto = false)
         {
             var windows = windowSizes.Where(w =>
-                    w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+                                         w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase))
+                                     .ToList();
 
             if (onlyAuto)
             {
@@ -360,10 +364,16 @@ namespace WindowResizer
             if (match.NoMatch)
             {
                 // Add a wildcard match for all titles
-                InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect, State = state });
+                InsertOrder(new WindowSize
+                {
+                    Name = processName, Title = "*", Rect = rect, State = state
+                });
                 if (!string.IsNullOrWhiteSpace(title))
                 {
-                    InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect, State = state });
+                    InsertOrder(new WindowSize
+                    {
+                        Name = processName, Title = title, Rect = rect, State = state
+                    });
                 }
 
                 ConfigLoader.Save();
@@ -377,7 +387,10 @@ namespace WindowResizer
             }
             else if (!string.IsNullOrWhiteSpace(title))
             {
-                InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect, State = state });
+                InsertOrder(new WindowSize
+                {
+                    Name = processName, Title = title, Rect = rect, State = state
+                });
             }
 
             if (match.SuffixMatch != null)
@@ -399,7 +412,10 @@ namespace WindowResizer
             }
             else
             {
-                InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect, State = state });
+                InsertOrder(new WindowSize
+                {
+                    Name = processName, Title = "*", Rect = rect, State = state
+                });
             }
 
             ConfigLoader.Save();
@@ -407,7 +423,7 @@ namespace WindowResizer
 
         private static void InsertOrder(WindowSize item)
         {
-            var list = ConfigLoader.Config.WindowSizes;
+            var list = ConfigLoader.Current.WindowSizes;
             var backing = list.ToList();
             backing.Add(item);
             var index = backing.OrderBy(l => l.Name).ThenBy(l => l.Title).ToList().IndexOf(item);
@@ -416,13 +432,13 @@ namespace WindowResizer
 
 
         private static Hotkeys GetKeys(HotkeysType type) =>
-            ConfigLoader.Config.GetKeys(type);
+            ConfigLoader.Current.GetKeys(type);
 
-        private void ReloadConfig()
+        private void ReloadConfig(string message)
         {
             _hook.UnRegisterHotKey();
             RegisterHotkey();
-            ShowTooltips("Config reloaded.", ToolTipIcon.Info, 2000);
+            ShowTooltips(message, ToolTipIcon.Info, 2000);
         }
 
         private void ShowTooltips(string message, ToolTipIcon tipIcon, int mSeconds) =>
