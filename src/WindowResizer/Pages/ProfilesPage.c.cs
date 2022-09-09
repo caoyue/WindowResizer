@@ -13,6 +13,15 @@ namespace WindowResizer
         private const int ProfileMaxHeight = 480;
         private const int ProfileRowHeight = 60;
 
+        public void OnProfileSwitch(string message = null)
+        {
+            SetWindowTitle();
+            message = message ?? $"Profile switched to <{ConfigLoader.Current.ProfileName}>.";
+            ReloadConfig(message);
+
+            ResetButtonState();
+        }
+
         private void ProfilesPageInit()
         {
             NewProfile.Click += NewProfileBtn_Click;
@@ -170,7 +179,7 @@ namespace WindowResizer
             if (ConfigLoader.SwitchProfile(profileId))
             {
                 ReRenderProfiles();
-                OnProfileSwitch($"Profile switched to <{ConfigLoader.Current.ProfileName}>.");
+                OnProfileSwitch();
             }
         }
 
@@ -213,10 +222,22 @@ namespace WindowResizer
             Helper.ShowMessageBox("Profile can not be removed.");
         }
 
-        private void OnProfileSwitch(string message)
+        private void ResetButtonState()
         {
-            SetWindowTitle();
-            ReloadConfig(message);
+            foreach (var c in ConfigLoader.Profiles.Configs)
+            {
+                var isCurrent = c.ProfileId.Equals(ConfigLoader.Current.ProfileId);
+
+                var label = ProfilesLayout.Controls[$"ProfileLabel-{c.ProfileId}"];
+                label.Font = Helper.ChangeFontSize(this.Font, 12F, isCurrent ? FontStyle.Bold : FontStyle.Regular);
+                label.ForeColor = isCurrent ? SystemColors.Highlight : SystemColors.ControlText;
+
+                var switchBtn = ProfilesLayout.Controls[$"ProfileRemoveBtn-{c.ProfileId}"];
+                switchBtn.Enabled = !isCurrent;
+
+                var removeBtn = ProfilesLayout.Controls[$"ProfileRemoveBtn-{c.ProfileId}"];
+                removeBtn.Enabled = !isCurrent && ConfigLoader.Profiles.Configs.Count > 1;
+            }
         }
     }
 }

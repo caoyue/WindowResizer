@@ -51,15 +51,7 @@ namespace WindowResizer
 
             _trayIcon = new NotifyIcon
             {
-                Icon = Resources.AppIcon,
-                ContextMenu =
-                    new ContextMenu(new[]
-                    {
-                        new MenuItem("Setting", OnSetting),
-                        new MenuItem("Exit", OnExit),
-                    }),
-                Visible = true,
-                Text = nameof(WindowResizer)
+                Icon = Resources.AppIcon, ContextMenuStrip = BuildContextMenu(), Visible = true, Text = nameof(WindowResizer)
             };
 
             _trayIcon.DoubleClick += OnSetting;
@@ -75,6 +67,29 @@ namespace WindowResizer
                 });
                 Update();
             }
+        }
+
+        private ContextMenuStrip BuildContextMenu()
+        {
+            var menu = new ContextMenuStrip();
+            foreach (var c in ConfigLoader.Profiles.Configs)
+            {
+                var isCurrent = c.ProfileId.Equals(ConfigLoader.Current.ProfileId, StringComparison.Ordinal);
+                var image = isCurrent ? Resources.CheckIcon : null;
+                menu.Items.Add(new ToolStripMenuItem(c.ProfileName, image?.ToBitmap(), (s, e) => OnProfileChange(c.ProfileId)));
+            }
+
+            menu.Items.Add(new ToolStripSeparator());
+            menu.Items.Add(new ToolStripMenuItem("Setting", Resources.SettingIcon.ToBitmap(), OnSetting));
+            menu.Items.Add(new ToolStripMenuItem("Exit", Resources.ExitIcon.ToBitmap(), OnExit));
+            return menu;
+        }
+
+        private void OnProfileChange(string profileId)
+        {
+            ConfigLoader.Profiles.Switch(profileId);
+            _trayIcon.ContextMenuStrip = BuildContextMenu();
+            _settingForm?.OnProfileSwitch();
         }
 
         private void Update()
@@ -104,7 +119,7 @@ namespace WindowResizer
             if (_settingForm == null)
             {
                 _settingForm = new SettingForm(_hook);
-                _settingForm.ConfigReload += s => ReloadConfig(s);
+                _settingForm.ConfigReload += ReloadConfig;
             }
 
             _settingForm.Show();
@@ -292,6 +307,18 @@ namespace WindowResizer
             }
         }
 
+        private void ReloadConfig(string message)
+        {
+            _hook.UnRegisterHotKey();
+            RegisterHotkey();
+            ShowTooltips(message, ToolTipIcon.Info, 2000);
+        }
+
+        private void ShowTooltips(string message, ToolTipIcon tipIcon, int mSeconds) =>
+            _trayIcon.ShowBalloonTip(mSeconds, nameof(WindowResizer), message, tipIcon);
+
+        #region window resize
+
         private static MatchWindowSize GetMatchWindowSize(
             BindingList<WindowSize> windowSizes,
             string processName,
@@ -434,14 +461,6 @@ namespace WindowResizer
         private static Hotkeys GetKeys(HotkeysType type) =>
             ConfigLoader.Current.GetKeys(type);
 
-        private void ReloadConfig(string message)
-        {
-            _hook.UnRegisterHotKey();
-            RegisterHotkey();
-            ShowTooltips(message, ToolTipIcon.Info, 2000);
-        }
-
-        private void ShowTooltips(string message, ToolTipIcon tipIcon, int mSeconds) =>
-            _trayIcon.ShowBalloonTip(mSeconds, nameof(WindowResizer), message, tipIcon);
+        #endregion
     }
 }

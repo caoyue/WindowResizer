@@ -58,6 +58,7 @@ public class Profiles
 
     public delegate void ProfileSwitchEvent(Config config) ;
 
+    [JsonIgnore]
     public ProfileSwitchEvent? OnProfileSwitch;
 
     private Config? Get(string profileId) =>

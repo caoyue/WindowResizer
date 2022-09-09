@@ -134,7 +134,6 @@ public static class ConfigLoader
 
     #endregion
 
-
     public static Hotkeys? GetKeys(this Config config, HotkeysType type)
     {
         return config.Keys.TryGetValue(type, out var k) ? k : null;
