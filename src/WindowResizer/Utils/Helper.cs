@@ -1,4 +1,6 @@
+using System;
 using System.Drawing;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace WindowResizer.Utils
@@ -27,6 +29,25 @@ namespace WindowResizer.Utils
             toolTip.IsBalloon = true;
             toolTip.ShowAlways = true;
             toolTip.SetToolTip(control, message);
+        }
+
+        public static T Clone<T>(this T control)
+            where T : Control
+        {
+            PropertyInfo[] controlProperties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            T instance = Activator.CreateInstance<T>();
+
+            foreach (PropertyInfo propInfo in controlProperties)
+            {
+                if (propInfo.CanWrite)
+                {
+                    if (propInfo.Name != "WindowTarget")
+                        propInfo.SetValue(instance, propInfo.GetValue(control, null), null);
+                }
+            }
+
+            return instance;
         }
     }
 }

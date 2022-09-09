@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 
@@ -6,42 +7,72 @@ namespace WindowResizer.Configuration;
 
 public class Profiles
 {
+    public string CurrentProfileId { get; private set; } = string.Empty;
+
     public List<Config> Configs { get; private set; } = new();
 
     [JsonIgnore]
     public const string DefaultProfileName = "default";
 
     [JsonIgnore]
-    public Config Current => GetCurrentConfig();
+    public Config? Current => Get(CurrentProfileId);
 
-    public void Rename(string name)
-    {
-        Current.ProfileName = name;
-    }
-
-    public Profiles UseDefaultProfile()
+    public Config UseDefault()
     {
         Configs.Clear();
-        var defaultConfig = Config.DefaultConfig();
-        Configs.Add(defaultConfig);
-        return this;
+        var defaultConfig = Add(DefaultProfileName);
+        CurrentProfileId = defaultConfig.ProfileId;
+        return defaultConfig;
     }
 
-    private Config GetCurrentConfig()
+    public bool Rename(string profileId, string profileName)
     {
-        if (Configs.Exists(i => i.IsCurrent))
+        var profile = Get(profileId);
+        if (profile is null)
         {
-            return Configs.First();
+            return false;
         }
 
-        var first = Configs.FirstOrDefault();
-        if (first is null)
+        profile.ProfileName = profileName;
+        return true;
+    }
+
+    public Config Add(string profileName)
+    {
+        var newConfig = Config.NewConfig(profileName);
+        Configs.Add(newConfig);
+        return newConfig;
+    }
+
+    public bool Remove(string profileId)
+    {
+        var config = Get(profileId);
+        if (config is null)
         {
-            UseDefaultProfile();
-            return Configs.First();
+            return false;
         }
 
-        first.IsCurrent = true;
-        return first;
+        Configs.Remove(config);
+        return true;
+    }
+
+    public delegate void ProfileSwitchEvent(Config config) ;
+
+    public ProfileSwitchEvent? OnProfileSwitch;
+
+    private Config? Get(string profileId) =>
+        Configs.FirstOrDefault(i => i.ProfileId.Equals(profileId, StringComparison.Ordinal));
+
+    public bool Switch(string profileId)
+    {
+        var p = Get(profileId);
+        if (p is null)
+        {
+            return false;
+        }
+
+        CurrentProfileId = p.ProfileId;
+        OnProfileSwitch?.Invoke(p);
+        return true;
     }
 }

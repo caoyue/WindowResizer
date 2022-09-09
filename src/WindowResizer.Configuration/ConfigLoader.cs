@@ -18,7 +18,6 @@ public static class ConfigLoader
 
     private static string _portableConfigPath = string.Empty;
 
-    private static readonly Profiles Profiles = new();
 
     public static bool PortableMode => File.Exists(RoamingPath);
 
@@ -30,7 +29,11 @@ public static class ConfigLoader
 
     public static string ConfigPath => PortableMode ? _portableConfigPath : _roamingConfigPath;
 
-    public static Config Config => Profiles.Current;
+    public static readonly Profiles Profiles = new();
+
+    public static Config Current => GetCurrentConfig();
+
+    #region Config
 
     public static void Load()
     {
@@ -41,11 +44,6 @@ public static class ConfigLoader
         }
 
         Load(ConfigPath);
-    }
-
-    public static void UseDefault()
-    {
-        Profiles.UseDefaultProfile();
     }
 
     public static void Load(string path)
@@ -73,23 +71,6 @@ public static class ConfigLoader
         File.WriteAllText(ConfigPath, json);
     }
 
-    public static bool RenameCurrentProfile(string name)
-    {
-        if (name.Equals(Config.ProfileName))
-        {
-            return true;
-        }
-
-        if (Profiles.Configs.Exists(i => i.ProfileName.Equals(name)))
-        {
-            return false;
-        }
-
-        Config.ProfileName = name;
-        Save();
-        return true;
-    }
-
     public static void Move(bool portable)
     {
         if (portable && !PortableMode)
@@ -103,6 +84,56 @@ public static class ConfigLoader
             File.Move(_portableConfigPath, _roamingConfigPath);
         }
     }
+
+    #endregion
+
+    #region Profiles
+
+    public static void UseDefault() =>
+        Profiles.UseDefault();
+
+    public static bool RenameProfile(string profileId, string profileName)
+    {
+        if (!Profiles.Rename(profileId, profileName))
+        {
+            return false;
+        }
+
+        Save();
+        return true;
+    }
+
+    public static Config AddProfile(string profileName)
+    {
+        var p = Profiles.Add(profileName);
+        Save();
+        return p;
+    }
+
+    public static bool RemoveProfile(string profileId)
+    {
+        if (!Profiles.Remove(profileId))
+        {
+            return false;
+        }
+
+        Save();
+        return true;
+    }
+
+    public static bool SwitchProfile(string profileId)
+    {
+        if (!Profiles.Switch(profileId))
+        {
+            return false;
+        }
+
+        Save();
+        return true;
+    }
+
+    #endregion
+
 
     public static Hotkeys? GetKeys(this Config config, HotkeysType type)
     {
@@ -123,6 +154,24 @@ public static class ConfigLoader
         return configKeys;
     }
 
+    private static Config GetCurrentConfig()
+    {
+        var cur = Profiles.Current;
+        if (cur is not null)
+        {
+            return cur;
+        }
+
+        var f = Profiles.Configs.FirstOrDefault();
+        if (f is null)
+        {
+            return Profiles.UseDefault();
+        }
+
+        Profiles.Switch(f.ProfileId);
+        return f;
+    }
+
     #region migrate config(v1.1.0) to profiles(v1.2.0)
 
     private static void MigrateToProfile(string path)
@@ -133,8 +182,9 @@ public static class ConfigLoader
         if (config is not null)
         {
             config.ProfileName = Profiles.DefaultProfileName;
-            config.IsCurrent = true;
+            config.ProfileId = Config.GenerateConfigId();
             Profiles.Configs.Add(config);
+            Profiles.Switch(config.ProfileId);
             Save();
         }
     }

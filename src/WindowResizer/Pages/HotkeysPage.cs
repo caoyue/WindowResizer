@@ -60,8 +60,26 @@ namespace WindowResizer
                 control.Label.Font = Helper.ChangeFontSize(SaveLabel.Font, 12F, FontStyle.Bold);
             }
 
-            DisableInFullScreenCheckBox.Checked = ConfigLoader.Config.DisableInFullScreen;
+            DisableInFullScreenCheckBox.Checked = ConfigLoader.Current.DisableInFullScreen;
             DisableInFullScreenCheckBox.CheckedChanged += DisableInFullScreen_CheckedChanged;
+        }
+
+        private void HotkeysPageReload()
+        {
+            _keyRecordingControls.Clear();
+            _keyRecordingControls.Add(new HotkeysControl(HotkeysType.Save, SaveKeyBtn, SaveKeyLabel));
+            _keyRecordingControls.Add(new HotkeysControl(HotkeysType.Restore, RestoreKeyBtn, RestoreKeyLabel));
+            _keyRecordingControls.Add(new HotkeysControl(HotkeysType.SaveAll, SaveAllKeyBtn, SaveAllKeyLabel));
+            _keyRecordingControls.Add(new HotkeysControl(HotkeysType.RestoreAll, RestoreAllKeyBtn, RestoreAllKeyLabel));
+
+            SetToolTips();
+
+            foreach (var control in _keyRecordingControls)
+            {
+                control.Label.Text = GetLabelByType(control.Type);
+            }
+
+            DisableInFullScreenCheckBox.Checked = ConfigLoader.Current.DisableInFullScreen;
         }
 
         private void Stop_Recording(object sender, EventArgs e)
@@ -86,7 +104,7 @@ namespace WindowResizer
 
         private void DisableInFullScreen_CheckedChanged(object sender, EventArgs e)
         {
-            ConfigLoader.Config.DisableInFullScreen = DisableInFullScreenCheckBox.Checked;
+            ConfigLoader.Current.DisableInFullScreen = DisableInFullScreenCheckBox.Checked;
             ConfigLoader.Save();
         }
 
@@ -231,9 +249,9 @@ namespace WindowResizer
             !_hotKeys.Equals(GetKeys(type));
 
         private static void SetKeys(HotkeysType type, Hotkeys hotkeys) =>
-            ConfigLoader.Config.SetKeys(type, hotkeys);
+            ConfigLoader.Current.SetKeys(type, hotkeys);
 
         private static Hotkeys GetKeys(HotkeysType type) =>
-            ConfigLoader.Config.GetKeys(type);
+            ConfigLoader.Current.GetKeys(type);
     }
 }

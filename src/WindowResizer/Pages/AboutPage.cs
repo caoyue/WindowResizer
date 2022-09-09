@@ -13,7 +13,7 @@ namespace WindowResizer
 
         private void AboutPageInit()
         {
-            UpdateCheckBox.Checked = ConfigLoader.Config.CheckUpdate;
+            UpdateCheckBox.Checked = ConfigLoader.Current.CheckUpdate;
             UpdateCheckBox.CheckedChanged += UpdateCheckBox_CheckedChanged;
 
             VersionLabel.Text = $"{nameof(WindowResizer)} {Application.ProductVersion}";
@@ -27,7 +27,7 @@ namespace WindowResizer
 
         private void UpdateCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            ConfigLoader.Config.CheckUpdate = UpdateCheckBox.Checked;
+            ConfigLoader.Current.CheckUpdate = UpdateCheckBox.Checked;
             ConfigLoader.Save();
         }
 
@@ -78,13 +78,13 @@ namespace WindowResizer
                 ConfigLoader.Load(filePath);
                 ConfigLoader.Save();
 
-                ReloadConfig();
+                ReRenderProfiles();
+                OnProfileSwitch("Configs imported.");
             }
             catch (Exception)
             {
                 MessageBox.Show("Import failed, config file is not valid json.");
             }
-
         }
 
         private void PortableModeCheckBox_CheckedChanged(object sender, EventArgs e)

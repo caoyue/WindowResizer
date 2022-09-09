@@ -123,7 +123,7 @@ namespace WindowResizer
             }
 
             ProcessesGrid.AutoGenerateColumns = false;
-            ProcessesGrid.DataSource = ConfigLoader.Config.WindowSizes;
+            ProcessesGrid.DataSource = ConfigLoader.Current.WindowSizes;
 
             ProcessesGrid.ShowCellToolTips = true;
             ProcessesGrid.CellFormatting += PrecessesGrid_CellFormatting;
@@ -158,7 +158,7 @@ namespace WindowResizer
 
             if ((e.ColumnIndex >= ProcessesGrid.Columns["Top"]?.Index && e.ColumnIndex <= ProcessesGrid.Columns["Bottom"]?.Index))
             {
-                var r = ConfigLoader.Config.WindowSizes[e.RowIndex];
+                var r = ConfigLoader.Current.WindowSizes[e.RowIndex];
                 if (r.State == Common.Windows.WindowState.Maximized)
                 {
                     cell.Style.ForeColor = SystemColors.GradientInactiveCaption;
@@ -197,9 +197,9 @@ namespace WindowResizer
         {
             if (e.ColumnIndex == ProcessesGrid.Columns["Remove"]?.Index &&
                 e.RowIndex >= 0 &&
-                e.RowIndex < ConfigLoader.Config.WindowSizes.Count)
+                e.RowIndex < ConfigLoader.Current.WindowSizes.Count)
             {
-                ConfigLoader.Config.WindowSizes.RemoveAt(e.RowIndex);
+                ConfigLoader.Current.WindowSizes.RemoveAt(e.RowIndex);
                 ConfigLoader.Save();
             }
         }

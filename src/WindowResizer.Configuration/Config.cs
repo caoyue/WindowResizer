@@ -7,9 +7,9 @@ namespace WindowResizer.Configuration;
 
 public class Config
 {
-    public string ProfileName { get; set; } = string.Empty;
+    public string ProfileId { get; set; } = string.Empty;
 
-    public bool IsCurrent { get; set; }
+    public string ProfileName { get; set; } = string.Empty;
 
     public bool DisableInFullScreen { get; set; } = true;
 
@@ -52,20 +52,20 @@ public class Config
         }
     };
 
-    public static Config DefaultConfig()
+    public static Config NewConfig(string profileName)
     {
-        var c = new Config();
+        var c = new Config
+        {
+            ProfileId = GenerateConfigId(),
+            DisableInFullScreen = true,
+            CheckUpdate = true,
+            ProfileName = profileName,
+        };
+
         foreach (var key in DefaultKeys)
         {
             c.Keys.Add(key.Key, key.Value);
         }
-
-        c.DisableInFullScreen = true;
-        c.WindowSizes.Clear();
-        c.CheckUpdate = true;
-
-        c.ProfileName = Profiles.DefaultProfileName;
-        c.IsCurrent = true;
         return c;
     }
 
@@ -88,4 +88,22 @@ public class Config
         }
 #pragma warning restore CS0612
     }
+
+    public bool Equals(Config? x, Config? y)
+    {
+        if (x is null || y is null)
+        {
+            return false;
+        }
+
+        return x.ProfileId.Equals(y.ProfileId, StringComparison.Ordinal);
+    }
+
+    public int GetHashCode(Config obj)
+    {
+        return obj.ProfileId.GetHashCode();
+    }
+
+    public static string GenerateConfigId() =>
+        Guid.NewGuid().ToString("N");
 }
