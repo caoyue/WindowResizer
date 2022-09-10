@@ -123,7 +123,7 @@ namespace WindowResizer
             }
 
             ProcessesGrid.AutoGenerateColumns = false;
-            ProcessesGrid.DataSource = ConfigLoader.Current.WindowSizes;
+            ProcessesGrid.DataSource = ConfigFactory.Current.WindowSizes;
 
             ProcessesGrid.ShowCellToolTips = true;
             ProcessesGrid.CellFormatting += PrecessesGrid_CellFormatting;
@@ -143,7 +143,7 @@ namespace WindowResizer
 
         private void PrecessesGrid_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            ConfigLoader.Save();
+            ConfigFactory.Save();
         }
 
         private void PrecessesGrid_CellFormatting(object sender,
@@ -158,7 +158,7 @@ namespace WindowResizer
 
             if ((e.ColumnIndex >= ProcessesGrid.Columns["Top"]?.Index && e.ColumnIndex <= ProcessesGrid.Columns["Bottom"]?.Index))
             {
-                var r = ConfigLoader.Current.WindowSizes[e.RowIndex];
+                var r = ConfigFactory.Current.WindowSizes[e.RowIndex];
                 if (r.State == Common.Windows.WindowState.Maximized)
                 {
                     cell.Style.ForeColor = SystemColors.GradientInactiveCaption;
@@ -197,10 +197,10 @@ namespace WindowResizer
         {
             if (e.ColumnIndex == ProcessesGrid.Columns["Remove"]?.Index &&
                 e.RowIndex >= 0 &&
-                e.RowIndex < ConfigLoader.Current.WindowSizes.Count)
+                e.RowIndex < ConfigFactory.Current.WindowSizes.Count)
             {
-                ConfigLoader.Current.WindowSizes.RemoveAt(e.RowIndex);
-                ConfigLoader.Save();
+                ConfigFactory.Current.WindowSizes.RemoveAt(e.RowIndex);
+                ConfigFactory.Save();
             }
         }
     }
