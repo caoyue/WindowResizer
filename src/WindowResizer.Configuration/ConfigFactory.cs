@@ -60,6 +60,8 @@ public static class ConfigFactory
         {
             Profiles.Configs.Add(config);
         }
+
+        Profiles.Switch(p.CurrentProfileId);
     }
 
     public static void Save()

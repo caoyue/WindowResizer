@@ -256,6 +256,11 @@ namespace WindowResizer
                 var isCurrent = c.ProfileId.Equals(ConfigFactory.Current.ProfileId);
 
                 var label = ProfilesLayout.Controls[$"ProfileLabel-{c.ProfileId}"];
+                if (label is null)
+                {
+                    return;
+                }
+
                 label.Font = Helper.ChangeFontSize(this.Font, 12F, isCurrent ? FontStyle.Bold : FontStyle.Regular);
                 label.ForeColor = isCurrent ? SystemColors.Highlight : SystemColors.ControlText;
 

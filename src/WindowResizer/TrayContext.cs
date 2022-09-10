@@ -280,8 +280,7 @@ namespace WindowResizer
             {
                 if (showTips)
                 {
-                    var titleStr = string.IsNullOrWhiteSpace(windowTitle) ? "" : $"[{windowTitle}]";
-                    ShowTooltips($"No saved settings for <{processName}>{titleStr}.", ToolTipIcon.Info, 2000);
+                    ShowTooltips($"No saved settings for <{processName} :: {windowTitle}>.", ToolTipIcon.Info, 2000);
                 }
             }
         }
