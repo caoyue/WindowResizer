@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using WindowResizer.Configuration;
 using WindowResizer.Controls;
@@ -10,8 +11,19 @@ namespace WindowResizer
 {
     public partial class SettingForm
     {
-        private const int ProfileMaxHeight = 480;
-        private const int ProfileRowHeight = 60;
+        private int _profileRowHeight;
+        private int _profileMaxHeight;
+
+        private void ProfilesPageInit()
+        {
+            NewProfile.Click += NewProfileBtn_Click;
+
+            _profileRowHeight = ProfilesLayout.GetRowHeights().FirstOrDefault();
+            _profileMaxHeight = ProfileGroupBox.Height - 50;
+
+            InitProfilesLayout();
+            ReRenderProfiles();
+        }
 
         public void OnProfileSwitch(string message = null)
         {
@@ -22,18 +34,10 @@ namespace WindowResizer
             ResetButtonState();
         }
 
-        private void ProfilesPageInit()
-        {
-            NewProfile.Click += NewProfileBtn_Click;
-
-            InitProfilesLayout();
-            ReRenderProfiles();
-        }
-
         private void InitProfilesLayout()
         {
             ProfilesLayout.RowStyles.Clear();
-            ProfilesLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, ProfileRowHeight));
+            ProfilesLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, _profileRowHeight));
 
             ProfilesLayout.ColumnStyles.Clear();
             ProfilesLayout.ColumnCount = 4;
@@ -44,7 +48,7 @@ namespace WindowResizer
 
             ProfilesLayout.AutoSize = true;
             ProfilesLayout.AutoScroll = false;
-            ProfilesLayout.Height = ProfileRowHeight;
+            ProfilesLayout.Height = _profileRowHeight;
             ProfilesLayout.HorizontalScroll.Enabled = false;
         }
 
@@ -69,8 +73,8 @@ namespace WindowResizer
             label.AutoSize = false;
             label.ForeColor = SystemColors.ControlText;
             label.Name = $"ProfileLabel-{profile.ProfileId}";
-            label.Size = new Size(150, 40);
             label.Text = profile.ProfileName;
+            label.Size = SaveKeyLabel.Size;
             label.Font = Helper.ChangeFontSize(this.Font, 12F);
             label.TextAlign = ContentAlignment.MiddleLeft;
 
@@ -83,10 +87,12 @@ namespace WindowResizer
             label.Anchor = AnchorStyles.Left;
             ProfilesLayout.Controls.Add(label);
 
+            var btnSize = ConfigImportBtn.Size;
             var switchBtn = new Button();
             switchBtn.BackColor = SystemColors.ButtonFace;
             switchBtn.Name = $"ProfileSwitchBtn-{profile.ProfileId}";
-            switchBtn.Size = new Size(100, 40);
+            switchBtn.Size = btnSize;
+            switchBtn.Size = ConfigImportBtn.Size;
             switchBtn.Text = "Switch";
             switchBtn.UseVisualStyleBackColor = false;
             switchBtn.Enabled = !isCurrent;
@@ -97,7 +103,7 @@ namespace WindowResizer
             var renameBtn = new Button();
             renameBtn.BackColor = SystemColors.ButtonFace;
             renameBtn.Name = $"ProfileRenameBtn-{profile.ProfileId}";
-            renameBtn.Size = new Size(100, 40);
+            renameBtn.Size = btnSize;
             renameBtn.Text = "Rename";
             renameBtn.UseVisualStyleBackColor = false;
             renameBtn.Anchor = AnchorStyles.None;
@@ -107,7 +113,7 @@ namespace WindowResizer
             var removeBtn = new Button();
             removeBtn.BackColor = SystemColors.ButtonFace;
             removeBtn.Name = $"ProfileRemoveBtn-{profile.ProfileId}";
-            removeBtn.Size = new Size(100, 40);
+            removeBtn.Size = btnSize;
             removeBtn.Text = "Remove";
             removeBtn.UseVisualStyleBackColor = false;
             removeBtn.Enabled = !isCurrent && ConfigLoader.Profiles.Configs.Count > 1;
@@ -120,7 +126,7 @@ namespace WindowResizer
 
         private void OnRowAdded()
         {
-            ProfilesLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, ProfileRowHeight));
+            ProfilesLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, _profileRowHeight));
             ProfileResetHeight();
         }
 
@@ -141,11 +147,11 @@ namespace WindowResizer
             ProfilesLayout.HorizontalScroll.Enabled = false;
 
             var rowCount = ConfigLoader.Profiles.Configs.Count;
-            var scroll = rowCount > ProfileMaxHeight / ProfileRowHeight;
+            var scroll = rowCount > _profileMaxHeight / _profileRowHeight;
             ProfilesLayout.AutoSize = !scroll;
             ProfilesLayout.AutoScroll = scroll;
 
-            ProfilesLayout.Height = scroll ? ProfileMaxHeight : rowCount * ProfileRowHeight;
+            ProfilesLayout.Height = scroll ? _profileMaxHeight : rowCount * _profileRowHeight;
         }
 
         private void ClearProfiles()
@@ -155,9 +161,9 @@ namespace WindowResizer
 
         private void NewProfileBtn_Click(object sender, EventArgs e)
         {
-            using (Prompt prompt = new Prompt("Enter new profile name:", "New Profile", this.Font))
+            using (Prompt prompt = new Prompt("Enter new profile name:", "New Profile"))
             {
-                string result = prompt.Result;
+                string result = prompt.Dialog();
                 if (string.IsNullOrWhiteSpace(result))
                 {
                     return;
@@ -185,9 +191,9 @@ namespace WindowResizer
 
         private void ProfileRename_OnClick(string profileId)
         {
-            using (Prompt prompt = new Prompt("Enter new profile name:", "Rename profile", this.Font))
+            using (Prompt prompt = new Prompt("Enter new profile name:", "Rename profile"))
             {
-                string result = prompt.Result.Trim();
+                string result = prompt.Dialog();
                 if (string.IsNullOrWhiteSpace(result))
                 {
                     return;
