@@ -7,15 +7,26 @@ namespace WindowResizer.Configuration;
 
 public class Profiles
 {
+    public Profiles()
+    {
+    }
+
+    [JsonConstructor]
+    public Profiles(string currentProfileId, List<Config> configs)
+    {
+        CurrentProfileId = currentProfileId;
+        Configs = configs;
+    }
+
     public string CurrentProfileId { get; private set; } = string.Empty;
 
     public List<Config> Configs { get; private set; } = new();
 
-    [JsonIgnore]
-    public const string DefaultProfileName = "default";
+    [JsonIgnore] public const string DefaultProfileName = "default";
 
-    [JsonIgnore]
-    public Config? Current => Get(CurrentProfileId);
+    [JsonIgnore] public Config? Current => Get(CurrentProfileId);
+
+    [JsonIgnore] public readonly ProfileEvents ProfileEvents = new();
 
     public Config UseDefault()
     {
@@ -34,6 +45,7 @@ public class Profiles
         }
 
         profile.ProfileName = profileName;
+        ProfileEvents.ProfileRename?.Invoke(profileId, profileName);
         return true;
     }
 
@@ -41,6 +53,7 @@ public class Profiles
     {
         var newConfig = Config.NewConfig(profileName);
         Configs.Add(newConfig);
+        ProfileEvents.ProfileAdd?.Invoke(newConfig.ProfileId, newConfig.ProfileName);
         return newConfig;
     }
 
@@ -53,19 +66,18 @@ public class Profiles
         }
 
         Configs.Remove(config);
+        ProfileEvents.ProfileRemove?.Invoke(config.ProfileId);
         return true;
     }
 
-    public delegate void ProfileSwitchEvent(Config config) ;
-
-    [JsonIgnore]
-    public ProfileSwitchEvent? OnProfileSwitch;
-
-    private Config? Get(string profileId) =>
-        Configs.FirstOrDefault(i => i.ProfileId.Equals(profileId, StringComparison.Ordinal));
 
     public bool Switch(string profileId)
     {
+        if (profileId.Equals(CurrentProfileId, StringComparison.Ordinal))
+        {
+            return true;
+        }
+
         var p = Get(profileId);
         if (p is null)
         {
@@ -73,7 +85,10 @@ public class Profiles
         }
 
         CurrentProfileId = p.ProfileId;
-        OnProfileSwitch?.Invoke(p);
+        ProfileEvents.ProfileSwitch?.Invoke(p.ProfileId);
         return true;
     }
+
+    private Config? Get(string profileId) =>
+        Configs.FirstOrDefault(i => i.ProfileId.Equals(profileId, StringComparison.Ordinal));
 }

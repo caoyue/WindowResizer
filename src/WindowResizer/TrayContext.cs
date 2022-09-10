@@ -34,43 +34,29 @@ namespace WindowResizer
                     ConfigFile);
                 var portablePath = Path.Combine(
                     Application.StartupPath, ConfigFile);
-                ConfigLoader.SetPath(roamingPath, portablePath);
-                ConfigLoader.Load();
+                ConfigFactory.SetPath(roamingPath, portablePath);
+                ConfigFactory.Load();
             }
             catch (Exception e)
             {
-                var message = $"Config file {ConfigLoader.ConfigPath} load failed, use default configs.";
+                var message = $"Config file {ConfigFactory.ConfigPath} load failed, use default configs.";
                 Log.Append($"{message}\nException: {e}");
                 Helper.ShowMessageBox(message, MessageBoxIcon.Warning);
 
-                ConfigLoader.UseDefault();
-                ConfigLoader.Save();
+                ConfigFactory.UseDefault();
+                ConfigFactory.Save();
             }
 
             RegisterHotkey();
 
-            _trayIcon = new NotifyIcon
-            {
-                Icon = Resources.AppIcon,
-                ContextMenuStrip = BuildContextMenu(),
-                Visible = true,
-                Text = nameof(WindowResizer)
-            };
+            _trayIcon = BuildTrayIcon();
 
-            _trayIcon.MouseClick += (s, e) =>
-            {
-                if (e.Button == MouseButtons.Right)
-                {
-                    _trayIcon.ContextMenuStrip = BuildContextMenu();
-                }
-            };
-
-            _trayIcon.DoubleClick += OnSetting;
+            EventsHandle();
 
             _windowEventHandler = new WindowEventHandler(OnWindowCreated);
             _windowEventHandler.AddWindowCreateHandle();
 
-            if (ConfigLoader.Current.CheckUpdate)
+            if (ConfigFactory.Current.CheckUpdate)
             {
                 _updater = new SquirrelUpdater(ConfirmUpdate, (message, tipIcon, seconds) =>
                 {
@@ -80,12 +66,34 @@ namespace WindowResizer
             }
         }
 
+        private NotifyIcon BuildTrayIcon()
+        {
+            var trayIcon = new NotifyIcon
+            {
+                Icon = Resources.AppIcon,
+                ContextMenuStrip = BuildContextMenu(),
+                Visible = true,
+                Text = nameof(WindowResizer)
+            };
+
+            trayIcon.MouseClick += (s, e) =>
+            {
+                if (e.Button == MouseButtons.Right)
+                {
+                    _trayIcon.ContextMenuStrip = BuildContextMenu();
+                }
+            };
+
+            trayIcon.DoubleClick += OnSetting;
+            return trayIcon;
+        }
+
         private ContextMenuStrip BuildContextMenu()
         {
             var menu = new ContextMenuStrip();
-            foreach (var c in ConfigLoader.Profiles.Configs)
+            foreach (var c in ConfigFactory.Profiles.Configs)
             {
-                var isCurrent = c.ProfileId.Equals(ConfigLoader.Current.ProfileId, StringComparison.Ordinal);
+                var isCurrent = c.ProfileId.Equals(ConfigFactory.Current.ProfileId, StringComparison.Ordinal);
                 var image = isCurrent ? Resources.CheckIcon : null;
                 menu.Items.Add(new ToolStripMenuItem(c.ProfileName, image?.ToBitmap(),
                     (s, e) => OnProfileChange(c.ProfileId)));
@@ -97,11 +105,22 @@ namespace WindowResizer
             return menu;
         }
 
+        private void EventsHandle()
+        {
+            ConfigFactory.Profiles.ProfileEvents.ProfileAdd += (i, n) => RebuildContextMenu();
+            ConfigFactory.Profiles.ProfileEvents.ProfileSwitch += i => RebuildContextMenu();
+            ConfigFactory.Profiles.ProfileEvents.ProfileRename += (i, n) => RebuildContextMenu();
+            ConfigFactory.Profiles.ProfileEvents.ProfileRemove += i => RebuildContextMenu();
+        }
+
+        private void RebuildContextMenu()
+        {
+            _trayIcon.ContextMenuStrip = BuildContextMenu();
+        }
+
         private void OnProfileChange(string profileId)
         {
-            ConfigLoader.Profiles.Switch(profileId);
-            _trayIcon.ContextMenuStrip = BuildContextMenu();
-            _settingForm?.OnProfileSwitch();
+            ConfigFactory.ProfileSwitch(profileId);
         }
 
         private void Update()
@@ -120,7 +139,7 @@ namespace WindowResizer
         {
             _settingForm?.Close();
             _windowEventHandler.RemoveWindowCreateHandle();
-            ConfigLoader.Save();
+            ConfigFactory.Save();
             _trayIcon.Dispose();
             _hook.Dispose();
             Environment.Exit(0);
@@ -175,7 +194,7 @@ namespace WindowResizer
         {
             try
             {
-                if (ConfigLoader.Current.DisableInFullScreen && Resizer.IsForegroundFullScreen())
+                if (ConfigFactory.Current.DisableInFullScreen && Resizer.IsForegroundFullScreen())
                 {
                     return;
                 }
@@ -252,7 +271,7 @@ namespace WindowResizer
             if (string.IsNullOrWhiteSpace(processName)) return;
 
             var windowTitle = Resizer.GetWindowTitle(handle) ?? string.Empty;
-            var match = GetMatchWindowSize(ConfigLoader.Current.WindowSizes, processName, windowTitle, onlyAuto);
+            var match = GetMatchWindowSize(ConfigFactory.Current.WindowSizes, processName, windowTitle, onlyAuto);
             if (!match.NoMatch)
             {
                 MoveMatchWindow(match, handle);
@@ -275,7 +294,7 @@ namespace WindowResizer
             }
 
             var windowTitle = Resizer.GetWindowTitle(handle);
-            var match = GetMatchWindowSize(ConfigLoader.Current.WindowSizes, processName, windowTitle);
+            var match = GetMatchWindowSize(ConfigFactory.Current.WindowSizes, processName, windowTitle);
             var state = Resizer.GetWindowState(handle);
             UpdateOrSaveConfig(match, processName, windowTitle, Resizer.GetRect(handle), state);
         }
@@ -409,7 +428,7 @@ namespace WindowResizer
                     InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect, State = state });
                 }
 
-                ConfigLoader.Save();
+                ConfigFactory.Save();
                 return;
             }
 
@@ -445,12 +464,12 @@ namespace WindowResizer
                 InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect, State = state });
             }
 
-            ConfigLoader.Save();
+            ConfigFactory.Save();
         }
 
         private static void InsertOrder(WindowSize item)
         {
-            var list = ConfigLoader.Current.WindowSizes;
+            var list = ConfigFactory.Current.WindowSizes;
             var backing = list.ToList();
             backing.Add(item);
             var index = backing.OrderBy(l => l.Name).ThenBy(l => l.Title).ToList().IndexOf(item);
@@ -459,7 +478,7 @@ namespace WindowResizer
 
 
         private static Hotkeys GetKeys(HotkeysType type) =>
-            ConfigLoader.Current.GetKeys(type);
+            ConfigFactory.Current.GetKeys(type);
 
         #endregion
     }

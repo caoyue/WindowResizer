@@ -13,7 +13,7 @@ namespace WindowResizer
 
         private void AboutPageInit()
         {
-            UpdateCheckBox.Checked = ConfigLoader.Current.CheckUpdate;
+            UpdateCheckBox.Checked = ConfigFactory.Current.CheckUpdate;
             UpdateCheckBox.CheckedChanged += UpdateCheckBox_CheckedChanged;
 
             VersionLabel.Text = $"{nameof(WindowResizer)} {Application.ProductVersion}";
@@ -21,14 +21,14 @@ namespace WindowResizer
             GithubLinkLabel.Text = ProjectLink;
             GithubLinkLabel.LinkClicked += LinkClicked;
 
-            PortableModeCheckBox.Checked = ConfigLoader.PortableMode;
+            PortableModeCheckBox.Checked = ConfigFactory.PortableMode;
             PortableModeCheckBox.CheckedChanged += PortableModeCheckBox_CheckedChanged;
         }
 
         private void UpdateCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            ConfigLoader.Current.CheckUpdate = UpdateCheckBox.Checked;
-            ConfigLoader.Save();
+            ConfigFactory.Current.CheckUpdate = UpdateCheckBox.Checked;
+            ConfigFactory.Save();
         }
 
         private void LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -50,7 +50,7 @@ namespace WindowResizer
                     File.Delete(saveFileDialog.FileName);
                 }
 
-                File.Copy(ConfigLoader.ConfigPath, saveFileDialog.FileName);
+                File.Copy(ConfigFactory.ConfigPath, saveFileDialog.FileName);
             }
         }
 
@@ -75,8 +75,8 @@ namespace WindowResizer
 
             try
             {
-                ConfigLoader.Load(filePath);
-                ConfigLoader.Save();
+                ConfigFactory.Load(filePath);
+                ConfigFactory.Save();
 
                 ReRenderProfiles();
                 OnProfileSwitch("Configs imported.");
@@ -94,7 +94,7 @@ namespace WindowResizer
             DialogResult dr = MessageBox.Show($"{desc} portable mode?", "Confirm", messButton);
             if (dr == DialogResult.OK)
             {
-                ConfigLoader.Move(PortableModeCheckBox.Checked);
+                ConfigFactory.Move(PortableModeCheckBox.Checked);
             }
             else
             {

@@ -23,16 +23,104 @@ namespace WindowResizer
 
             InitProfilesLayout();
             ReRenderProfiles();
+
+            EventsHandle();
         }
 
-        public void OnProfileSwitch(string message = null)
+        private void NewProfileBtn_Click(object sender, EventArgs e)
         {
-            SetWindowTitle();
-            message = message ?? $"Profile switched to <{ConfigLoader.Current.ProfileName}>.";
-            ReloadConfig(message);
+            using (Prompt prompt = new Prompt("Enter new profile name:", "New Profile"))
+            {
+                string result = prompt.Dialog();
+                if (string.IsNullOrWhiteSpace(result))
+                {
+                    return;
+                }
 
-            ResetButtonState();
+                ConfigFactory.ProfileAdd(result.Trim());
+            }
         }
+
+        private void ProfileSwitch_OnClick(string profileId)
+        {
+            if (profileId.Equals(ConfigFactory.Current.ProfileId))
+            {
+                return;
+            }
+
+            ConfigFactory.ProfileSwitch(profileId);
+        }
+
+        private void ProfileRename_OnClick(string profileId)
+        {
+            using (Prompt prompt = new Prompt("Enter new profile name:", "Rename profile"))
+            {
+                string result = prompt.Dialog();
+                if (string.IsNullOrWhiteSpace(result))
+                {
+                    return;
+                }
+
+                ConfigFactory.ProfileRename(profileId, result);
+            }
+        }
+
+        private void ProfileRemove_OnClick(string profileId)
+        {
+            if (!ConfigFactory.ProfileRemove(profileId))
+            {
+                Helper.ShowMessageBox("Profile can not be removed.");
+            }
+        }
+
+        #region Events
+
+        private void EventsHandle()
+        {
+            ConfigFactory.Profiles.ProfileEvents.ProfileAdd += OnProfileAdd;
+            ConfigFactory.Profiles.ProfileEvents.ProfileSwitch += id => OnProfileSwitch(id);
+            ConfigFactory.Profiles.ProfileEvents.ProfileRename += OnProfileRename;
+            ConfigFactory.Profiles.ProfileEvents.ProfileRemove += OnProfileRemove;
+        }
+
+        private void OnProfileAdd(string profileId, string profileName)
+        {
+            RenderProfile(profileId, profileName);
+            OnRowAdded();
+        }
+
+        private void OnProfileSwitch(string profileId, string message = null)
+        {
+            ResetButtonState();
+            SetWindowTitle();
+            message = message ?? $"Profile switched to <{ConfigFactory.Current.ProfileName}>.";
+            ReloadConfig(message);
+        }
+
+        private void OnProfileRename(string profileId, string profileName)
+        {
+            var label = ProfilesLayout.Controls[$"ProfileLabel-{profileId}"];
+            label.Text = profileName;
+
+            if (profileId.Equals(ConfigFactory.Current.ProfileId))
+            {
+                SetWindowTitle();
+            }
+        }
+
+        private void OnProfileRemove(string profileId)
+        {
+            ProfilesLayout.Controls.RemoveByKey($"ProfileLabel-{profileId}");
+            ProfilesLayout.Controls.RemoveByKey($"ProfileSwitchBtn-{profileId}");
+            ProfilesLayout.Controls.RemoveByKey($"ProfileRenameBtn-{profileId}");
+            ProfilesLayout.Controls.RemoveByKey($"ProfileRemoveBtn-{profileId}");
+
+            OnRowRemoved();
+        }
+
+        #endregion
+
+        #region layouts
 
         private void InitProfilesLayout()
         {
@@ -55,25 +143,25 @@ namespace WindowResizer
         private void ReRenderProfiles()
         {
             ClearProfiles();
-            var profiles = ConfigLoader.Profiles.Configs;
+            var profiles = ConfigFactory.Profiles.Configs;
 
             ProfilesLayout.RowCount = profiles.Count;
 
             foreach (var p in profiles)
             {
-                RenderProfile(p);
+                RenderProfile(p.ProfileId, p.ProfileName);
             }
         }
 
-        private void RenderProfile(Config profile)
+        private void RenderProfile(string profileId, string profileName)
         {
-            var isCurrent = ConfigLoader.Current.ProfileId.Equals(profile.ProfileId, StringComparison.Ordinal);
+            var isCurrent = ConfigFactory.Current.ProfileId.Equals(profileId, StringComparison.Ordinal);
 
             var label = new Label();
             label.AutoSize = false;
             label.ForeColor = SystemColors.ControlText;
-            label.Name = $"ProfileLabel-{profile.ProfileId}";
-            label.Text = profile.ProfileName;
+            label.Name = $"ProfileLabel-{profileId}";
+            label.Text = profileName;
             label.Size = SaveKeyLabel.Size;
             label.Font = Helper.ChangeFontSize(this.Font, 12F);
             label.TextAlign = ContentAlignment.MiddleLeft;
@@ -90,39 +178,41 @@ namespace WindowResizer
             var btnSize = ConfigImportBtn.Size;
             var switchBtn = new Button();
             switchBtn.BackColor = SystemColors.ButtonFace;
-            switchBtn.Name = $"ProfileSwitchBtn-{profile.ProfileId}";
+            switchBtn.Name = $"ProfileSwitchBtn-{profileId}";
             switchBtn.Size = btnSize;
             switchBtn.Size = ConfigImportBtn.Size;
             switchBtn.Text = "Switch";
             switchBtn.UseVisualStyleBackColor = false;
             switchBtn.Enabled = !isCurrent;
             switchBtn.Anchor = AnchorStyles.None;
-            switchBtn.Click += (s, e) => ProfileSwitch_OnClick(profile.ProfileId);
+            switchBtn.Click += (s, e) => ProfileSwitch_OnClick(profileId);
             ProfilesLayout.Controls.Add(switchBtn);
 
             var renameBtn = new Button();
             renameBtn.BackColor = SystemColors.ButtonFace;
-            renameBtn.Name = $"ProfileRenameBtn-{profile.ProfileId}";
+            renameBtn.Name = $"ProfileRenameBtn-{profileId}";
             renameBtn.Size = btnSize;
             renameBtn.Text = "Rename";
             renameBtn.UseVisualStyleBackColor = false;
             renameBtn.Anchor = AnchorStyles.None;
-            renameBtn.Click += (s, e) => ProfileRename_OnClick(profile.ProfileId);
+            renameBtn.Click += (s, e) => ProfileRename_OnClick(profileId);
             ProfilesLayout.Controls.Add(renameBtn);
 
             var removeBtn = new Button();
             removeBtn.BackColor = SystemColors.ButtonFace;
-            removeBtn.Name = $"ProfileRemoveBtn-{profile.ProfileId}";
+            removeBtn.Name = $"ProfileRemoveBtn-{profileId}";
             removeBtn.Size = btnSize;
             removeBtn.Text = "Remove";
             removeBtn.UseVisualStyleBackColor = false;
-            removeBtn.Enabled = !isCurrent && ConfigLoader.Profiles.Configs.Count > 1;
-            removeBtn.Click += (s, e) => ProfileRemove_OnClick(profile.ProfileId);
+            removeBtn.Enabled = !isCurrent && ConfigFactory.Profiles.Configs.Count > 1;
+            removeBtn.Click += (s, e) => ProfileRemove_OnClick(profileId);
             removeBtn.Anchor = AnchorStyles.None;
             ProfilesLayout.Controls.Add(removeBtn);
 
             OnRowAdded();
         }
+
+        #endregion
 
         private void OnRowAdded()
         {
@@ -146,7 +236,7 @@ namespace WindowResizer
             ProfilesLayout.AutoScroll = false;
             ProfilesLayout.HorizontalScroll.Enabled = false;
 
-            var rowCount = ConfigLoader.Profiles.Configs.Count;
+            var rowCount = ConfigFactory.Profiles.Configs.Count;
             var scroll = rowCount > _profileMaxHeight / _profileRowHeight;
             ProfilesLayout.AutoSize = !scroll;
             ProfilesLayout.AutoScroll = scroll;
@@ -159,90 +249,21 @@ namespace WindowResizer
             ProfilesLayout.Controls.Clear();
         }
 
-        private void NewProfileBtn_Click(object sender, EventArgs e)
-        {
-            using (Prompt prompt = new Prompt("Enter new profile name:", "New Profile"))
-            {
-                string result = prompt.Dialog();
-                if (string.IsNullOrWhiteSpace(result))
-                {
-                    return;
-                }
-
-                var p = ConfigLoader.AddProfile(result.Trim());
-                RenderProfile(p);
-                OnRowAdded();
-            }
-        }
-
-        private void ProfileSwitch_OnClick(string profileId)
-        {
-            if (profileId.Equals(ConfigLoader.Current.ProfileId))
-            {
-                return;
-            }
-
-            if (ConfigLoader.SwitchProfile(profileId))
-            {
-                ReRenderProfiles();
-                OnProfileSwitch();
-            }
-        }
-
-        private void ProfileRename_OnClick(string profileId)
-        {
-            using (Prompt prompt = new Prompt("Enter new profile name:", "Rename profile"))
-            {
-                string result = prompt.Dialog();
-                if (string.IsNullOrWhiteSpace(result))
-                {
-                    return;
-                }
-
-                if (ConfigLoader.RenameProfile(profileId, result))
-                {
-                    var label = ProfilesLayout.Controls[$"ProfileLabel-{profileId}"];
-                    label.Text = result;
-
-                    if (profileId.Equals(ConfigLoader.Current.ProfileId))
-                    {
-                        SetWindowTitle();
-                    }
-                }
-            }
-        }
-
-        private void ProfileRemove_OnClick(string profileId)
-        {
-            if (ConfigLoader.RemoveProfile(profileId))
-            {
-                ProfilesLayout.Controls.RemoveByKey($"ProfileLabel-{profileId}");
-                ProfilesLayout.Controls.RemoveByKey($"ProfileSwitchBtn-{profileId}");
-                ProfilesLayout.Controls.RemoveByKey($"ProfileRenameBtn-{profileId}");
-                ProfilesLayout.Controls.RemoveByKey($"ProfileRemoveBtn-{profileId}");
-
-                OnRowRemoved();
-                return;
-            }
-
-            Helper.ShowMessageBox("Profile can not be removed.");
-        }
-
         private void ResetButtonState()
         {
-            foreach (var c in ConfigLoader.Profiles.Configs)
+            foreach (var c in ConfigFactory.Profiles.Configs)
             {
-                var isCurrent = c.ProfileId.Equals(ConfigLoader.Current.ProfileId);
+                var isCurrent = c.ProfileId.Equals(ConfigFactory.Current.ProfileId);
 
                 var label = ProfilesLayout.Controls[$"ProfileLabel-{c.ProfileId}"];
                 label.Font = Helper.ChangeFontSize(this.Font, 12F, isCurrent ? FontStyle.Bold : FontStyle.Regular);
                 label.ForeColor = isCurrent ? SystemColors.Highlight : SystemColors.ControlText;
 
-                var switchBtn = ProfilesLayout.Controls[$"ProfileRemoveBtn-{c.ProfileId}"];
+                var switchBtn = ProfilesLayout.Controls[$"ProfileSwitchBtn-{c.ProfileId}"];
                 switchBtn.Enabled = !isCurrent;
 
                 var removeBtn = ProfilesLayout.Controls[$"ProfileRemoveBtn-{c.ProfileId}"];
-                removeBtn.Enabled = !isCurrent && ConfigLoader.Profiles.Configs.Count > 1;
+                removeBtn.Enabled = !isCurrent && ConfigFactory.Profiles.Configs.Count > 1;
             }
         }
     }

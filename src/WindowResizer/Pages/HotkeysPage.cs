@@ -60,7 +60,7 @@ namespace WindowResizer
                 control.Label.Font = Helper.ChangeFontSize(SaveLabel.Font, 12F, FontStyle.Bold);
             }
 
-            DisableInFullScreenCheckBox.Checked = ConfigLoader.Current.DisableInFullScreen;
+            DisableInFullScreenCheckBox.Checked = ConfigFactory.Current.DisableInFullScreen;
             DisableInFullScreenCheckBox.CheckedChanged += DisableInFullScreen_CheckedChanged;
         }
 
@@ -79,7 +79,7 @@ namespace WindowResizer
                 control.Label.Text = GetLabelByType(control.Type);
             }
 
-            DisableInFullScreenCheckBox.Checked = ConfigLoader.Current.DisableInFullScreen;
+            DisableInFullScreenCheckBox.Checked = ConfigFactory.Current.DisableInFullScreen;
         }
 
         private void Stop_Recording(object sender, EventArgs e)
@@ -104,8 +104,8 @@ namespace WindowResizer
 
         private void DisableInFullScreen_CheckedChanged(object sender, EventArgs e)
         {
-            ConfigLoader.Current.DisableInFullScreen = DisableInFullScreenCheckBox.Checked;
-            ConfigLoader.Save();
+            ConfigFactory.Current.DisableInFullScreen = DisableInFullScreenCheckBox.Checked;
+            ConfigFactory.Save();
         }
 
         private void SetToolTips()
@@ -234,7 +234,7 @@ namespace WindowResizer
 
                 SetKeys(_recordingControl.Type, _hotKeys);
 
-                ConfigLoader.Save();
+                ConfigFactory.Save();
             }
             else
             {
@@ -249,9 +249,9 @@ namespace WindowResizer
             !_hotKeys.Equals(GetKeys(type));
 
         private static void SetKeys(HotkeysType type, Hotkeys hotkeys) =>
-            ConfigLoader.Current.SetKeys(type, hotkeys);
+            ConfigFactory.Current.SetKeys(type, hotkeys);
 
         private static Hotkeys GetKeys(HotkeysType type) =>
-            ConfigLoader.Current.GetKeys(type);
+            ConfigFactory.Current.GetKeys(type);
     }
 }

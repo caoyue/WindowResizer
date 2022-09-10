@@ -49,7 +49,7 @@ namespace WindowResizer
 
         private void SetWindowTitle()
         {
-            Text = $"{nameof(WindowResizer)} - Setting  ::  {ConfigLoader.Current.ProfileName}";
+            Text = $"{nameof(WindowResizer)} - Setting  ::  {ConfigFactory.Current.ProfileName}";
         }
 
         public delegate void ConfigReloadEvent(string message);
@@ -60,7 +60,7 @@ namespace WindowResizer
         {
             HotkeysPageReload();
             ConfigReload(message);
-            ProcessesGrid.DataSource = ConfigLoader.Current.WindowSizes;
+            ProcessesGrid.DataSource = ConfigFactory.Current.WindowSizes;
         }
     }
 }

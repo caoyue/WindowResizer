@@ -7,7 +7,7 @@ using WindowResizer.Common.Shortcuts;
 
 namespace WindowResizer.Configuration;
 
-public static class ConfigLoader
+public static class ConfigFactory
 {
     private const string ConfigFile = $"{nameof(WindowResizer)}.config.json";
 
@@ -15,9 +15,7 @@ public static class ConfigLoader
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(WindowResizer));
 
     private static string _roamingConfigPath = Path.Combine(RoamingPath, ConfigFile);
-
     private static string _portableConfigPath = string.Empty;
-
 
     public static bool PortableMode => File.Exists(RoamingPath);
 
@@ -92,25 +90,20 @@ public static class ConfigLoader
     public static void UseDefault() =>
         Profiles.UseDefault();
 
-    public static bool RenameProfile(string profileId, string profileName)
-    {
-        if (!Profiles.Rename(profileId, profileName))
-        {
-            return false;
-        }
-
-        Save();
-        return true;
-    }
-
-    public static Config AddProfile(string profileName)
+    public static Config ProfileAdd(string profileName)
     {
         var p = Profiles.Add(profileName);
         Save();
         return p;
     }
 
-    public static bool RemoveProfile(string profileId)
+    public static void ProfileRename(string profileId, string profileName)
+    {
+        Profiles.Rename(profileId, profileName);
+        Save();
+    }
+
+    public static bool ProfileRemove(string profileId)
     {
         if (!Profiles.Remove(profileId))
         {
@@ -121,7 +114,7 @@ public static class ConfigLoader
         return true;
     }
 
-    public static bool SwitchProfile(string profileId)
+    public static bool ProfileSwitch(string profileId)
     {
         if (!Profiles.Switch(profileId))
         {
@@ -216,9 +209,9 @@ public static class ConfigLoader
 
         var sortedInstance = new BindingList<WindowSize>(
             config.WindowSizes
-                  .OrderBy(w => w.Name)
-                  .ThenBy(w => w.Title)
-                  .ToList()
+                .OrderBy(w => w.Name)
+                .ThenBy(w => w.Title)
+                .ToList()
         );
         config.WindowSizes = sortedInstance;
         return config;
