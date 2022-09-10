@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using WindowResizer.Configuration;
+using WindowResizer.Utils;
 
 // ReSharper disable once CheckNamespace
 namespace WindowResizer
@@ -41,7 +42,10 @@ namespace WindowResizer
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
-                Title = "Export Config", AddExtension = true, DefaultExt = "json", FileName = $"{nameof(WindowResizer)}.config.json"
+                Title = "Export Config",
+                AddExtension = true,
+                DefaultExt = "json",
+                FileName = $"{nameof(WindowResizer)}.config.json"
             };
             if (saveFileDialog.ShowDialog() != DialogResult.Cancel && saveFileDialog.FileName != "")
             {
@@ -81,8 +85,9 @@ namespace WindowResizer
                 ReRenderProfiles();
                 OnProfileSwitch("Configs imported.");
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                Log.Append($"Import failed: {exception}");
                 MessageBox.Show("Import failed, config file is not valid json.");
             }
         }
