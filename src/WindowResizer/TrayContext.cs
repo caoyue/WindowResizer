@@ -51,7 +51,18 @@ namespace WindowResizer
 
             _trayIcon = new NotifyIcon
             {
-                Icon = Resources.AppIcon, ContextMenuStrip = BuildContextMenu(), Visible = true, Text = nameof(WindowResizer)
+                Icon = Resources.AppIcon,
+                ContextMenuStrip = BuildContextMenu(),
+                Visible = true,
+                Text = nameof(WindowResizer)
+            };
+
+            _trayIcon.MouseClick += (s, e) =>
+            {
+                if (e.Button == MouseButtons.Right)
+                {
+                    _trayIcon.ContextMenuStrip = BuildContextMenu();
+                }
             };
 
             _trayIcon.DoubleClick += OnSetting;
@@ -76,7 +87,8 @@ namespace WindowResizer
             {
                 var isCurrent = c.ProfileId.Equals(ConfigLoader.Current.ProfileId, StringComparison.Ordinal);
                 var image = isCurrent ? Resources.CheckIcon : null;
-                menu.Items.Add(new ToolStripMenuItem(c.ProfileName, image?.ToBitmap(), (s, e) => OnProfileChange(c.ProfileId)));
+                menu.Items.Add(new ToolStripMenuItem(c.ProfileName, image?.ToBitmap(),
+                    (s, e) => OnProfileChange(c.ProfileId)));
             }
 
             menu.Items.Add(new ToolStripSeparator());
@@ -326,8 +338,8 @@ namespace WindowResizer
             bool onlyAuto = false)
         {
             var windows = windowSizes.Where(w =>
-                                         w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase))
-                                     .ToList();
+                    w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
             if (onlyAuto)
             {
@@ -391,16 +403,10 @@ namespace WindowResizer
             if (match.NoMatch)
             {
                 // Add a wildcard match for all titles
-                InsertOrder(new WindowSize
-                {
-                    Name = processName, Title = "*", Rect = rect, State = state
-                });
+                InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect, State = state });
                 if (!string.IsNullOrWhiteSpace(title))
                 {
-                    InsertOrder(new WindowSize
-                    {
-                        Name = processName, Title = title, Rect = rect, State = state
-                    });
+                    InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect, State = state });
                 }
 
                 ConfigLoader.Save();
@@ -414,10 +420,7 @@ namespace WindowResizer
             }
             else if (!string.IsNullOrWhiteSpace(title))
             {
-                InsertOrder(new WindowSize
-                {
-                    Name = processName, Title = title, Rect = rect, State = state
-                });
+                InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect, State = state });
             }
 
             if (match.SuffixMatch != null)
@@ -439,10 +442,7 @@ namespace WindowResizer
             }
             else
             {
-                InsertOrder(new WindowSize
-                {
-                    Name = processName, Title = "*", Rect = rect, State = state
-                });
+                InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect, State = state });
             }
 
             ConfigLoader.Save();
