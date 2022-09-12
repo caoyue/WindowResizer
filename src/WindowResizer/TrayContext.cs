@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -49,6 +50,7 @@ namespace WindowResizer
 
             RegisterHotkey();
 
+            SettingWindowInit();
             _trayIcon = BuildTrayIcon();
 
             EventsHandle();
@@ -71,37 +73,59 @@ namespace WindowResizer
             var trayIcon = new NotifyIcon
             {
                 Icon = Resources.AppIcon,
-                ContextMenuStrip = BuildContextMenu(),
                 Visible = true,
-                Text = nameof(WindowResizer)
-            };
-
-            trayIcon.MouseClick += (s, e) =>
-            {
-                if (e.Button == MouseButtons.Right)
-                {
-                    _trayIcon.ContextMenuStrip = BuildContextMenu();
-                }
+                ContextMenuStrip = BuildContextMenu(),
+                Text = BuildTrayToolTips(),
             };
 
             trayIcon.DoubleClick += OnSetting;
             return trayIcon;
         }
 
+        private string BuildTrayToolTips()
+        {
+            return $"{nameof(WindowResizer)}\nv{Application.ProductVersion}\nProfile: {ConfigFactory.Current.ProfileName}";
+        }
+
         private ContextMenuStrip BuildContextMenu()
         {
             var menu = new ContextMenuStrip();
+            menu.RenderMode = ToolStripRenderMode.System;
+            menu.BackColor = SystemColors.Window;
+            menu.ForeColor = SystemColors.ControlText;
+            menu.ShowCheckMargin = false;
+            menu.ShowImageMargin = true;
+
+            menu.Font = Helper.ChangeFontSize(menu.Font, 10F);
+            var imageSize = (int)Math.Round(menu.Font.Height * 0.9);
+            menu.ImageScalingSize = new Size(imageSize, imageSize);
+
+            var padding = new Padding(6, 6, 6, 6);
+
+            void SetMenuStyle(ToolStripItem m)
+            {
+                m.Margin = padding;
+                m.MouseEnter += (s, e) => m.ForeColor = Color.White;
+                m.MouseLeave += (s, e) => m.ForeColor = SystemColors.ControlText;
+            }
+
             foreach (var c in ConfigFactory.Profiles.Configs)
             {
                 var isCurrent = c.ProfileId.Equals(ConfigFactory.Current.ProfileId, StringComparison.Ordinal);
                 var image = isCurrent ? Resources.CheckIcon : null;
-                menu.Items.Add(new ToolStripMenuItem(c.ProfileName, image?.ToBitmap(),
-                    (s, e) => OnProfileChange(c.ProfileId)));
+                var m = new ToolStripMenuItem(c.ProfileName, image?.ToBitmap(),
+                    (s, e) => OnProfileChange(c.ProfileId));
+                SetMenuStyle(m);
+                menu.Items.Add(m);
             }
 
             menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add(new ToolStripMenuItem("Setting", Resources.SettingIcon.ToBitmap(), OnSetting));
-            menu.Items.Add(new ToolStripMenuItem("Exit", Resources.ExitIcon.ToBitmap(), OnExit));
+            var item = new ToolStripMenuItem("Setting", Resources.SettingIcon.ToBitmap(), OnSetting);
+            SetMenuStyle(item);
+            menu.Items.Add(item);
+            item = new ToolStripMenuItem("Exit", Resources.ExitIcon.ToBitmap(), OnExit);
+            SetMenuStyle(item);
+            menu.Items.Add(item);
             return menu;
         }
 
@@ -115,6 +139,7 @@ namespace WindowResizer
 
         private void RebuildContextMenu()
         {
+            _trayIcon.Text = BuildTrayToolTips();
             _trayIcon.ContextMenuStrip = BuildContextMenu();
         }
 
@@ -130,7 +155,7 @@ namespace WindowResizer
 
         private static bool ConfirmUpdate(string message)
         {
-            var res = MessageBox.Show(message, "WindowResizer Update",
+            var res = MessageBox.Show(message, $"{nameof(WindowResizer)} Update",
                 MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
             return res == DialogResult.OK;
         }
@@ -149,11 +174,16 @@ namespace WindowResizer
         {
             if (_settingForm == null)
             {
-                _settingForm = new SettingForm(_hook);
-                _settingForm.ConfigReload += ReloadConfig;
+                SettingWindowInit();
             }
 
-            _settingForm.Show();
+            _settingForm?.Show();
+        }
+
+        private void SettingWindowInit()
+        {
+            _settingForm = new SettingForm(_hook);
+            _settingForm.ConfigReload += ReloadConfig;
         }
 
         private void RegisterHotkey()
@@ -356,8 +386,8 @@ namespace WindowResizer
             bool onlyAuto = false)
         {
             var windows = windowSizes.Where(w =>
-                    w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+                                         w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase))
+                                     .ToList();
 
             if (onlyAuto)
             {
@@ -421,10 +451,16 @@ namespace WindowResizer
             if (match.NoMatch)
             {
                 // Add a wildcard match for all titles
-                InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect, State = state });
+                InsertOrder(new WindowSize
+                {
+                    Name = processName, Title = "*", Rect = rect, State = state
+                });
                 if (!string.IsNullOrWhiteSpace(title))
                 {
-                    InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect, State = state });
+                    InsertOrder(new WindowSize
+                    {
+                        Name = processName, Title = title, Rect = rect, State = state
+                    });
                 }
 
                 ConfigFactory.Save();
@@ -438,7 +474,10 @@ namespace WindowResizer
             }
             else if (!string.IsNullOrWhiteSpace(title))
             {
-                InsertOrder(new WindowSize { Name = processName, Title = title, Rect = rect, State = state });
+                InsertOrder(new WindowSize
+                {
+                    Name = processName, Title = title, Rect = rect, State = state
+                });
             }
 
             if (match.SuffixMatch != null)
@@ -460,7 +499,10 @@ namespace WindowResizer
             }
             else
             {
-                InsertOrder(new WindowSize { Name = processName, Title = "*", Rect = rect, State = state });
+                InsertOrder(new WindowSize
+                {
+                    Name = processName, Title = "*", Rect = rect, State = state
+                });
             }
 
             ConfigFactory.Save();
