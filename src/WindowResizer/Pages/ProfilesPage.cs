@@ -91,7 +91,7 @@ namespace WindowResizer
 
         private void OnProfileSwitch(string profileId, string message = null)
         {
-            ResetButtonState();
+            ResetProfileControlState();
             SetWindowTitle();
             message = message ?? $"Profile switched to <{ConfigFactory.Current.ProfileName}>.";
             ReloadConfig(message);
@@ -151,12 +151,12 @@ namespace WindowResizer
             {
                 RenderProfile(p.ProfileId, p.ProfileName);
             }
+
+            ResetProfileControlState();
         }
 
         private void RenderProfile(string profileId, string profileName)
         {
-            var isCurrent = ConfigFactory.Current.ProfileId.Equals(profileId, StringComparison.Ordinal);
-
             var label = new Label();
             label.AutoSize = false;
             label.ForeColor = SystemColors.ControlText;
@@ -165,13 +165,6 @@ namespace WindowResizer
             label.Size = SaveKeyLabel.Size;
             label.Font = Helper.ChangeFontSize(this.Font, 12F);
             label.TextAlign = ContentAlignment.MiddleLeft;
-
-            if (isCurrent)
-            {
-                label.ForeColor = SystemColors.Highlight;
-                label.Font = Helper.ChangeFontSize(this.Font, 12F, FontStyle.Bold);
-            }
-
             label.Anchor = AnchorStyles.Left;
             ProfilesLayout.Controls.Add(label);
 
@@ -183,7 +176,6 @@ namespace WindowResizer
             switchBtn.Size = ConfigImportBtn.Size;
             switchBtn.Text = "Switch";
             switchBtn.UseVisualStyleBackColor = false;
-            switchBtn.Enabled = !isCurrent;
             switchBtn.Anchor = AnchorStyles.None;
             switchBtn.Click += (s, e) => ProfileSwitch_OnClick(profileId);
             ProfilesLayout.Controls.Add(switchBtn);
@@ -204,7 +196,6 @@ namespace WindowResizer
             removeBtn.Size = btnSize;
             removeBtn.Text = "Remove";
             removeBtn.UseVisualStyleBackColor = false;
-            removeBtn.Enabled = !isCurrent && ConfigFactory.Profiles.Configs.Count > 1;
             removeBtn.Click += (s, e) => ProfileRemove_OnClick(profileId);
             removeBtn.Anchor = AnchorStyles.None;
             ProfilesLayout.Controls.Add(removeBtn);
@@ -249,7 +240,7 @@ namespace WindowResizer
             ProfilesLayout.Controls.Clear();
         }
 
-        private void ResetButtonState()
+        private void ResetProfileControlState()
         {
             foreach (var c in ConfigFactory.Profiles.Configs)
             {
