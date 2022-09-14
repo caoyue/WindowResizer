@@ -69,6 +69,8 @@ public static class ConfigFactory
         var json = JsonConvert.SerializeObject(Profiles);
         new FileInfo(ConfigPath).Directory?.Create();
         File.WriteAllText(ConfigPath, json);
+
+        Current.WindowSizes.ResetBindings();
     }
 
     public static void Move(bool portable)
