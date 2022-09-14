@@ -1,16 +1,15 @@
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using WindowResizer.Common.Shortcuts;
 using WindowResizer.Common.Windows;
 using WindowResizer.Configuration;
 using WindowResizer.Core.Shortcuts;
 using WindowResizer.Core.WindowControl;
 using WindowResizer.Utils;
+using static WindowResizer.Utils.WindowUtils;
 
 namespace WindowResizer
 {
@@ -72,10 +71,7 @@ namespace WindowResizer
         {
             var trayIcon = new NotifyIcon
             {
-                Icon = Resources.AppIcon,
-                Visible = true,
-                ContextMenuStrip = BuildContextMenu(),
-                Text = BuildTrayToolTips(),
+                Icon = Resources.AppIcon, Visible = true, ContextMenuStrip = BuildContextMenu(), Text = BuildTrayToolTips(),
             };
 
             trayIcon.DoubleClick += OnSetting;
@@ -324,8 +320,12 @@ namespace WindowResizer
 
             var windowTitle = Resizer.GetWindowTitle(handle);
             var match = GetMatchWindowSize(ConfigFactory.Current.WindowSizes, processName, windowTitle);
-            var state = Resizer.GetWindowState(handle);
-            UpdateOrSaveConfig(match, processName, windowTitle, Resizer.GetRect(handle), state);
+
+            var place = Resizer.GetPlacement(handle);
+
+            // workaround: use GetWindowRect to get actual window coordinates
+            place.Rect = place.WindowState == WindowState.Maximized ? place.Rect : Resizer.GetRect(handle);
+            UpdateOrSaveConfig(match, processName, windowTitle, place);
         }
 
         private bool IsProcessAvailable(IntPtr handle, out string processName, bool showTips = false)
@@ -376,151 +376,5 @@ namespace WindowResizer
 
         private void ShowTooltips(string message, ToolTipIcon tipIcon, int mSeconds) =>
             _trayIcon.ShowBalloonTip(mSeconds, nameof(WindowResizer), message, tipIcon);
-
-        #region window resize
-
-        private static MatchWindowSize GetMatchWindowSize(
-            BindingList<WindowSize> windowSizes,
-            string processName,
-            string title,
-            bool onlyAuto = false)
-        {
-            var windows = windowSizes.Where(w =>
-                                         w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase))
-                                     .ToList();
-
-            if (onlyAuto)
-            {
-                windows = windows.Where(w => w.AutoResize).ToList();
-            }
-
-            return new MatchWindowSize
-            {
-                FullMatch = windows.FirstOrDefault(w => w.Title == title),
-                PrefixMatch = windows.FirstOrDefault(w =>
-                    w.Title.StartsWith("*") && w.Title.Length > 1 && title.EndsWith(w.Title.TrimStart('*'))),
-                SuffixMatch = windows.FirstOrDefault(w =>
-                    w.Title.EndsWith("*") && w.Title.Length > 1 && title.StartsWith(w.Title.TrimEnd('*'))),
-                WildcardMatch = windows.FirstOrDefault(w => w.Title.Equals("*"))
-            };
-        }
-
-        private static void MoveMatchWindow(MatchWindowSize match, IntPtr handle)
-        {
-            if (match.FullMatch != null)
-            {
-                MoveWindow(handle, match.FullMatch);
-                return;
-            }
-
-            if (match.PrefixMatch != null)
-            {
-                MoveWindow(handle, match.PrefixMatch);
-                return;
-            }
-
-            if (match.SuffixMatch != null)
-            {
-                MoveWindow(handle, match.SuffixMatch);
-                return;
-            }
-
-            if (match.WildcardMatch != null)
-            {
-                MoveWindow(handle, match.WildcardMatch);
-            }
-        }
-
-        private static void MoveWindow(IntPtr handle, WindowSize match)
-        {
-            if (match.State == WindowState.Maximized)
-            {
-                Resizer.MaximizeWindow(handle);
-            }
-            else
-            {
-                Resizer.MoveWindow(handle, match.Rect);
-            }
-        }
-
-        private static void UpdateOrSaveConfig(MatchWindowSize match, string processName, string title, Rect rect,
-            WindowState state = WindowState.Normal)
-        {
-            if (string.IsNullOrWhiteSpace(processName)) return;
-
-            if (match.NoMatch)
-            {
-                // Add a wildcard match for all titles
-                InsertOrder(new WindowSize
-                {
-                    Name = processName, Title = "*", Rect = rect, State = state
-                });
-                if (!string.IsNullOrWhiteSpace(title))
-                {
-                    InsertOrder(new WindowSize
-                    {
-                        Name = processName, Title = title, Rect = rect, State = state
-                    });
-                }
-
-                ConfigFactory.Save();
-                return;
-            }
-
-            if (match.FullMatch != null)
-            {
-                match.FullMatch.Rect = rect;
-                match.FullMatch.State = state;
-            }
-            else if (!string.IsNullOrWhiteSpace(title))
-            {
-                InsertOrder(new WindowSize
-                {
-                    Name = processName, Title = title, Rect = rect, State = state
-                });
-            }
-
-            if (match.SuffixMatch != null)
-            {
-                match.SuffixMatch.Rect = rect;
-                match.SuffixMatch.State = state;
-            }
-
-            if (match.PrefixMatch != null)
-            {
-                match.PrefixMatch.Rect = rect;
-                match.PrefixMatch.State = state;
-            }
-
-            if (match.WildcardMatch != null)
-            {
-                match.WildcardMatch.Rect = rect;
-                match.WildcardMatch.State = state;
-            }
-            else
-            {
-                InsertOrder(new WindowSize
-                {
-                    Name = processName, Title = "*", Rect = rect, State = state
-                });
-            }
-
-            ConfigFactory.Save();
-        }
-
-        private static void InsertOrder(WindowSize item)
-        {
-            var list = ConfigFactory.Current.WindowSizes;
-            var backing = list.ToList();
-            backing.Add(item);
-            var index = backing.OrderBy(l => l.Name).ThenBy(l => l.Title).ToList().IndexOf(item);
-            list.Insert(index, item);
-        }
-
-
-        private static Hotkeys GetKeys(HotkeysType type) =>
-            ConfigFactory.Current.GetKeys(type);
-
-        #endregion
     }
 }

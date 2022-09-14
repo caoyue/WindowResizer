@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Windows.Forms;
+using WindowResizer.Common.Exceptions;
 using WindowResizer.Common.Windows;
 using static WindowResizer.Core.WindowControl.NativeMethods;
+using WindowPlacement = WindowResizer.Common.Windows.WindowPlacement;
 
 namespace WindowResizer.Core.WindowControl;
 
@@ -74,7 +76,7 @@ public static class Resizer
     public static void MaximizeWindow(IntPtr handle)
     {
         if (handle == IntPtr.Zero) return;
-        ShowWindow(handle, (int)ShowWindowFlags.SW_SHOWMAXIMIZED);
+        ShowWindow(handle, (int)ShowWindowCommands.ShowMaximized);
     }
 
     public static bool MoveWindow(IntPtr handle, Rect rect)
@@ -82,7 +84,7 @@ public static class Resizer
         if (handle == IntPtr.Zero)
             return false;
 
-        ShowWindow(handle, (int)ShowWindowFlags.SW_SHOWNORMAL);
+        ShowWindow(handle, (int)ShowWindowCommands.Normal);
         var result = SetWindowPos(handle, 0, rect.Left, rect.Top,
             rect.Right - rect.Left, rect.Bottom - rect.Top,
             (int)SetWindowPosFlags.SWP_NOOWNERZORDER);
@@ -119,8 +121,7 @@ public static class Resizer
 
     public static Process? GetRealProcess(IntPtr handle)
     {
-        uint pid;
-        GetWindowThreadProcessId(handle, out pid);
+        _ = GetWindowThreadProcessId(handle, out var pid);
         var foregroundProcess = Process.GetProcessById((int)pid);
         if (foregroundProcess.ProcessName == "ApplicationFrameHost")
         {
@@ -162,11 +163,46 @@ public static class Resizer
         }
     }
 
-    public static Rect GetRect(IntPtr handle)
+    public static Rect GetRect(IntPtr hWnd)
     {
         var rect = new Rect();
-        GetWindowRect(handle, ref rect);
+        GetWindowRect(hWnd, ref rect);
         return rect;
+    }
+
+    public static WindowPlacement GetPlacement(IntPtr hWnd)
+    {
+        var placement = NativeMethods.WindowPlacement.Default;
+        if (!GetWindowPlacement(hWnd, ref placement))
+        {
+            throw new WindowResizerException($"Cannot get window placement of {hWnd}");
+        }
+
+        var state = placement.ShowCmd switch
+        {
+            ShowWindowCommands.ShowMaximized => WindowState.Maximized,
+            ShowWindowCommands.ShowMinimized => WindowState.Minimized,
+            _ => WindowState.Normal,
+        };
+        return new WindowPlacement
+        {
+            Rect = placement.NormalPosition, WindowState = state, MaximizedPosition = placement.MaxPosition
+        };
+    }
+
+    public static bool SetPlacement(IntPtr hWnd, Rect rect, Point maximizedPosition, WindowState state)
+    {
+        var placement = NativeMethods.WindowPlacement.Default;
+        placement.MaxPosition = maximizedPosition;
+        placement.ShowCmd = state switch
+        {
+            WindowState.Maximized => ShowWindowCommands.ShowMaximized,
+            WindowState.Minimized => ShowWindowCommands.ShowMinimized,
+            _ => ShowWindowCommands.Normal,
+        };
+        placement.NormalPosition = rect;
+
+        return SetWindowPlacement(hWnd, ref placement);
     }
 
     public static bool IsForegroundFullScreen(Screen? screen = null)

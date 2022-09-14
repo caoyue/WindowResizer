@@ -13,6 +13,14 @@ internal static class NativeMethods
     [DllImport("user32.dll")]
     internal static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
 
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool GetWindowPlacement(IntPtr hWnd, ref WindowPlacement placement);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool SetWindowPlacement(IntPtr hWnd, [In] ref WindowPlacement placement);
+
     [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
     internal static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy, int wFlags);
 
@@ -61,16 +69,47 @@ internal static class NativeMethods
     }
 
     [Flags]
-    internal enum ShowWindowFlags : uint
-    {
-        SW_SHOWNORMAL = 1,
-        SW_SHOWMAXIMIZED = 3,
-    }
-
-    [Flags]
     internal enum WindowStyles : uint
     {
         WS_MINIMIZE = 0x20000000,
         WS_MAXIMIZE = 0x1000000,
+    }
+
+    internal enum ShowWindowCommands
+    {
+        Hide = 0,
+        Normal = 1,
+        ShowMinimized = 2,
+        ShowMaximized = 3,
+        ShowNoActivate = 4,
+        Show = 5,
+        Minimize = 6,
+        ShowMinNoActive = 7,
+        ShowNA = 8,
+        Restore = 9,
+        ShowDefault = 10,
+        ForceMinimize = 11
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
+    public struct WindowPlacement
+    {
+        public int Length;
+        public int Flags;
+        public ShowWindowCommands ShowCmd;
+        public Point MinPosition;
+        public Point MaxPosition;
+        public Rect NormalPosition;
+
+        public static WindowPlacement Default
+        {
+            get
+            {
+                var result = new WindowPlacement();
+                result.Length = Marshal.SizeOf(result);
+                return result;
+            }
+        }
     }
 }

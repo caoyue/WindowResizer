@@ -12,10 +12,9 @@ public class WindowSize : IComparable<WindowSize>
 
     public Rect Rect { get; set; }
 
-    /// <summary>
-    ///     Window State
-    /// </summary>
     public WindowState State { get; set; } = WindowState.Normal;
+
+    public Point MaximizedPosition { get; set; } = new(0, 0);
 
     public bool AutoResize { get; set; }
 
