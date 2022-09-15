@@ -91,7 +91,7 @@ namespace WindowResizer
             this.ProcessesGrid.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
             this.ProcessesGrid.GridColor = System.Drawing.SystemColors.Window;
             this.ProcessesGrid.Location = new System.Drawing.Point(17, 16);
-            this.ProcessesGrid.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ProcessesGrid.Margin = new System.Windows.Forms.Padding(4);
             this.ProcessesGrid.MultiSelect = false;
             this.ProcessesGrid.Name = "ProcessesGrid";
             this.ProcessesGrid.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
@@ -107,7 +107,7 @@ namespace WindowResizer
             this.ProcessesGrid.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.ProcessesGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.ProcessesGrid.ShowCellToolTips = false;
-            this.ProcessesGrid.Size = new System.Drawing.Size(968, 600);
+            this.ProcessesGrid.Size = new System.Drawing.Size(968, 638);
             this.ProcessesGrid.TabIndex = 7;
             this.ProcessesGrid.TabStop = false;
             // 
@@ -196,7 +196,7 @@ namespace WindowResizer
             this.HotkeysPage.Controls.Add(this.settingGroupBox);
             this.HotkeysPage.Location = new System.Drawing.Point(4, 44);
             this.HotkeysPage.Name = "HotkeysPage";
-            this.HotkeysPage.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.HotkeysPage.Padding = new System.Windows.Forms.Padding(3);
             this.HotkeysPage.Size = new System.Drawing.Size(992, 661);
             this.HotkeysPage.TabIndex = 0;
             this.HotkeysPage.Text = "Hotkeys";
@@ -334,7 +334,7 @@ namespace WindowResizer
             this.DisableInFullScreenCheckBox.BackColor = System.Drawing.SystemColors.Window;
             this.DisableInFullScreenCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.DisableInFullScreenCheckBox.Location = new System.Drawing.Point(32, 350);
-            this.DisableInFullScreenCheckBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.DisableInFullScreenCheckBox.Margin = new System.Windows.Forms.Padding(2);
             this.DisableInFullScreenCheckBox.Name = "DisableInFullScreenCheckBox";
             this.DisableInFullScreenCheckBox.Size = new System.Drawing.Size(237, 19);
             this.DisableInFullScreenCheckBox.TabIndex = 6;
@@ -370,7 +370,7 @@ namespace WindowResizer
             this.ProcessesPage.Controls.Add(this.ProcessesGrid);
             this.ProcessesPage.Location = new System.Drawing.Point(4, 44);
             this.ProcessesPage.Name = "ProcessesPage";
-            this.ProcessesPage.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.ProcessesPage.Padding = new System.Windows.Forms.Padding(3);
             this.ProcessesPage.Size = new System.Drawing.Size(992, 661);
             this.ProcessesPage.TabIndex = 1;
             this.ProcessesPage.Text = "Processes";
@@ -381,7 +381,7 @@ namespace WindowResizer
             this.ProfilesTab.Controls.Add(this.NewProfile);
             this.ProfilesTab.Location = new System.Drawing.Point(4, 44);
             this.ProfilesTab.Name = "ProfilesTab";
-            this.ProfilesTab.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.ProfilesTab.Padding = new System.Windows.Forms.Padding(3);
             this.ProfilesTab.Size = new System.Drawing.Size(992, 661);
             this.ProfilesTab.TabIndex = 3;
             this.ProfilesTab.Text = "Profiles";
@@ -442,7 +442,7 @@ namespace WindowResizer
             this.AboutPage.Controls.Add(this.ConfigExportGroup);
             this.AboutPage.Location = new System.Drawing.Point(4, 44);
             this.AboutPage.Name = "AboutPage";
-            this.AboutPage.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.AboutPage.Padding = new System.Windows.Forms.Padding(3);
             this.AboutPage.Size = new System.Drawing.Size(992, 661);
             this.AboutPage.TabIndex = 2;
             this.AboutPage.Text = "About";
@@ -480,7 +480,7 @@ namespace WindowResizer
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.MaximizeBox = false;
             this.Name = "SettingForm";
             this.Text = "Setting";

@@ -197,28 +197,38 @@ public static class Resizer
 
         ShowWindow(hWnd, (int)ShowWindowCommands.Normal);
 
-        var currentMonitor = MonitorFromWindow(hWnd, (uint)MONITOR_FLAGS.MONITOR_DEFAULTTONEAREST);
-        var targetMonitor = MonitorFromRect(ref rect, (uint)MONITOR_FLAGS.MONITOR_DEFAULTTONEAREST);
-        var isSameMonitor = currentMonitor == targetMonitor;
-
-        // try to handle mixed-mode DPI scaling
-        IntPtr? context = null;
-        if (!isSameMonitor && WindowsHelper.IsDpiAware)
-        {
-            context = SetThreadDpiAwarenessContext(GetWindowDpiAwarenessContext(hWnd));
-        }
-
         var placement = NativeMethods.WindowPlacement.Default;
         placement.MaxPosition = maximizedPosition;
+        placement.NormalPosition = rect;
         placement.ShowCmd = state switch
         {
             WindowState.Maximized => ShowWindowCommands.ShowMaximized,
             WindowState.Minimized => ShowWindowCommands.ShowMinimized,
             _ => ShowWindowCommands.Normal,
         };
-        placement.NormalPosition = rect;
 
-        var r = SetWindowPlacement(hWnd, ref placement);
+        var currentMonitor = MonitorFromWindow(hWnd, (uint)MONITOR_FLAGS.MONITOR_DEFAULTTONEAREST);
+        var targetMonitor = MonitorFromRect(ref rect, (uint)MONITOR_FLAGS.MONITOR_DEFAULTTONEAREST);
+        var isSameMonitor = currentMonitor == targetMonitor;
+        if (!isSameMonitor)
+        {
+            SetWindowPlacement(hWnd, ref placement);
+        }
+
+        return SetWindowPlacement(hWnd, ref placement);
+    }
+
+    // ReSharper disable once UnusedMember.Local
+    private static T DpiAwarenessAction<T>(IntPtr hWnd, Func<T> action)
+    {
+        // try to handle mixed-mode DPI scaling
+        IntPtr? context = null;
+        if (WindowsHelper.IsDpiAware)
+        {
+            context = SetThreadDpiAwarenessContext(GetWindowDpiAwarenessContext(hWnd));
+        }
+
+        var r = action();
 
         if (context is not null)
         {

@@ -88,7 +88,7 @@ namespace WindowResizer
             return trayIcon;
         }
 
-        private string BuildTrayToolTips()
+        private static string BuildTrayToolTips()
         {
             return $"{nameof(WindowResizer)}\nv{Application.ProductVersion}\nProfile: {ConfigFactory.Current.ProfileName}";
         }
@@ -188,7 +188,7 @@ namespace WindowResizer
             }
         }
 
-        private void OnProfileChange(string profileId)
+        private static void OnProfileChange(string profileId)
         {
             ConfigFactory.ProfileSwitch(profileId);
         }
@@ -311,7 +311,7 @@ namespace WindowResizer
             }
             catch (Exception exception)
             {
-                var message = "An error occurred.\nCheck the log file for more details.";
+                const string message = "An error occurred.\nCheck the log file for more details.";
                 ShowTooltips(message, ToolTipIcon.Error, 2000);
                 Log.Append($"Exception: {exception}");
             }

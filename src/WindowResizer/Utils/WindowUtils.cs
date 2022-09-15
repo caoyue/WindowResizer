@@ -8,7 +8,7 @@ using WindowResizer.Core.WindowControl;
 
 namespace WindowResizer.Utils
 {
-    internal class WindowUtils
+    internal static class WindowUtils
     {
         internal static MatchWindowSize GetMatchWindowSize(
             IEnumerable<WindowSize> windowSizes,
