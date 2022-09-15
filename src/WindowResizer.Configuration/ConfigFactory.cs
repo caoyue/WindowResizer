@@ -79,8 +79,7 @@ public static class ConfigFactory
         {
             File.Move(_roamingConfigPath, _portableConfigPath);
         }
-
-        if (!portable && PortableMode)
+        else if (!portable && PortableMode)
         {
             new FileInfo(_roamingConfigPath).Directory?.Create();
             File.Move(_portableConfigPath, _roamingConfigPath);

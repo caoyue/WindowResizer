@@ -99,15 +99,5 @@ namespace WindowResizer {
                 return ((System.Drawing.Icon)(obj));
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        public static System.Drawing.Icon SwitchIcon {
-            get {
-                object obj = ResourceManager.GetObject("SwitchIcon", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
     }
 }

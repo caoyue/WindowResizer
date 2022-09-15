@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using WindowResizer.Configuration;
@@ -9,6 +10,21 @@ namespace WindowResizer
     public partial class SettingForm
     {
         private void ProcessesPageInit()
+        {
+            ProcessesGridLayout();
+
+            ProcessesGrid.AutoGenerateColumns = false;
+            ProcessesGrid.DataSource = ConfigFactory.Current.WindowSizes;
+
+            ProcessesGrid.ShowCellToolTips = true;
+            ProcessesGrid.CellFormatting += ProcessesGrid_CellFormatting;
+            ProcessesGrid.CellClick += ProcessesGrid_CellClick;
+            ProcessesGrid.CellContentClick += ProcessesGrid_CellContentClick;
+            ProcessesGrid.CellValueChanged += ProcessesGrid_CellValueChanged;
+            ProcessesGrid.CellMouseEnter += ProcessesGrid_CellMouseEnter;
+        }
+
+        private void ProcessesGridLayout()
         {
             ProcessesGrid.AllowUserToAddRows = false;
             ProcessesGrid.RowTemplate.Height = 50;
@@ -121,19 +137,9 @@ namespace WindowResizer
                 col.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
                 col.HeaderCell.Style.Font = Helper.ChangeFontSize(ProcessesGrid.Font, 9F, FontStyle.Bold);
             }
-
-            ProcessesGrid.AutoGenerateColumns = false;
-            ProcessesGrid.DataSource = ConfigFactory.Current.WindowSizes;
-
-            ProcessesGrid.ShowCellToolTips = true;
-            ProcessesGrid.CellFormatting += PrecessesGrid_CellFormatting;
-            ProcessesGrid.CellClick += PrecessesGrid_CellClick;
-            ProcessesGrid.CellContentClick += PrecessesGrid_CellContentClick;
-            ProcessesGrid.CellValueChanged += PrecessesGrid_CellValueChanged;
-            ProcessesGrid.CellMouseEnter += PrecessesGrid_CellMouseEnter;
         }
 
-        private void PrecessesGrid_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void ProcessesGrid_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex == ProcessesGrid.Columns["AutoResize"]?.Index && e.RowIndex >= 0)
             {
@@ -141,12 +147,12 @@ namespace WindowResizer
             }
         }
 
-        private void PrecessesGrid_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        private void ProcessesGrid_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             ConfigFactory.Save();
         }
 
-        private void PrecessesGrid_CellFormatting(object sender,
+        private void ProcessesGrid_CellFormatting(object sender,
             DataGridViewCellFormattingEventArgs e)
         {
             DataGridViewCell cell = ProcessesGrid.Rows[e.RowIndex].Cells[e.ColumnIndex];
@@ -168,7 +174,7 @@ namespace WindowResizer
             }
         }
 
-        private void PrecessesGrid_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
+        private void ProcessesGrid_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex == -1)
             {
@@ -193,7 +199,7 @@ namespace WindowResizer
             }
         }
 
-        private void PrecessesGrid_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void ProcessesGrid_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex == ProcessesGrid.Columns["Remove"]?.Index &&
                 e.RowIndex >= 0 &&

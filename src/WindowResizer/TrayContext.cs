@@ -15,12 +15,11 @@ namespace WindowResizer
 {
     public class TrayContext : ApplicationContext
     {
+        private static SettingForm _settingForm;
         private readonly NotifyIcon _trayIcon;
-        private readonly KeyboardHook _hook = new KeyboardHook();
         private readonly SquirrelUpdater _updater;
 
-        private static SettingForm _settingForm;
-
+        private readonly KeyboardHook _hook = new KeyboardHook();
         private static WindowEventHandler _windowEventHandler;
 
         private static readonly string ConfigFile = $"{nameof(WindowResizer)}.config.json";
@@ -47,15 +46,12 @@ namespace WindowResizer
                 ConfigFactory.Save();
             }
 
-            RegisterHotkey();
-
-            SettingWindowInit();
+            RegisterHotkeys();
             _trayIcon = BuildTrayIcon();
+            SettingWindowInit();
 
-            EventsHandle();
-
-            _windowEventHandler = new WindowEventHandler(OnWindowCreated);
-            _windowEventHandler.AddWindowCreateHandle();
+            ProfilesEventsHandle();
+            WindowsEventHandle();
 
             if (ConfigFactory.Current.CheckUpdate)
             {
@@ -67,11 +63,25 @@ namespace WindowResizer
             }
         }
 
+        #region tray
+
         private NotifyIcon BuildTrayIcon()
         {
+            ContextMenu.Items.Clear();
+            ContextMenu.RenderMode = ToolStripRenderMode.System;
+            ContextMenu.BackColor = SystemColors.Window;
+            ContextMenu.ForeColor = SystemColors.ControlText;
+            ContextMenu.ShowCheckMargin = false;
+            ContextMenu.ShowImageMargin = true;
+
+            ContextMenu.Font = Helper.ChangeFontSize(ContextMenu.Font, 10F);
+            var imageSize = (int)Math.Round(ContextMenu.Font.Height * 0.9);
+            ContextMenu.ImageScalingSize = new Size(imageSize, imageSize);
+            BuildContextMenu();
+
             var trayIcon = new NotifyIcon
             {
-                Icon = Resources.AppIcon, Visible = true, ContextMenuStrip = BuildContextMenu(), Text = BuildTrayToolTips(),
+                Icon = Resources.AppIcon, Visible = true, ContextMenuStrip = ContextMenu, Text = BuildTrayToolTips(),
             };
 
             trayIcon.DoubleClick += OnSetting;
@@ -83,27 +93,11 @@ namespace WindowResizer
             return $"{nameof(WindowResizer)}\nv{Application.ProductVersion}\nProfile: {ConfigFactory.Current.ProfileName}";
         }
 
-        private ContextMenuStrip BuildContextMenu()
+        private static readonly ContextMenuStrip ContextMenu = new ContextMenuStrip();
+
+        private void BuildContextMenu()
         {
-            var menu = new ContextMenuStrip();
-            menu.RenderMode = ToolStripRenderMode.System;
-            menu.BackColor = SystemColors.Window;
-            menu.ForeColor = SystemColors.ControlText;
-            menu.ShowCheckMargin = false;
-            menu.ShowImageMargin = true;
-
-            menu.Font = Helper.ChangeFontSize(menu.Font, 10F);
-            var imageSize = (int)Math.Round(menu.Font.Height * 0.9);
-            menu.ImageScalingSize = new Size(imageSize, imageSize);
-
-            var padding = new Padding(6, 6, 6, 6);
-
-            void SetMenuStyle(ToolStripItem m)
-            {
-                m.Margin = padding;
-                m.MouseEnter += (s, e) => m.ForeColor = Color.White;
-                m.MouseLeave += (s, e) => m.ForeColor = SystemColors.ControlText;
-            }
+            ContextMenu.Items.Clear();
 
             foreach (var c in ConfigFactory.Profiles.Configs)
             {
@@ -112,57 +106,39 @@ namespace WindowResizer
                 var m = new ToolStripMenuItem(c.ProfileName, image?.ToBitmap(),
                     (s, e) => OnProfileChange(c.ProfileId));
                 SetMenuStyle(m);
-                menu.Items.Add(m);
+                ContextMenu.Items.Add(m);
             }
 
-            menu.Items.Add(new ToolStripSeparator());
+            ContextMenu.Items.Add(new ToolStripSeparator());
             var item = new ToolStripMenuItem("Setting", Resources.SettingIcon.ToBitmap(), OnSetting);
             SetMenuStyle(item);
-            menu.Items.Add(item);
+            ContextMenu.Items.Add(item);
             item = new ToolStripMenuItem("Exit", Resources.ExitIcon.ToBitmap(), OnExit);
             SetMenuStyle(item);
-            menu.Items.Add(item);
-            return menu;
+            ContextMenu.Items.Add(item);
         }
 
-        private void EventsHandle()
+        private static void SetMenuStyle(ToolStripItem m)
         {
-            ConfigFactory.Profiles.ProfileEvents.ProfileAdd += (i, n) => RebuildContextMenu();
-            ConfigFactory.Profiles.ProfileEvents.ProfileSwitch += i => RebuildContextMenu();
-            ConfigFactory.Profiles.ProfileEvents.ProfileRename += (i, n) => RebuildContextMenu();
-            ConfigFactory.Profiles.ProfileEvents.ProfileRemove += i => RebuildContextMenu();
+            m.Margin = ContextMenuPadding;
+            m.MouseEnter += (s, e) => ((ToolStripItem)s).ForeColor = Color.White;
+            m.MouseLeave += (s, e) => ((ToolStripItem)s).ForeColor = SystemColors.ControlText;
         }
+
+        private static readonly Padding ContextMenuPadding= new Padding(6, 6, 6, 6);
 
         private void RebuildContextMenu()
         {
             _trayIcon.Text = BuildTrayToolTips();
-            _trayIcon.ContextMenuStrip = BuildContextMenu();
-        }
-
-        private void OnProfileChange(string profileId)
-        {
-            ConfigFactory.ProfileSwitch(profileId);
-        }
-
-        private void Update()
-        {
-            _ = _updater.Update();
-        }
-
-        private static bool ConfirmUpdate(string message)
-        {
-            var res = MessageBox.Show(message, $"{nameof(WindowResizer)} Update",
-                MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
-            return res == DialogResult.OK;
+            BuildContextMenu();
         }
 
         private void OnExit(object sender, EventArgs e)
         {
             _settingForm?.Close();
-            _windowEventHandler.RemoveWindowCreateHandle();
-            ConfigFactory.Save();
-            _trayIcon.Dispose();
-            _hook.Dispose();
+            _windowEventHandler?.Dispose();
+            _trayIcon?.Dispose();
+            _hook?.Dispose();
             Environment.Exit(0);
         }
 
@@ -176,13 +152,75 @@ namespace WindowResizer
             _settingForm?.Show();
         }
 
-        private void SettingWindowInit()
+        #endregion
+
+        #region events
+
+        private void ProfilesEventsHandle()
         {
-            _settingForm = new SettingForm(_hook);
-            _settingForm.ConfigReload += ReloadConfig;
+            ConfigFactory.Profiles.ProfileEvents.ProfileAdd += (i, n) => RebuildContextMenu();
+            ConfigFactory.Profiles.ProfileEvents.ProfileSwitch += i => RebuildContextMenu();
+            ConfigFactory.Profiles.ProfileEvents.ProfileRename += (i, n) => RebuildContextMenu();
+            ConfigFactory.Profiles.ProfileEvents.ProfileRemove += i => RebuildContextMenu();
+            ConfigFactory.Current.WindowSizes.ListChanged += (s, e) => WindowsEventHandle();
         }
 
-        private void RegisterHotkey()
+        private void WindowsEventHandle()
+        {
+            var autoSizeEnable = ConfigFactory.Current.WindowSizes.Any(i => i.AutoResize);
+            if (_windowEventHandler == null && autoSizeEnable)
+            {
+                _windowEventHandler = new WindowEventHandler(OnWindowCreated);
+                _windowEventHandler.AddWindowCreateHandle();
+            }
+            else if (_windowEventHandler != null && !autoSizeEnable)
+            {
+                _windowEventHandler?.Dispose();
+                _windowEventHandler = null;
+            }
+        }
+
+        private void OnWindowCreated(IntPtr handle)
+        {
+            if (Resizer.IsWindowVisible(handle))
+            {
+                ResizeWindow(handle, false, true);
+            }
+        }
+
+        private void OnProfileChange(string profileId)
+        {
+            ConfigFactory.ProfileSwitch(profileId);
+        }
+
+        private void ReloadConfig(string message)
+        {
+            _hook.UnRegisterHotKey();
+            RegisterHotkeys();
+            ShowTooltips(message, ToolTipIcon.Info, 2000);
+        }
+
+        #endregion
+
+        #region update
+
+        private void Update()
+        {
+            _ = _updater.Update();
+        }
+
+        private static bool ConfirmUpdate(string message)
+        {
+            var res = MessageBox.Show(message, $"{nameof(WindowResizer)} Update",
+                MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+            return res == DialogResult.OK;
+        }
+
+        #endregion
+
+        #region hotkeys
+
+        private void RegisterHotkeys()
         {
             foreach (var type in Enum.GetValues(typeof(HotkeysType)).Cast<HotkeysType>())
             {
@@ -279,13 +317,9 @@ namespace WindowResizer
             }
         }
 
-        private void OnWindowCreated(IntPtr handle)
-        {
-            if (Resizer.IsWindowVisible(handle))
-            {
-                ResizeWindow(handle, false, true);
-            }
-        }
+        #endregion
+
+        #region window resize
 
         private void ResizeWindow(IntPtr handle, bool showTips = false, bool onlyAuto = false)
         {
@@ -367,11 +401,12 @@ namespace WindowResizer
             }
         }
 
-        private void ReloadConfig(string message)
+        #endregion
+
+        private void SettingWindowInit()
         {
-            _hook.UnRegisterHotKey();
-            RegisterHotkey();
-            ShowTooltips(message, ToolTipIcon.Info, 2000);
+            _settingForm = new SettingForm(_hook);
+            _settingForm.ConfigReload += ReloadConfig;
         }
 
         private void ShowTooltips(string message, ToolTipIcon tipIcon, int mSeconds) =>

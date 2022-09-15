@@ -38,7 +38,6 @@ namespace WindowResizer
             public Label Label { get; }
         }
 
-
         private void HotkeysPageInit()
         {
             _globalHook.KeyDown += HookOnKeyDown;

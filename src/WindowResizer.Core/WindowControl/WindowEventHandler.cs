@@ -3,7 +3,7 @@ using System.Windows.Automation;
 
 namespace WindowResizer.Core.WindowControl;
 
-public class WindowEventHandler
+public class WindowEventHandler:IDisposable
 {
     private static AutomationEventHandler? _eventHandler;
 
@@ -34,5 +34,11 @@ public class WindowEventHandler
             AutomationElement.RootElement,
             _eventHandler
         );
+    }
+
+    public void Dispose()
+    {
+        RemoveWindowCreateHandle();
+        _eventHandler = null;
     }
 }
