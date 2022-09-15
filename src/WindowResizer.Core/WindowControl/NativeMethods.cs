@@ -112,4 +112,52 @@ internal static class NativeMethods
             }
         }
     }
+
+    #region dpi
+
+    internal enum PROCESS_DPI_AWARENESS {
+        PROCESS_DPI_UNAWARE = 0,
+        PROCESS_SYSTEM_DPI_AWARE = 1,
+        PROCESS_PER_MONITOR_DPI_AWARE = 2
+    }
+
+    internal enum DPI_AWARENESS {
+        DPI_AWARENESS_INVALID = -1,
+        DPI_AWARENESS_UNAWARE = 0,
+        DPI_AWARENESS_SYSTEM_AWARE = 1,
+        DPI_AWARENESS_PER_MONITOR_AWARE = 2
+    }
+
+    [DllImport("SHcore.dll")]
+    internal static extern int GetProcessDpiAwareness(IntPtr hWnd, out PROCESS_DPI_AWARENESS value);
+
+    [DllImport("user32.dll")]
+    internal static extern int GetDpiForWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    internal static extern IntPtr GetWindowDpiAwarenessContext(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    internal static extern IntPtr SetThreadDpiAwarenessContext(IntPtr dpiContext);
+
+    [DllImport("user32.dll")]
+    internal static extern int GetAwarenessFromDpiAwarenessContext(IntPtr dpiContext);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static extern bool AreDpiAwarenessContextsEqual(IntPtr dpiContextA, IntPtr dpiContextB);
+
+    internal enum MONITOR_FLAGS {
+        MONITOR_DEFAULTTONULL = 0,
+        MONITOR_DEFAULTTOPRIMARY = 1,
+        MONITOR_DEFAULTTONEAREST = 2,
+    }
+
+    [DllImport("user32.dll")]
+    internal static extern IntPtr MonitorFromWindow(IntPtr hWnd, uint dwFlags);
+
+    [DllImport("user32.dll")]
+    internal static extern IntPtr MonitorFromRect([In] ref Rect rect, uint dwFlags);
+
+    #endregion
 }

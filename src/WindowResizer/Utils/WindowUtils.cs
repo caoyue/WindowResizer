@@ -154,6 +154,17 @@ namespace WindowResizer.Utils
             Resizer.SetPlacement(handle, match.Rect, match.MaximizedPosition, match.State);
         }
 
+/*
+        private static void MoveWindow(IntPtr handle, WindowSize match)
+        {
+            Resizer.MoveWindow(handle, match.Rect);
+            if (match.State == WindowState.Maximized)
+            {
+                Resizer.MaximizeWindow(handle);
+            }
+        }
+*/
+
         private static void InsertOrder(WindowSize item)
         {
             var list = ConfigFactory.Current.WindowSizes;

@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Windows.Forms;
+using WindowResizer.Core.Utils;
 using WindowResizer.Utils;
 
 namespace WindowResizer
@@ -12,7 +13,7 @@ namespace WindowResizer
         [STAThread]
         static void Main()
         {
-            if (Environment.OSVersion.Version.Major >= 6)
+            if (WindowsHelper.IsDpiAware)
             {
                 SetProcessDPIAware();
             }

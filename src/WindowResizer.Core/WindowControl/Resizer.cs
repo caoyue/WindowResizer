@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows.Forms;
 using WindowResizer.Common.Exceptions;
 using WindowResizer.Common.Windows;
+using WindowResizer.Core.Utils;
 using static WindowResizer.Core.WindowControl.NativeMethods;
 using WindowPlacement = WindowResizer.Common.Windows.WindowPlacement;
 
@@ -41,16 +42,16 @@ public static class Resizer
         return GetForegroundWindow();
     }
 
-    public static bool IsChildWindow(IntPtr handle)
+    public static bool IsChildWindow(IntPtr hWnd)
     {
-        var r = GetParent(handle);
+        var r = GetParent(hWnd);
         return r != IntPtr.Zero;
     }
 
-    public static WindowState GetWindowState(IntPtr handle)
+    public static WindowState GetWindowState(IntPtr hWnd)
     {
         const int GWL_STYLE = -16;
-        var style = (long)GetWindowLongPtr(handle, GWL_STYLE);
+        var style = (long)GetWindowLongPtr(hWnd, GWL_STYLE);
         if ((style & (int)WindowStyles.WS_MAXIMIZE) == (int)WindowStyles.WS_MAXIMIZE)
         {
             return WindowState.Maximized;
@@ -61,42 +62,41 @@ public static class Resizer
             : WindowState.Normal;
     }
 
-    public static bool IsWindowVisible(IntPtr handle)
+    public static bool IsWindowVisible(IntPtr hWnd)
     {
-        return NativeMethods.IsWindowVisible(handle);
+        return NativeMethods.IsWindowVisible(hWnd);
     }
 
-    public static string? GetWindowTitle(IntPtr handle)
+    public static string? GetWindowTitle(IntPtr hWnd)
     {
         const int nChars = 256;
         var buff = new StringBuilder(nChars);
-        return GetWindowText(handle, buff, nChars) > 0 ? buff.ToString() : null;
+        return GetWindowText(hWnd, buff, nChars) > 0 ? buff.ToString() : null;
     }
 
-    public static void MaximizeWindow(IntPtr handle)
+    public static void MaximizeWindow(IntPtr hWnd)
     {
-        if (handle == IntPtr.Zero) return;
-        ShowWindow(handle, (int)ShowWindowCommands.ShowMaximized);
+        if (hWnd == IntPtr.Zero) return;
+        ShowWindow(hWnd, (int)ShowWindowCommands.ShowMaximized);
     }
 
-    public static bool MoveWindow(IntPtr handle, Rect rect)
+    public static bool MoveWindow(IntPtr hWnd, Rect rect)
     {
-        if (handle == IntPtr.Zero)
+        if (hWnd == IntPtr.Zero)
             return false;
 
-        ShowWindow(handle, (int)ShowWindowCommands.Normal);
-        var result = SetWindowPos(handle, 0, rect.Left, rect.Top,
+        ShowWindow(hWnd, (int)ShowWindowCommands.Normal);
+        var result = SetWindowPos(hWnd, 0, rect.Left, rect.Top,
             rect.Right - rect.Left, rect.Bottom - rect.Top,
             (int)SetWindowPosFlags.SWP_NOOWNERZORDER);
-
         return result == IntPtr.Zero;
     }
 
-    public static string? GetProcessName(IntPtr handle)
+    public static string? GetProcessName(IntPtr hWnd)
     {
         try
         {
-            _ = GetWindowThreadProcessId(handle, out var pid);
+            _ = GetWindowThreadProcessId(hWnd, out var pid);
             var proc = Process.GetProcessById((int)pid);
             return proc.MainModule?.ModuleName;
         }
@@ -106,11 +106,11 @@ public static class Resizer
         }
     }
 
-    public static string? GetRealProcessName(IntPtr handle)
+    public static string? GetRealProcessName(IntPtr hWnd)
     {
         try
         {
-            var proc = GetRealProcess(handle);
+            var proc = GetRealProcess(hWnd);
             return proc?.MainModule?.ModuleName;
         }
         catch (Exception)
@@ -119,9 +119,9 @@ public static class Resizer
         }
     }
 
-    public static Process? GetRealProcess(IntPtr handle)
+    public static Process? GetRealProcess(IntPtr hWnd)
     {
-        _ = GetWindowThreadProcessId(handle, out var pid);
+        _ = GetWindowThreadProcessId(hWnd, out var pid);
         var foregroundProcess = Process.GetProcessById((int)pid);
         if (foregroundProcess.ProcessName == "ApplicationFrameHost")
         {
@@ -139,9 +139,9 @@ public static class Resizer
         return _realProcess;
     }
 
-    private static bool ChildWindowCallback(IntPtr handle, IntPtr lparam)
+    private static bool ChildWindowCallback(IntPtr hWnd, IntPtr lparam)
     {
-        _ = GetWindowThreadProcessId(handle, out var pid);
+        _ = GetWindowThreadProcessId(hWnd, out var pid);
         var process = GetProcess(pid);
         if (process != null && process.ProcessName != "ApplicationFrameHost")
         {
@@ -192,6 +192,22 @@ public static class Resizer
 
     public static bool SetPlacement(IntPtr hWnd, Rect rect, Point maximizedPosition, WindowState state)
     {
+        if (hWnd == IntPtr.Zero)
+            return false;
+
+        ShowWindow(hWnd, (int)ShowWindowCommands.Normal);
+
+        var currentMonitor = MonitorFromWindow(hWnd, (uint)MONITOR_FLAGS.MONITOR_DEFAULTTONEAREST);
+        var targetMonitor = MonitorFromRect(ref rect, (uint)MONITOR_FLAGS.MONITOR_DEFAULTTONEAREST);
+        var isSameMonitor = currentMonitor == targetMonitor;
+
+        // try to handle mixed-mode DPI scaling
+        IntPtr? context = null;
+        if (!isSameMonitor && WindowsHelper.IsDpiAware)
+        {
+            context = SetThreadDpiAwarenessContext(GetWindowDpiAwarenessContext(hWnd));
+        }
+
         var placement = NativeMethods.WindowPlacement.Default;
         placement.MaxPosition = maximizedPosition;
         placement.ShowCmd = state switch
@@ -202,7 +218,14 @@ public static class Resizer
         };
         placement.NormalPosition = rect;
 
-        return SetWindowPlacement(hWnd, ref placement);
+        var r = SetWindowPlacement(hWnd, ref placement);
+
+        if (context is not null)
+        {
+            SetThreadDpiAwarenessContext(context.Value);
+        }
+
+        return r;
     }
 
     public static bool IsForegroundFullScreen(Screen? screen = null)
