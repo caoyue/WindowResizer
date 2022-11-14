@@ -25,11 +25,18 @@ Change hotkeys in setting window.
 
     default hotkey: `ctrl+alt+r`
 
-    ![restore](https://i.imgur.com/5TJdL44.gif)
+    <details>
+        <summary>demo</summary>
+        <img src="https://i.imgur.com/5TJdL44.gif" title="restore" loading="lazy" />
+    </details>
+
 
 -   restore all opened window position
-
-    ![restore-all.gif](https://i.imgur.com/3558lKS.gif)
+    <details>
+        <summary>demo</summary>
+        <img src="https://i.imgur.com/3558lKS.gif" title="restore all" loading="lazy" />
+    </details>
+    
 
 ## usage
 
@@ -46,8 +53,12 @@ Change hotkeys in setting window.
 -   restore window position automatically
 
     check the checkbox on `Auto` column.
+    <details>
+        <summary>demo</summary>
+        <img src="https://i.imgur.com/LeNyJQu.gif" title="auto restore" loading="lazy" />
+    </details>
 
-    ![auto-restore](https://i.imgur.com/LeNyJQu.gif)
+   
 
 ## Stats
 ![Alt](https://repobeats.axiom.co/api/embed/75ddcde135edf6e28a84cbe8c5fbe2b029f73c8e.svg "Repobeats analytics image")
