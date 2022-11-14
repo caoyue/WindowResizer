@@ -1,12 +1,12 @@
-using System;
 using System.CommandLine;
-using System.IO;
+using WindowResizer.Base;
+using WindowResizer.CLI.Utils;
 
 namespace WindowResizer.CLI.Commands
 {
     internal class ResizeCommand : Command
     {
-        public ResizeCommand() : base("resize", "resize windows.")
+        public ResizeCommand() : base("resize", "Resize window by process and window title.")
         {
             var configOption = new ConfigOption();
             AddOption(configOption);
@@ -14,19 +14,13 @@ namespace WindowResizer.CLI.Commands
             AddOption(profileOption);
             var processOption = new ProcessOption();
             AddOption(processOption);
+            var titleOption = new TitleOption();
+            AddOption(titleOption);
 
-            this.SetHandler(ResizeHandle, configOption, profileOption, processOption);
-        }
-
-        private static void ResizeHandle(FileInfo config, string profile, string process)
-        {
-            if (config is null)
+            this.SetHandler((config, profile, process, title) =>
             {
-                Output.Error("Config file does not exist.");
-            }
-
-            var fp = Core.WindowControl.Resizer.GetForegroundHandle();
-            Console.WriteLine(fp);
+                WindowCmd.Resize(config?.FullName, profile, process, title, Output.Error);
+            }, configOption, profileOption, processOption, titleOption);
         }
     }
 }

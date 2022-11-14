@@ -1,6 +1,6 @@
 ﻿using Spectre.Console;
 
-namespace WindowResizer.CLI
+namespace WindowResizer.CLI.Utils
 {
     public static class Output
     {

@@ -9,7 +9,7 @@ using WindowResizer.Configuration;
 using WindowResizer.Core.Shortcuts;
 using WindowResizer.Core.WindowControl;
 using WindowResizer.Utils;
-using static WindowResizer.Utils.WindowUtils;
+using static WindowResizer.Base.WindowUtils;
 
 namespace WindowResizer
 {
@@ -125,7 +125,7 @@ namespace WindowResizer
             m.MouseLeave += (s, e) => ((ToolStripItem)s).ForeColor = SystemColors.ControlText;
         }
 
-        private static readonly Padding ContextMenuPadding= new Padding(6, 6, 6, 6);
+        private static readonly Padding ContextMenuPadding = new Padding(6, 6, 6, 6);
 
         private void RebuildContextMenu()
         {
@@ -184,7 +184,7 @@ namespace WindowResizer
         {
             if (Resizer.IsWindowVisible(handle))
             {
-                ResizeWindow(handle, false, true);
+                ResizeWindow(handle, ConfigFactory.Current, null, null, true);
             }
         }
 
@@ -272,7 +272,7 @@ namespace WindowResizer
                     {
                         if (Resizer.GetWindowState(window) != WindowState.Minimized)
                         {
-                            ResizeWindow(window);
+                            ResizeWindow(window, ConfigFactory.Current, null, null);
                         }
                     }
 
@@ -287,7 +287,7 @@ namespace WindowResizer
                     {
                         if (Resizer.GetWindowState(window) != WindowState.Minimized)
                         {
-                            UpdateOrSaveWindowSize(window);
+                            UpdateOrSaveWindowSize(window, ConfigFactory.Current, null);
                         }
                     }
 
@@ -298,7 +298,7 @@ namespace WindowResizer
                 if (keys.KeysEqual(e.Modifier, e.Key))
                 {
                     var window = Resizer.GetForegroundHandle();
-                    UpdateOrSaveWindowSize(window, true);
+                    UpdateOrSaveWindowSize(window, ConfigFactory.Current, OnGetProcessFailed);
                     return;
                 }
 
@@ -306,7 +306,7 @@ namespace WindowResizer
                 if (keys.KeysEqual(e.Modifier, e.Key))
                 {
                     var window = Resizer.GetForegroundHandle();
-                    ResizeWindow(window, true);
+                    ResizeWindow(window, ConfigFactory.Current, OnGetProcessFailed, OnConfigNoMatch);
                 }
             }
             catch (Exception exception)
@@ -319,89 +319,18 @@ namespace WindowResizer
 
         #endregion
 
-        #region window resize
-
-        private void ResizeWindow(IntPtr handle, bool showTips = false, bool onlyAuto = false)
+        private void OnConfigNoMatch(string processName, string windowTitle)
         {
-            if (!IsProcessAvailable(handle, out string processName, showTips))
-            {
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(processName)) return;
-
-            var windowTitle = Resizer.GetWindowTitle(handle) ?? string.Empty;
-            var match = GetMatchWindowSize(ConfigFactory.Current.WindowSizes, processName, windowTitle, onlyAuto);
-            if (!match.NoMatch)
-            {
-                MoveMatchWindow(match, handle);
-            }
-            else
-            {
-                if (showTips)
-                {
-                    ShowTooltips($"No saved settings for <{processName} :: {windowTitle}>.", ToolTipIcon.Info, 2000);
-                }
-            }
+            ShowTooltips($"No saved settings for <{processName} :: {windowTitle}>.", ToolTipIcon.Info, 2000);
         }
 
-        private void UpdateOrSaveWindowSize(IntPtr handle, bool showTips = false)
+        private void OnGetProcessFailed(Process process, Exception e)
         {
-            if (!IsProcessAvailable(handle, out string processName, showTips))
-            {
-                return;
-            }
-
-            var windowTitle = Resizer.GetWindowTitle(handle);
-            var match = GetMatchWindowSize(ConfigFactory.Current.WindowSizes, processName, windowTitle);
-
-            var place = Resizer.GetPlacement(handle);
-
-            // workaround: use GetWindowRect to get actual window coordinates
-            place.Rect = place.WindowState == WindowState.Maximized ? place.Rect : Resizer.GetRect(handle);
-            UpdateOrSaveConfig(match, processName, windowTitle, place);
+            var message =
+                $"Unable to resize process <{process.ProcessName}>, elevated privileges may be required.";
+            ShowTooltips(message, ToolTipIcon.Warning, 1500);
+            Log.Append($"{message}\nException: {e}");
         }
-
-        private bool IsProcessAvailable(IntPtr handle, out string processName, bool showTips = false)
-        {
-            processName = string.Empty;
-            if (Resizer.IsChildWindow(handle))
-            {
-                return false;
-            }
-
-            var process = Resizer.GetRealProcess(handle);
-            if (process is null || !TryGetProcessName(process, out processName, showTips))
-            {
-                return false;
-            }
-
-            return !Resizer.IsInvisibleProcess(processName);
-        }
-
-        private bool TryGetProcessName(Process process, out string processName, bool showTips = true)
-        {
-            try
-            {
-                processName = process.MainModule?.ModuleName;
-                return true;
-            }
-            catch (Exception e)
-            {
-                if (showTips)
-                {
-                    var message =
-                        $"Unable to resize process <{process.ProcessName}>, elevated privileges may be required.";
-                    ShowTooltips(message, ToolTipIcon.Warning, 1500);
-                    Log.Append($"{message}\nException: {e}");
-                }
-
-                processName = null;
-                return false;
-            }
-        }
-
-        #endregion
 
         private void SettingWindowInit()
         {
