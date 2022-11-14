@@ -4,7 +4,9 @@ using System.CommandLine.Parsing;
 using System.Linq;
 using System.Threading.Tasks;
 using Spectre.Console;
+using WindowResizer.Base;
 using WindowResizer.CLI.Commands;
+using WindowResizer.CLI.Utils;
 
 namespace WindowResizer.CLI
 {
@@ -12,6 +14,15 @@ namespace WindowResizer.CLI
     {
         static Task Main(string[] args)
         {
+            DpiUtils.SetDpiAware();
+
+            // args = new[]
+            // {
+            //     "resize",
+            //     "-p",
+            //     "explorer.exe"
+            // };
+
             var rootCommand = new RootCommand($"{nameof(WindowResizer)} CLI.");
             rootCommand.AddCommand(new ResizeCommand());
 
@@ -32,6 +43,8 @@ namespace WindowResizer.CLI
                     "--help"
                 };
             }
+
+
 
             return parser.InvokeAsync(args);
         }
