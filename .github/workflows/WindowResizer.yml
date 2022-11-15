@@ -3,12 +3,10 @@ name: WindowResizer
 on:
   push:
     tags:
-      - '*.*.*'
+      - "*.*.*"
 
 jobs:
-
   build:
-
     strategy:
       matrix:
         configuration: [Release]
@@ -19,37 +17,40 @@ jobs:
       Solution_Name: WindowResizer.sln
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
-    - name: Get Tag
-      id: get_version
-      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-      shell: bash
+      - name: Get Tag
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        shell: bash
 
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.1
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.1
 
-    - name: Setup NuGet.exe for use with actions
-      uses: NuGet/setup-nuget@v1.0.5
+      - name: Setup NuGet.exe for use with actions
+        uses: NuGet/setup-nuget@v1.0.5
 
-    - name: Navigate to Workspace
-      run: cd $GITHUB_WORKSPACE
+      - name: Navigate to Workspace
+        run: cd $GITHUB_WORKSPACE
 
-    - name: Build
-      run: .\Installer\build.ps1 ${{ steps.get_version.outputs.VERSION }}
+      - name: Build App
+        run: .\Installer\build.ps1 ${{ steps.get_version.outputs.VERSION }}
 
-    - name: Rename
-      run: Move-Item .\Releases\Setup.exe .\Releases\WindowResizer-${{ steps.get_version.outputs.VERSION }}.exe
+      - name: Build CLI
+        run: .\Installer\build-cli.ps1 ${{ steps.get_version.outputs.VERSION }}
 
-    - name: Show files
-      run: Get-ChildItem .\Releases
+      - name: Rename
+        run: Move-Item .\Releases\Setup.exe .\Releases\WindowResizer-${{ steps.get_version.outputs.VERSION }}.exe
 
-    - name: Release
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-        # prerelease: true
-        files: 'Releases/*'
+      - name: Show files
+        run: Get-ChildItem .\Releases
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          # prerelease: true
+          files: "Releases/*"
