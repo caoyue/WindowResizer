@@ -24,6 +24,12 @@ namespace WindowResizer
 
             PortableModeCheckBox.Checked = ConfigFactory.PortableMode;
             PortableModeCheckBox.CheckedChanged += PortableModeCheckBox_CheckedChanged;
+
+            if (App.IsRunningAsUwp)
+            {
+                UpdateCheckBox.Enabled = false;
+                PortableModeCheckBox.Enabled = false;
+            }
         }
 
         private void UpdateCheckBox_CheckedChanged(object sender, EventArgs e)

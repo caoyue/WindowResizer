@@ -53,7 +53,7 @@ namespace WindowResizer
             ProfilesEventsHandle();
             WindowsEventHandle();
 
-            if (ConfigFactory.Current.CheckUpdate)
+            if (!App.IsRunningAsUwp && ConfigFactory.Current.CheckUpdate)
             {
                 _updater = new SquirrelUpdater(ConfirmUpdate, (message, tipIcon, seconds) =>
                 {
@@ -248,9 +248,11 @@ namespace WindowResizer
                 var id = _hook.RegisterHotKey(hotkeys.GetModifierKeys(), hotkeys.GetKey());
                 App.RegisteredHotKeys[type] = id;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Helper.ShowMessageBox($"Register hotkey {hotkeys.ToKeysString()} failed.");
+                var error = $"Register hotkey {hotkeys.ToKeysString()} failed.";
+                Log.Append($"{error}: {e}");
+                Helper.ShowMessageBox(error);
             }
         }
 
