@@ -1,0 +1,18 @@
+* text=auto
+
+*.c text
+*.h text
+*.js text
+*.yml text
+*.yaml text
+*.sh text
+
+*.sln text eol=crlf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.reg text eol=crlf
+*.cs text eol=crlf
+
+# binary
+*.png binary
+*.jpg binary
