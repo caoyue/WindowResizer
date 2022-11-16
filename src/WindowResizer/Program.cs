@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Windows.Forms;
-using WindowResizer.Base;
 using WindowResizer.Utils;
 
 namespace WindowResizer
@@ -13,7 +12,7 @@ namespace WindowResizer
         [STAThread]
         static void Main()
         {
-            DpiUtils.SetDpiAware();
+            Core.Dpi.Utils.SetDpiAwareness();
 
             using (var mutex = new Mutex(false, "Global\\" + AppGuid))
             {
