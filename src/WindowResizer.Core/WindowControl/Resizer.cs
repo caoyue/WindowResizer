@@ -5,8 +5,8 @@ using System.Text;
 using System.Windows.Forms;
 using WindowResizer.Common.Exceptions;
 using WindowResizer.Common.Windows;
-using WindowResizer.Core.Utils;
 using static WindowResizer.Core.WindowControl.NativeMethods;
+using static WindowResizer.Core.Dpi.NativeMethods;
 using WindowPlacement = WindowResizer.Common.Windows.WindowPlacement;
 
 namespace WindowResizer.Core.WindowControl;
@@ -223,7 +223,7 @@ public static class Resizer
     {
         // try to handle mixed-mode DPI scaling
         IntPtr? context = null;
-        if (WindowsHelper.IsDpiAware)
+        if (Dpi.Utils.IsDpiAwareness)
         {
             context = SetThreadDpiAwarenessContext(GetWindowDpiAwarenessContext(hWnd));
         }

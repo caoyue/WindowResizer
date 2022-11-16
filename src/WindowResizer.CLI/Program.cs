@@ -5,7 +5,6 @@ using System.CommandLine.Parsing;
 using System.Linq;
 using System.Threading.Tasks;
 using Spectre.Console;
-using WindowResizer.Base;
 using WindowResizer.CLI.Commands;
 using WindowResizer.CLI.Utils;
 
@@ -15,7 +14,7 @@ namespace WindowResizer.CLI
     {
         static Task<int> Main(string[] args)
         {
-            DpiUtils.SetDpiAware();
+            Core.Dpi.Utils.SetDpiAwareness();
 
             var rootCommand = new RootCommand($"{nameof(WindowResizer)} CLI.");
             rootCommand.AddCommand(new ResizeCommand());
