@@ -21,13 +21,7 @@ namespace WindowResizer.CLI.Commands
                 }
 
                 var filePath = result.Tokens.Single().Value;
-                if (File.Exists(filePath))
-                {
-                    return new FileInfo(filePath);
-                }
-
-                result.ErrorMessage = "Config file does not exist";
-                return null;
+                return new FileInfo(filePath);
             })
         {
             IsRequired = false;

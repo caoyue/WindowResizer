@@ -21,7 +21,7 @@ namespace WindowResizer.Base
             }
             catch (Exception)
             {
-                onError?.Invoke($"Load config file {configPath} error, file not exists or not valid.");
+                onError?.Invoke($"Could not Load config file from <{configPath}>, file not exists or not valid.");
                 return false;
             }
         }
