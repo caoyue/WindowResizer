@@ -1,5 +1,6 @@
 using System.CommandLine;
 using System.CommandLine.Builder;
+using System.CommandLine.Help;
 using System.CommandLine.Parsing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,9 +11,9 @@ using WindowResizer.CLI.Utils;
 
 namespace WindowResizer.CLI
 {
-    internal class Program
+    internal static class Program
     {
-        static Task Main(string[] args)
+        static Task<int> Main(string[] args)
         {
             DpiUtils.SetDpiAware();
 
@@ -25,17 +26,18 @@ namespace WindowResizer.CLI
                          {
                              Output.Error(e.Message);
                          }, 1)
+                         .UseHelp(ctx =>
+                         {
+                             ctx.HelpBuilder.CustomizeLayout(
+                                 c =>
+                                     HelpBuilder.Default
+                                                .GetLayout()
+                                                .Skip(1)
+                                                .Prepend(p =>
+                                                    AnsiConsole.Write(new FigletText(nameof(WindowResizer)).LeftJustified().Color(Color.Blue)))
+                             );
+                         })
                          .Build();
-
-            if (!args.Any())
-            {
-                AnsiConsole.Write(new FigletText(nameof(WindowResizer)).LeftAligned().Color(Color.Blue));
-                AnsiConsole.WriteLine();
-                args = new[]
-                {
-                    "--help"
-                };
-            }
 
             return parser.InvokeAsync(args);
         }

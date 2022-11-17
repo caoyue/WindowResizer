@@ -1,4 +1,5 @@
 using System.CommandLine;
+using System.Threading.Tasks;
 using WindowResizer.Base;
 using WindowResizer.CLI.Utils;
 
@@ -21,14 +22,11 @@ namespace WindowResizer.CLI.Commands
 
             this.SetHandler((config, profile, process, title, all) =>
             {
-                if (all)
-                {
-                    WindowCmd.ResizeAll(config?.FullName, profile, Output.Error);
-                }
-                else
-                {
-                    WindowCmd.Resize(config?.FullName, profile, process, title, Output.Error);
-                }
+                var success = all
+                    ? WindowResizerCmd.ResizeAll(config?.FullName, profile, Output.Error)
+                    : WindowResizerCmd.Resize(config?.FullName, profile, process, title, Output.Error);
+
+                return Task.FromResult(success ? 0 : 1);
             }, configOption, profileOption, processOption, titleOption, allOption);
         }
     }

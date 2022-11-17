@@ -8,15 +8,14 @@ using static WindowResizer.Base.WindowUtils;
 
 namespace WindowResizer.Base;
 
-public static class WindowCmd
+public static class WindowResizerCmd
 {
-    public static void Resize(string? configPath, string? profileName, string? process, string? title, Action<string>? onError)
+    public static bool Resize(string? configPath, string? profileName, string? process, string? title, Action<string>? onError)
     {
         var profile = LoadConfig(configPath, profileName, onError);
         if (profile is null)
         {
-            onError?.Invoke($"Profile <{profileName}> not exists");
-            return;
+            return false;
         }
 
         var targets = new List<IntPtr>();
@@ -63,15 +62,16 @@ public static class WindowCmd
                 onError?.Invoke($"No saved settings for <{p} :: {t}>.");
             });
         }
+
+        return true;
     }
 
-    public static void ResizeAll(string? configPath, string? profileName, Action<string>? onError)
+    public static bool ResizeAll(string? configPath, string? profileName, Action<string>? onError)
     {
         var profile = LoadConfig(configPath, profileName, onError);
         if (profile is null)
         {
-            onError?.Invoke($"Profile <{profileName}> not exists");
-            return;
+            return false;
         }
 
         var windows = Resizer.GetOpenWindows();
@@ -83,6 +83,8 @@ public static class WindowCmd
                 ResizeWindow(window, profile, null, null);
             }
         }
+
+        return true;
     }
 
     private static Config? LoadConfig(string? configPath, string? profileName, Action<string>? onError)
@@ -97,7 +99,13 @@ public static class WindowCmd
             return ConfigFactory.Current;
         }
 
-        return ConfigFactory.Profiles.Configs.FirstOrDefault(i =>
+        var p = ConfigFactory.Profiles.Configs.FirstOrDefault(i =>
             i.ProfileName.Equals(profileName, StringComparison.OrdinalIgnoreCase));
+        if (p is null)
+        {
+            onError?.Invoke($"Profile <{profileName}> not exists");
+        }
+
+        return p;
     }
 }

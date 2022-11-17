@@ -11,7 +11,7 @@ namespace WindowResizer.CLI.Utils
 
         public static void Error(string str)
         {
-            AnsiConsole.MarkupLineInterpolated($"[red]Error: {str}[/]");
+            AnsiConsole.MarkupLineInterpolated($"[red]{str}[/]");
         }
     }
 }
