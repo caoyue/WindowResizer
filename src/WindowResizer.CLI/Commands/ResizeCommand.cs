@@ -8,6 +8,8 @@ namespace WindowResizer.CLI.Commands
     {
         public ResizeCommand() : base("resize", "Resize window by process and window title.")
         {
+            var allOption = new AllOption();
+            AddOption(allOption);
             var configOption = new ConfigOption();
             AddOption(configOption);
             var profileOption = new ProfileOption();
@@ -17,10 +19,17 @@ namespace WindowResizer.CLI.Commands
             var titleOption = new TitleOption();
             AddOption(titleOption);
 
-            this.SetHandler((config, profile, process, title) =>
+            this.SetHandler((config, profile, process, title, all) =>
             {
-                WindowCmd.Resize(config?.FullName, profile, process, title, Output.Error);
-            }, configOption, profileOption, processOption, titleOption);
+                if (all)
+                {
+                    WindowCmd.ResizeAll(config?.FullName, profile, Output.Error);
+                }
+                else
+                {
+                    WindowCmd.Resize(config?.FullName, profile, process, title, Output.Error);
+                }
+            }, configOption, profileOption, processOption, titleOption, allOption);
         }
     }
 }

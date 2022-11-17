@@ -35,7 +35,6 @@ namespace WindowResizer.CLI.Commands
         }
     }
 
-
     public class ProfileOption : Option<string>
     {
         public ProfileOption() : base(
@@ -45,6 +44,21 @@ namespace WindowResizer.CLI.Commands
                 "-P"
             },
             description: "Profile name, use current profile if omitted.")
+        {
+            IsRequired = false;
+            AllowMultipleArgumentsPerToken = false;
+        }
+    }
+
+    public class AllOption : Option<bool>
+    {
+        public AllOption() : base(
+            aliases: new[]
+            {
+                "--all",
+                "-a"
+            },
+            description: "Resize all processes, default is false.")
         {
             IsRequired = false;
             AllowMultipleArgumentsPerToken = false;
