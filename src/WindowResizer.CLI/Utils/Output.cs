@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using System.Collections.Generic;
+using Spectre.Console;
 
 namespace WindowResizer.CLI.Utils
 {
