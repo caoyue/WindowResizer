@@ -44,21 +44,6 @@ namespace WindowResizer.CLI.Commands
         }
     }
 
-    public class AllOption : Option<bool>
-    {
-        public AllOption() : base(
-            aliases: new[]
-            {
-                "--all",
-                "-a"
-            },
-            description: "Resize all processes, default is false.")
-        {
-            IsRequired = false;
-            AllowMultipleArgumentsPerToken = false;
-        }
-    }
-
     public class ProcessOption : Option<string>
     {
         public ProcessOption() : base(
@@ -83,6 +68,21 @@ namespace WindowResizer.CLI.Commands
                 "-t"
             },
             description: "Process title, all windows of the process will be resized if not specified.")
+        {
+            IsRequired = false;
+            AllowMultipleArgumentsPerToken = false;
+        }
+    }
+
+    public class VerboseOption : Option<bool>
+    {
+        public VerboseOption() : base(
+            aliases: new[]
+            {
+                "--verbose",
+                "-v"
+            },
+            description: "Show more details.")
         {
             IsRequired = false;
             AllowMultipleArgumentsPerToken = false;

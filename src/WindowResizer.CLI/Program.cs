@@ -16,6 +16,14 @@ namespace WindowResizer.CLI
         {
             Core.Dpi.Utils.SetDpiAwareness();
 
+            System.Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            // args = new[]
+            // {
+            //     "resize",
+            //     "-v"
+            // };
+
             var rootCommand = new RootCommand($"{nameof(WindowResizer)} CLI.");
             rootCommand.AddCommand(new ResizeCommand());
 
