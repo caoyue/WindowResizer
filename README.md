@@ -4,10 +4,19 @@
 
 WindowResizer is a simple tool that gives you a way to use hotkeys to quickly save and restore different window positions and sizes.
 
-## Require
+## Download
+- Github Release
+    > <https://github.com/caoyue/WindowResizer/releases/latest>
 
--   Windows 7+ (x64)
--   .NET Framework 4.7.2+
+    require:
+    -   Windows 7+ (x64)
+    -   .NET Framework 4.7.2+
+
+- Microsoft Store
+    > [<img src="https://raw.githubusercontent.com/caoyue/WindowResizer/package/.github/assets/microsoft-store-badge.png" width="160" title="Get WindowResizer from Microsoft Store" alt="Get WindowResizer from Microsoft Store">](https://www.microsoft.com/store/apps/9NZ07CQ6WZMB)
+    
+    The Windows Store version has the same features as the GitHub release version.  
+    You can support development by purchasing it on the Windows Store.
 
 ## App
 ### hotkeys
@@ -104,6 +113,13 @@ WindowResizer.CLI.exe resize -t ".*.txt"
 WindowResizer.CLI.exe resize -c "X:\WindowResizer.config.json" -P "my-profile" -p "notepad.exe" -t ".*.txt" -v
 ```
 
+
+## Build
+- .NET Framework 4.7.2
+- Visual Studio 2019/2022 or JetBrains Rider
+- Projects
+  - WindowResizer: the GUI app
+  - WindowResizer.CLI: the CLI app
 
 ## Stats
 ![Alt](https://repobeats.axiom.co/api/embed/75ddcde135edf6e28a84cbe8c5fbe2b029f73c8e.svg "Repobeats analytics image")
