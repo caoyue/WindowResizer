@@ -61,6 +61,7 @@ namespace WindowResizer
             this.NewProfile = new System.Windows.Forms.Button();
             this.AboutPage = new System.Windows.Forms.TabPage();
             this.AboutGroup = new System.Windows.Forms.GroupBox();
+            this.StartupCheckBox = new System.Windows.Forms.CheckBox();
             this.UpdateCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.ProcessesGrid)).BeginInit();
             this.ConfigExportGroup.SuspendLayout();
@@ -139,7 +140,7 @@ namespace WindowResizer
             this.PortableModeCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.PortableModeCheckBox.Location = new System.Drawing.Point(26, 46);
             this.PortableModeCheckBox.Name = "PortableModeCheckBox";
-            this.PortableModeCheckBox.Size = new System.Drawing.Size(133, 19);
+            this.PortableModeCheckBox.Size = new System.Drawing.Size(118, 20);
             this.PortableModeCheckBox.TabIndex = 11;
             this.PortableModeCheckBox.Text = "Portable Mode";
             this.PortableModeCheckBox.UseVisualStyleBackColor = true;
@@ -149,7 +150,7 @@ namespace WindowResizer
             this.ConfigExportGroup.Controls.Add(this.PortableModeCheckBox);
             this.ConfigExportGroup.Controls.Add(this.ConfigImportBtn);
             this.ConfigExportGroup.Controls.Add(this.ConfigExportBtn);
-            this.ConfigExportGroup.Location = new System.Drawing.Point(33, 280);
+            this.ConfigExportGroup.Location = new System.Drawing.Point(33, 346);
             this.ConfigExportGroup.Name = "ConfigExportGroup";
             this.ConfigExportGroup.Size = new System.Drawing.Size(925, 160);
             this.ConfigExportGroup.TabIndex = 12;
@@ -239,7 +240,7 @@ namespace WindowResizer
             this.SaveAllKeyLabel.ForeColor = System.Drawing.SystemColors.Highlight;
             this.SaveAllKeyLabel.Location = new System.Drawing.Point(204, 192);
             this.SaveAllKeyLabel.Name = "SaveAllKeyLabel";
-            this.SaveAllKeyLabel.Size = new System.Drawing.Size(127, 15);
+            this.SaveAllKeyLabel.Size = new System.Drawing.Size(111, 16);
             this.SaveAllKeyLabel.TabIndex = 17;
             this.SaveAllKeyLabel.Text = "SaveAllKeyLabel";
             // 
@@ -250,7 +251,7 @@ namespace WindowResizer
             this.SaveAllLabel.Location = new System.Drawing.Point(32, 192);
             this.SaveAllLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.SaveAllLabel.Name = "SaveAllLabel";
-            this.SaveAllLabel.Size = new System.Drawing.Size(71, 15);
+            this.SaveAllLabel.Size = new System.Drawing.Size(57, 16);
             this.SaveAllLabel.TabIndex = 16;
             this.SaveAllLabel.Text = "Save All";
             this.SaveAllLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -262,7 +263,7 @@ namespace WindowResizer
             this.SaveLabel.Location = new System.Drawing.Point(32, 51);
             this.SaveLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.SaveLabel.Name = "SaveLabel";
-            this.SaveLabel.Size = new System.Drawing.Size(39, 15);
+            this.SaveLabel.Size = new System.Drawing.Size(39, 16);
             this.SaveLabel.TabIndex = 2;
             this.SaveLabel.Text = "Save";
             this.SaveLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -273,7 +274,7 @@ namespace WindowResizer
             this.RestoreAllKeyLabel.ForeColor = System.Drawing.SystemColors.Highlight;
             this.RestoreAllKeyLabel.Location = new System.Drawing.Point(204, 269);
             this.RestoreAllKeyLabel.Name = "RestoreAllKeyLabel";
-            this.RestoreAllKeyLabel.Size = new System.Drawing.Size(151, 15);
+            this.RestoreAllKeyLabel.Size = new System.Drawing.Size(127, 16);
             this.RestoreAllKeyLabel.TabIndex = 15;
             this.RestoreAllKeyLabel.Text = "RestoreAllKeyLabel";
             // 
@@ -283,7 +284,7 @@ namespace WindowResizer
             this.RestoreLabel.Location = new System.Drawing.Point(32, 118);
             this.RestoreLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.RestoreLabel.Name = "RestoreLabel";
-            this.RestoreLabel.Size = new System.Drawing.Size(63, 15);
+            this.RestoreLabel.Size = new System.Drawing.Size(55, 16);
             this.RestoreLabel.TabIndex = 5;
             this.RestoreLabel.Text = "Restore";
             this.RestoreLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -294,7 +295,7 @@ namespace WindowResizer
             this.RestoreKeyLabel.ForeColor = System.Drawing.SystemColors.Highlight;
             this.RestoreKeyLabel.Location = new System.Drawing.Point(204, 118);
             this.RestoreKeyLabel.Name = "RestoreKeyLabel";
-            this.RestoreKeyLabel.Size = new System.Drawing.Size(127, 15);
+            this.RestoreKeyLabel.Size = new System.Drawing.Size(112, 16);
             this.RestoreKeyLabel.TabIndex = 14;
             this.RestoreKeyLabel.Text = "RestoreKeyLabel";
             // 
@@ -314,7 +315,7 @@ namespace WindowResizer
             this.SaveKeyLabel.ForeColor = System.Drawing.SystemColors.Highlight;
             this.SaveKeyLabel.Location = new System.Drawing.Point(204, 51);
             this.SaveKeyLabel.Name = "SaveKeyLabel";
-            this.SaveKeyLabel.Size = new System.Drawing.Size(103, 15);
+            this.SaveKeyLabel.Size = new System.Drawing.Size(96, 16);
             this.SaveKeyLabel.TabIndex = 11;
             this.SaveKeyLabel.Text = "SaveKeyLabel";
             // 
@@ -336,7 +337,7 @@ namespace WindowResizer
             this.DisableInFullScreenCheckBox.Location = new System.Drawing.Point(32, 350);
             this.DisableInFullScreenCheckBox.Margin = new System.Windows.Forms.Padding(2);
             this.DisableInFullScreenCheckBox.Name = "DisableInFullScreenCheckBox";
-            this.DisableInFullScreenCheckBox.Size = new System.Drawing.Size(237, 19);
+            this.DisableInFullScreenCheckBox.Size = new System.Drawing.Size(194, 20);
             this.DisableInFullScreenCheckBox.TabIndex = 6;
             this.DisableInFullScreenCheckBox.TabStop = false;
             this.DisableInFullScreenCheckBox.Text = "Disable in FullScreen Mode";
@@ -358,7 +359,7 @@ namespace WindowResizer
             this.RestoreAllLabel.Location = new System.Drawing.Point(32, 269);
             this.RestoreAllLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.RestoreAllLabel.Name = "RestoreAllLabel";
-            this.RestoreAllLabel.Size = new System.Drawing.Size(95, 15);
+            this.RestoreAllLabel.Size = new System.Drawing.Size(73, 16);
             this.RestoreAllLabel.TabIndex = 9;
             this.RestoreAllLabel.Text = "Restore All";
             this.RestoreAllLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -449,23 +450,35 @@ namespace WindowResizer
             // 
             // AboutGroup
             // 
+            this.AboutGroup.Controls.Add(this.StartupCheckBox);
             this.AboutGroup.Controls.Add(this.UpdateCheckBox);
             this.AboutGroup.Controls.Add(this.VersionLabel);
             this.AboutGroup.Controls.Add(this.GithubLinkLabel);
             this.AboutGroup.Location = new System.Drawing.Point(33, 24);
             this.AboutGroup.Name = "AboutGroup";
-            this.AboutGroup.Size = new System.Drawing.Size(925, 215);
+            this.AboutGroup.Size = new System.Drawing.Size(925, 286);
             this.AboutGroup.TabIndex = 16;
             this.AboutGroup.TabStop = false;
             this.AboutGroup.Text = "About";
+            // 
+            // StartupCheckBox
+            // 
+            this.StartupCheckBox.AutoSize = true;
+            this.StartupCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.StartupCheckBox.Location = new System.Drawing.Point(26, 157);
+            this.StartupCheckBox.Name = "StartupCheckBox";
+            this.StartupCheckBox.Size = new System.Drawing.Size(160, 20);
+            this.StartupCheckBox.TabIndex = 16;
+            this.StartupCheckBox.Text = "Run on system startup";
+            this.StartupCheckBox.UseVisualStyleBackColor = true;
             // 
             // UpdateCheckBox
             // 
             this.UpdateCheckBox.AutoSize = true;
             this.UpdateCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.UpdateCheckBox.Location = new System.Drawing.Point(26, 160);
+            this.UpdateCheckBox.Location = new System.Drawing.Point(26, 206);
             this.UpdateCheckBox.Name = "UpdateCheckBox";
-            this.UpdateCheckBox.Size = new System.Drawing.Size(277, 19);
+            this.UpdateCheckBox.Size = new System.Drawing.Size(212, 20);
             this.UpdateCheckBox.TabIndex = 12;
             this.UpdateCheckBox.Text = "Checking for updates at startup";
             this.UpdateCheckBox.UseVisualStyleBackColor = true;
@@ -501,6 +514,8 @@ namespace WindowResizer
             this.AboutGroup.PerformLayout();
             this.ResumeLayout(false);
         }
+
+        private System.Windows.Forms.CheckBox StartupCheckBox;
 
         private System.Windows.Forms.TableLayoutPanel ProfilesLayout;
 

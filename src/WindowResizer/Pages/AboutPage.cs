@@ -14,6 +14,9 @@ namespace WindowResizer
 
         private void AboutPageInit()
         {
+            StartupCheckBox.Checked = Startup.StartupStatus();
+            StartupCheckBox.CheckedChanged += StartupCheckBox_CheckedChanged;
+
             UpdateCheckBox.Checked = ConfigFactory.Current.CheckUpdate;
             UpdateCheckBox.CheckedChanged += UpdateCheckBox_CheckedChanged;
 
@@ -29,6 +32,18 @@ namespace WindowResizer
             {
                 UpdateCheckBox.Enabled = false;
                 PortableModeCheckBox.Enabled = false;
+            }
+        }
+
+        private void StartupCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (StartupCheckBox.Checked)
+            {
+                Startup.AddToStartup();
+            }
+            else
+            {
+                Startup.RemoveFromStartup();
             }
         }
 
