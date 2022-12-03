@@ -82,7 +82,6 @@ Usage:
   WindowResizer.CLI resize [options]
 
 Options:
-  -a, --all                Resize all processes, default is false.
   -c, --config <config>    Config file path, use current config file if omitted.
   -P, --profile <profile>  Profile name, use current profile if omitted.
   -p, --process <process>  Process name, use foreground process if omitted.
