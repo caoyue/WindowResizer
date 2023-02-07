@@ -17,21 +17,21 @@ namespace WindowResizer
             StartupCheckBox.Checked = Startup.StartupStatus();
             StartupCheckBox.CheckedChanged += StartupCheckBox_CheckedChanged;
 
-            UpdateCheckBox.Checked = ConfigFactory.Current.CheckUpdate;
+
+            UpdateCheckBox.Enabled = !ConfigFactory.PortableMode;
+            UpdateCheckBox.Checked = ConfigFactory.Current.CheckUpdate && !ConfigFactory.PortableMode;
             UpdateCheckBox.CheckedChanged += UpdateCheckBox_CheckedChanged;
 
-            VersionLabel.Text = $"{nameof(WindowResizer)} {Application.ProductVersion}";
+
+            var portable = ConfigFactory.PortableMode ? " (portable)" : string.Empty;
+            VersionLabel.Text = $"{nameof(WindowResizer)} {Application.ProductVersion}{portable}";
 
             GithubLinkLabel.Text = ProjectLink;
             GithubLinkLabel.LinkClicked += LinkClicked;
 
-            PortableModeCheckBox.Checked = ConfigFactory.PortableMode;
-            PortableModeCheckBox.CheckedChanged += PortableModeCheckBox_CheckedChanged;
-
             if (App.IsRunningAsUwp)
             {
                 UpdateCheckBox.Enabled = false;
-                PortableModeCheckBox.Enabled = false;
             }
         }
 
@@ -63,10 +63,7 @@ namespace WindowResizer
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
-                Title = "Export Config",
-                AddExtension = true,
-                DefaultExt = "json",
-                FileName = $"{nameof(WindowResizer)}.config.json"
+                Title = "Export Config", AddExtension = true, DefaultExt = "json", FileName = $"{nameof(WindowResizer)}.config.json"
             };
             if (saveFileDialog.ShowDialog() != DialogResult.Cancel && saveFileDialog.FileName != "")
             {
@@ -110,23 +107,6 @@ namespace WindowResizer
             {
                 Log.Append($"Import failed: {exception}");
                 MessageBox.Show("Import failed, config file is not valid json.");
-            }
-        }
-
-        private void PortableModeCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            var desc = PortableModeCheckBox.Checked ? "Enter" : "Exit";
-            const MessageBoxButtons messButton = MessageBoxButtons.OKCancel;
-            DialogResult dr = MessageBox.Show($"{desc} portable mode?", "Confirm", messButton);
-            if (dr == DialogResult.OK)
-            {
-                ConfigFactory.Move(PortableModeCheckBox.Checked);
-            }
-            else
-            {
-                PortableModeCheckBox.CheckedChanged -= PortableModeCheckBox_CheckedChanged;
-                PortableModeCheckBox.Checked = !PortableModeCheckBox.Checked;
-                PortableModeCheckBox.CheckedChanged += PortableModeCheckBox_CheckedChanged;
             }
         }
     }

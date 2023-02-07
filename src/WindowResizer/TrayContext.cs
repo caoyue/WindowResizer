@@ -53,7 +53,7 @@ namespace WindowResizer
             ProfilesEventsHandle();
             WindowsEventHandle();
 
-            if (!App.IsRunningAsUwp && ConfigFactory.Current.CheckUpdate)
+            if (!App.IsRunningAsUwp && ConfigFactory.Current.CheckUpdate && !ConfigFactory.PortableMode)
             {
                 _updater = new SquirrelUpdater(ConfirmUpdate, (message, tipIcon, seconds) =>
                 {

@@ -65,6 +65,9 @@ Change hotkeys in setting window.
         <summary>demo</summary>
         <img src="https://i.imgur.com/LeNyJQu.gif" title="auto restore" loading="lazy" />
     </details>
+-   portable mode
+    - download portable package
+    - put `WindowResizer.config.json` in the same folder as the program file `WindowResizer.exe`
 
 ## CLI
 run ```WindowResizer.CLI.exe resize -h```   

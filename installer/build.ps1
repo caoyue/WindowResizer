@@ -24,6 +24,12 @@ Nuget pack .\installer\WindowResizer.nuspec -Version $version -Properties Config
 Write-Host '>> releasing...' -ForegroundColor Green
 squirrel  --setupIcon .\src\WindowResizer\Resources\AppIcon.ico --shortcut-locations 'StartMenu' --releasify .\pack\WindowResizer.$version.nupkg --no-msi
 
+# portable release
+Write-Host '>> portable package releasing...' -ForegroundColor Green
+$archive = "WindowResizer-portable-$version.zip"
+Copy-Item .\installer\WindowResizer.config.json .\publish\WindowResizer\WindowResizer.config.json
+7z a .\Releases\$archive .\publish\WindowResizer\
+
 Start-Sleep -Seconds 3
 Write-Host 'waiting for releases files...' -ForegroundColor Green
 tree .\Releases /F

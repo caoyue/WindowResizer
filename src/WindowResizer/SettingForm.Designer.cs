@@ -34,7 +34,6 @@ namespace WindowResizer
             this.ProcessesGrid = new System.Windows.Forms.DataGridView();
             this.ConfigExportBtn = new System.Windows.Forms.Button();
             this.ConfigImportBtn = new System.Windows.Forms.Button();
-            this.PortableModeCheckBox = new System.Windows.Forms.CheckBox();
             this.ConfigExportGroup = new System.Windows.Forms.GroupBox();
             this.GithubLinkLabel = new System.Windows.Forms.LinkLabel();
             this.VersionLabel = new System.Windows.Forms.Label();
@@ -115,7 +114,7 @@ namespace WindowResizer
             // ConfigExportBtn
             // 
             this.ConfigExportBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.ConfigExportBtn.Location = new System.Drawing.Point(148, 89);
+            this.ConfigExportBtn.Location = new System.Drawing.Point(148, 46);
             this.ConfigExportBtn.Name = "ConfigExportBtn";
             this.ConfigExportBtn.Size = new System.Drawing.Size(90, 40);
             this.ConfigExportBtn.TabIndex = 9;
@@ -126,7 +125,7 @@ namespace WindowResizer
             // ConfigImportBtn
             // 
             this.ConfigImportBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.ConfigImportBtn.Location = new System.Drawing.Point(26, 89);
+            this.ConfigImportBtn.Location = new System.Drawing.Point(26, 46);
             this.ConfigImportBtn.Name = "ConfigImportBtn";
             this.ConfigImportBtn.Size = new System.Drawing.Size(90, 40);
             this.ConfigImportBtn.TabIndex = 10;
@@ -134,25 +133,13 @@ namespace WindowResizer
             this.ConfigImportBtn.UseVisualStyleBackColor = false;
             this.ConfigImportBtn.Click += new System.EventHandler(this.ConfigImportBtn_Click);
             // 
-            // PortableModeCheckBox
-            // 
-            this.PortableModeCheckBox.AutoSize = true;
-            this.PortableModeCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.PortableModeCheckBox.Location = new System.Drawing.Point(26, 46);
-            this.PortableModeCheckBox.Name = "PortableModeCheckBox";
-            this.PortableModeCheckBox.Size = new System.Drawing.Size(118, 20);
-            this.PortableModeCheckBox.TabIndex = 11;
-            this.PortableModeCheckBox.Text = "Portable Mode";
-            this.PortableModeCheckBox.UseVisualStyleBackColor = true;
-            // 
             // ConfigExportGroup
             // 
-            this.ConfigExportGroup.Controls.Add(this.PortableModeCheckBox);
             this.ConfigExportGroup.Controls.Add(this.ConfigImportBtn);
             this.ConfigExportGroup.Controls.Add(this.ConfigExportBtn);
             this.ConfigExportGroup.Location = new System.Drawing.Point(33, 346);
             this.ConfigExportGroup.Name = "ConfigExportGroup";
-            this.ConfigExportGroup.Size = new System.Drawing.Size(925, 160);
+            this.ConfigExportGroup.Size = new System.Drawing.Size(925, 113);
             this.ConfigExportGroup.TabIndex = 12;
             this.ConfigExportGroup.TabStop = false;
             this.ConfigExportGroup.Text = "Import/Export Config";
@@ -500,7 +487,6 @@ namespace WindowResizer
             this.Load += new System.EventHandler(this.SettingForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.ProcessesGrid)).EndInit();
             this.ConfigExportGroup.ResumeLayout(false);
-            this.ConfigExportGroup.PerformLayout();
             this.SettingTab.ResumeLayout(false);
             this.HotkeysPage.ResumeLayout(false);
             this.settingGroupBox.ResumeLayout(false);
@@ -532,8 +518,6 @@ namespace WindowResizer
         private System.Windows.Forms.GroupBox settingGroupBox;
 
         private System.Windows.Forms.GroupBox ConfigExportGroup;
-
-        private System.Windows.Forms.CheckBox PortableModeCheckBox;
 
         #endregion
 

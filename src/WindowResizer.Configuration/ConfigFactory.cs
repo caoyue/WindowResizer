@@ -9,23 +9,19 @@ namespace WindowResizer.Configuration;
 
 public static class ConfigFactory
 {
-    private const string ConfigFile = $"{nameof(WindowResizer)}.config.json";
-
-    private static readonly string RoamingPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(WindowResizer));
-
-    private static string _roamingConfigPath = Path.Combine(RoamingPath, ConfigFile);
+    private static string _roamingConfigPath = string.Empty;
     private static string _portableConfigPath = string.Empty;
 
-    public static bool PortableMode => File.Exists(RoamingPath);
+    public static bool PortableMode;
+    public static string ConfigPath = string.Empty;
 
     public static void SetPath(string roamingPath, string portablePath)
     {
         _roamingConfigPath = roamingPath;
         _portableConfigPath = portablePath;
+        PortableMode = File.Exists(_portableConfigPath);
+        ConfigPath = PortableMode ? _portableConfigPath : _roamingConfigPath;
     }
-
-    public static string ConfigPath => PortableMode ? _portableConfigPath : _roamingConfigPath;
 
     public static readonly Profiles Profiles = new();
 
