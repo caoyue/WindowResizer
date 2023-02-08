@@ -53,6 +53,8 @@ namespace WindowResizer
             ProfilesEventsHandle();
             WindowsEventHandle();
 
+            Startup();
+
             if (!App.IsRunningAsUwp && ConfigFactory.Current.CheckUpdate && !ConfigFactory.PortableMode)
             {
                 _updater = new SquirrelUpdater(ConfirmUpdate, (message, tipIcon, seconds) =>
@@ -216,6 +218,17 @@ namespace WindowResizer
             return res == DialogResult.OK;
         }
 
+        #endregion
+
+        #region startup
+
+        private void Startup()
+        {
+            if (Utils.Startup.StartupStatus())
+            {
+                Utils.Startup.AddToStartup();
+            }
+        }
         #endregion
 
         #region hotkeys
