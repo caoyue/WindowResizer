@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
@@ -14,25 +14,30 @@ namespace WindowResizer
 
         private void AboutPageInit()
         {
-            StartupCheckBox.Checked = Startup.StartupStatus();
-            StartupCheckBox.CheckedChanged += StartupCheckBox_CheckedChanged;
 
+            if (App.IsRunningAsUwp)
+            {
+                StartupCheckBox.Checked = true;
+                StartupCheckBox.Enabled= false;
 
-            UpdateCheckBox.Enabled = !ConfigFactory.PortableMode;
-            UpdateCheckBox.Checked = ConfigFactory.Current.CheckUpdate && !ConfigFactory.PortableMode;
-            UpdateCheckBox.CheckedChanged += UpdateCheckBox_CheckedChanged;
+                UpdateCheckBox.Checked = true;
+                UpdateCheckBox.Enabled = false;
+            }
+            else
+            {
+                StartupCheckBox.Checked = Startup.StartupStatus();
+                StartupCheckBox.CheckedChanged += StartupCheckBox_CheckedChanged;
 
+                UpdateCheckBox.Enabled = !ConfigFactory.PortableMode;
+                UpdateCheckBox.Checked = ConfigFactory.Current.CheckUpdate && !ConfigFactory.PortableMode;
+                UpdateCheckBox.CheckedChanged += UpdateCheckBox_CheckedChanged;
+            }
 
             var portable = ConfigFactory.PortableMode ? " (portable)" : string.Empty;
             VersionLabel.Text = $"{nameof(WindowResizer)} {Application.ProductVersion}{portable}";
 
             GithubLinkLabel.Text = ProjectLink;
             GithubLinkLabel.LinkClicked += LinkClicked;
-
-            if (App.IsRunningAsUwp)
-            {
-                UpdateCheckBox.Enabled = false;
-            }
         }
 
         private void StartupCheckBox_CheckedChanged(object sender, EventArgs e)

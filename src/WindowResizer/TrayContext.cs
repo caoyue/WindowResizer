@@ -224,6 +224,11 @@ namespace WindowResizer
 
         private void Startup()
         {
+            if (App.IsRunningAsUwp)
+            {
+                return;
+            }
+            
             if (Utils.Startup.StartupStatus())
             {
                 Utils.Startup.AddToStartup();
