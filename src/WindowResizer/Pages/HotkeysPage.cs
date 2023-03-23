@@ -61,6 +61,10 @@ namespace WindowResizer
 
             DisableInFullScreenCheckBox.Checked = ConfigFactory.Current.DisableInFullScreen;
             DisableInFullScreenCheckBox.CheckedChanged += DisableInFullScreen_CheckedChanged;
+
+            IncludeMinimizeCheckBox.Checked = ConfigFactory.Current.RestoreAllIncludeMinimized;
+            IncludeMinimizeCheckBox.CheckedChanged += IncludeMinimized_CheckedChanged;
+            Helper.SetToolTip(IncludeMinimizeCheckBox, "Include minimized windows when restoring all.");
         }
 
         private void HotkeysPageReload()
@@ -104,6 +108,12 @@ namespace WindowResizer
         private void DisableInFullScreen_CheckedChanged(object sender, EventArgs e)
         {
             ConfigFactory.Current.DisableInFullScreen = DisableInFullScreenCheckBox.Checked;
+            ConfigFactory.Save();
+        }
+
+        private void IncludeMinimized_CheckedChanged(object sender, EventArgs e)
+        {
+            ConfigFactory.Current.RestoreAllIncludeMinimized = IncludeMinimizeCheckBox.Checked;
             ConfigFactory.Save();
         }
 

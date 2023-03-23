@@ -13,6 +13,8 @@ public class Config
 
     public bool DisableInFullScreen { get; set; } = true;
 
+    public bool RestoreAllIncludeMinimized  { get; set; } = false;
+
     public bool CheckUpdate { get; set; } = true;
 
     public Dictionary<HotkeysType, Hotkeys> Keys { get; } = new();

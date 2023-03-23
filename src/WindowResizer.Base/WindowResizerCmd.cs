@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using WindowResizer.Common.Windows;
 using WindowResizer.Configuration;
 using WindowResizer.Core.WindowControl;
 using static WindowResizer.Base.WindowUtils;
@@ -45,7 +44,7 @@ public static class WindowResizerCmd
                 {
                     targets.Add(handler);
                 }
-                else if (!string.IsNullOrWhiteSpace(title) && t!.Contains(title))
+                else if (!string.IsNullOrWhiteSpace(title) && t.Contains(title))
                 {
                     targets.Add(handler);
                 }
@@ -69,22 +68,7 @@ public static class WindowResizerCmd
     public static bool ResizeAll(string? configPath, string? profileName, Action<string>? onError)
     {
         var profile = LoadConfig(configPath, profileName, onError);
-        if (profile is null)
-        {
-            return false;
-        }
-
-        var windows = Resizer.GetOpenWindows();
-        windows.Reverse();
-        foreach (var window in windows)
-        {
-            if (Resizer.GetWindowState(window) != WindowState.Minimized)
-            {
-                ResizeWindow(window, profile, null, null);
-            }
-        }
-
-        return true;
+        return profile is not null && ResizeAllWindow(profile, onError);
     }
 
     private static Config? LoadConfig(string? configPath, string? profileName, Action<string>? onError)

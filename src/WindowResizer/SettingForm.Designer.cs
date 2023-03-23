@@ -40,6 +40,7 @@ namespace WindowResizer
             this.SettingTab = new System.Windows.Forms.TabControl();
             this.HotkeysPage = new System.Windows.Forms.TabPage();
             this.settingGroupBox = new System.Windows.Forms.GroupBox();
+            this.IncludeMinimizeCheckBox = new System.Windows.Forms.CheckBox();
             this.SaveAllKeyBtn = new System.Windows.Forms.Button();
             this.SaveAllKeyLabel = new System.Windows.Forms.Label();
             this.SaveAllLabel = new System.Windows.Forms.Label();
@@ -191,6 +192,7 @@ namespace WindowResizer
             // 
             // settingGroupBox
             // 
+            this.settingGroupBox.Controls.Add(this.IncludeMinimizeCheckBox);
             this.settingGroupBox.Controls.Add(this.SaveAllKeyBtn);
             this.settingGroupBox.Controls.Add(this.SaveAllKeyLabel);
             this.settingGroupBox.Controls.Add(this.SaveAllLabel);
@@ -206,10 +208,24 @@ namespace WindowResizer
             this.settingGroupBox.Controls.Add(this.RestoreAllLabel);
             this.settingGroupBox.Location = new System.Drawing.Point(33, 24);
             this.settingGroupBox.Name = "settingGroupBox";
-            this.settingGroupBox.Size = new System.Drawing.Size(925, 415);
+            this.settingGroupBox.Size = new System.Drawing.Size(925, 408);
             this.settingGroupBox.TabIndex = 16;
             this.settingGroupBox.TabStop = false;
             this.settingGroupBox.Text = "Hotkeys ";
+            // 
+            // IncludeMinimizeCheckBox
+            // 
+            this.IncludeMinimizeCheckBox.AutoSize = true;
+            this.IncludeMinimizeCheckBox.BackColor = System.Drawing.SystemColors.Window;
+            this.IncludeMinimizeCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.IncludeMinimizeCheckBox.Location = new System.Drawing.Point(694, 267);
+            this.IncludeMinimizeCheckBox.Margin = new System.Windows.Forms.Padding(2);
+            this.IncludeMinimizeCheckBox.Name = "IncludeMinimizeCheckBox";
+            this.IncludeMinimizeCheckBox.Size = new System.Drawing.Size(135, 20);
+            this.IncludeMinimizeCheckBox.TabIndex = 19;
+            this.IncludeMinimizeCheckBox.TabStop = false;
+            this.IncludeMinimizeCheckBox.Text = "Include Minimized";
+            this.IncludeMinimizeCheckBox.UseVisualStyleBackColor = false;
             // 
             // SaveAllKeyBtn
             // 
@@ -321,7 +337,7 @@ namespace WindowResizer
             this.DisableInFullScreenCheckBox.AutoSize = true;
             this.DisableInFullScreenCheckBox.BackColor = System.Drawing.SystemColors.Window;
             this.DisableInFullScreenCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.DisableInFullScreenCheckBox.Location = new System.Drawing.Point(32, 350);
+            this.DisableInFullScreenCheckBox.Location = new System.Drawing.Point(33, 353);
             this.DisableInFullScreenCheckBox.Margin = new System.Windows.Forms.Padding(2);
             this.DisableInFullScreenCheckBox.Name = "DisableInFullScreenCheckBox";
             this.DisableInFullScreenCheckBox.Size = new System.Drawing.Size(194, 20);
@@ -499,6 +515,7 @@ namespace WindowResizer
             this.AboutGroup.ResumeLayout(false);
             this.AboutGroup.PerformLayout();
             this.ResumeLayout(false);
+
         }
 
         private System.Windows.Forms.CheckBox StartupCheckBox;
@@ -542,5 +559,6 @@ namespace WindowResizer
         private System.Windows.Forms.Label RestoreKeyLabel;
         private System.Windows.Forms.Label RestoreAllKeyLabel;
         private System.Windows.Forms.TabPage ProfilesTab;
+        private System.Windows.Forms.CheckBox IncludeMinimizeCheckBox;
     }
 }

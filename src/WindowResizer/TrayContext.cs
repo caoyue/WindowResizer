@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using WindowResizer.Base;
 using WindowResizer.Common.Windows;
 using WindowResizer.Configuration;
 using WindowResizer.Core.Shortcuts;
@@ -152,9 +153,9 @@ namespace WindowResizer
                 SettingWindowInit();
             }
 
-            _settingForm?.Show();
-
             SetIconMode();
+
+            _settingForm?.Show();
         }
 
         #endregion
@@ -290,16 +291,7 @@ namespace WindowResizer
                 var keys = GetKeys(HotkeysType.RestoreAll);
                 if (keys.KeysEqual(e.Modifier, e.Key))
                 {
-                    var windows = Resizer.GetOpenWindows();
-                    windows.Reverse();
-                    foreach (var window in windows)
-                    {
-                        if (Resizer.GetWindowState(window) != WindowState.Minimized)
-                        {
-                            ResizeWindow(window, ConfigFactory.Current, null, null);
-                        }
-                    }
-
+                    ResizeAllWindow(ConfigFactory.Current, null);
                     return;
                 }
 

@@ -45,6 +45,23 @@ public static class WindowUtils
         }
     }
 
+    public static bool ResizeAllWindow(Config profile, Action<string>? onError)
+    {
+        var windows = Resizer.GetOpenWindows();
+        windows.Reverse();
+        foreach (var window in windows)
+        {
+            if (!profile.RestoreAllIncludeMinimized && Resizer.GetWindowState(window) == WindowState.Minimized)
+            {
+                continue;
+            }
+
+            ResizeWindow(window, profile, null, null);
+        }
+
+        return true;
+    }
+
     /// <summary>
     ///     Update or save window size
     /// </summary>
