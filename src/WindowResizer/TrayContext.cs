@@ -48,6 +48,7 @@ namespace WindowResizer
 
             RegisterHotkeys();
             _trayIcon = BuildTrayIcon();
+            SetIconMode();
             SettingWindowInit();
 
             ProfilesEventsHandle();
@@ -152,6 +153,8 @@ namespace WindowResizer
             }
 
             _settingForm?.Show();
+
+            SetIconMode();
         }
 
         #endregion
@@ -228,12 +231,13 @@ namespace WindowResizer
             {
                 return;
             }
-            
+
             if (Utils.Startup.StartupStatus())
             {
                 Utils.Startup.AddToStartup();
             }
         }
+
         #endregion
 
         #region hotkeys
@@ -356,6 +360,12 @@ namespace WindowResizer
         {
             _settingForm = new SettingForm(_hook);
             _settingForm.ConfigReload += ReloadConfig;
+        }
+
+        private void SetIconMode()
+        {
+            var darkMode = Core.Theme.ThemeDetect.IsDarkModeEnable();
+            _trayIcon.Icon = darkMode ? Resources.AppIcon_light : Resources.AppIcon;
         }
 
         private void ShowTooltips(string message, ToolTipIcon tipIcon, int mSeconds) =>

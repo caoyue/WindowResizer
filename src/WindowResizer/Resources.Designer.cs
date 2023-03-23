@@ -73,6 +73,16 @@ namespace WindowResizer {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        public static System.Drawing.Icon AppIcon_light {
+            get {
+                object obj = ResourceManager.GetObject("AppIcon_light", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         public static System.Drawing.Icon CheckIcon {
             get {
                 object obj = ResourceManager.GetObject("CheckIcon", resourceCulture);
