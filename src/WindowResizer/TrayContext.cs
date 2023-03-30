@@ -4,7 +4,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using WindowResizer.Base;
 using WindowResizer.Common.Windows;
 using WindowResizer.Configuration;
 using WindowResizer.Core.Shortcuts;

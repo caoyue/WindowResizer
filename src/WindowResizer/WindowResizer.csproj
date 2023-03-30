@@ -18,6 +18,7 @@
         <RepositoryType>git</RepositoryType>
         <PackageTags>windows;desktip;shortcuts</PackageTags>
         <ApplicationIcon>Resources\AppIcon.ico</ApplicationIcon>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
     </PropertyGroup>
 
     <ItemGroup>

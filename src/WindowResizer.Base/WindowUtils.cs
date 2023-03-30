@@ -82,9 +82,6 @@ public static class WindowUtils
         var match = GetMatchWindowSize(config.WindowSizes, processName, windowTitle);
 
         var place = Resizer.GetPlacement(handle);
-
-        // workaround: use GetWindowRect to get actual window coordinates
-        place.Rect = place.WindowState == WindowState.Maximized ? place.Rect : Resizer.GetRect(handle);
         UpdateOrSaveConfig(match, processName, windowTitle, place);
     }
 
@@ -181,9 +178,9 @@ public static class WindowUtils
         {
             FullMatch = windows.FirstOrDefault(w => w.Title == title),
             PrefixMatch = windows.FirstOrDefault(w =>
-                w.Title.StartsWith("*") && w.Title.Length > 1 && title!.EndsWith(w.Title.TrimStart('*'))),
+                w.Title.StartsWith("*") && w.Title.Length > 1 && title.EndsWith(w.Title.TrimStart('*'))),
             SuffixMatch = windows.FirstOrDefault(w =>
-                w.Title.EndsWith("*") && w.Title.Length > 1 && title!.StartsWith(w.Title.TrimEnd('*'))),
+                w.Title.EndsWith("*") && w.Title.Length > 1 && title.StartsWith(w.Title.TrimEnd('*'))),
             WildcardMatch = windows.FirstOrDefault(w => w.Title.Equals("*"))
         };
     }
@@ -209,7 +206,7 @@ public static class WindowUtils
                 InsertOrder(new WindowSize
                 {
                     Name = processName,
-                    Title = title!,
+                    Title = title,
                     Rect = placement.Rect,
                     State = placement.WindowState,
                     MaximizedPosition = placement.MaximizedPosition,
@@ -231,7 +228,7 @@ public static class WindowUtils
             InsertOrder(new WindowSize
             {
                 Name = processName,
-                Title = title!,
+                Title = title,
                 Rect = placement.Rect,
                 State = placement.WindowState,
                 MaximizedPosition = placement.MaximizedPosition,
