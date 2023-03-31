@@ -3,7 +3,7 @@ using Microsoft.Win32;
 
 namespace WindowResizer.Utils
 {
-    public static class Startup
+    public static class SystemStartup
     {
         private const string RegPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
 

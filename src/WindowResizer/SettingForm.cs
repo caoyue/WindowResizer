@@ -62,5 +62,10 @@ namespace WindowResizer
             ConfigReload(message);
             ProcessesGrid.DataSource = ConfigFactory.Current.WindowSizes;
         }
+
+        public void SwitchTab(string tabName)
+        {
+            SettingTab.SelectedTab = SettingTab.TabPages[tabName];
+        }
     }
 }

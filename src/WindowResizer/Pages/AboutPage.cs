@@ -25,7 +25,7 @@ namespace WindowResizer
             }
             else
             {
-                StartupCheckBox.Checked = Startup.StartupStatus();
+                StartupCheckBox.Checked = SystemStartup.StartupStatus();
                 StartupCheckBox.CheckedChanged += StartupCheckBox_CheckedChanged;
 
                 UpdateCheckBox.Enabled = !ConfigFactory.PortableMode;
@@ -44,11 +44,11 @@ namespace WindowResizer
         {
             if (StartupCheckBox.Checked)
             {
-                Startup.AddToStartup();
+                SystemStartup.AddToStartup();
             }
             else
             {
-                Startup.RemoveFromStartup();
+                SystemStartup.RemoveFromStartup();
             }
         }
 

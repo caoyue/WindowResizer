@@ -49,5 +49,10 @@ namespace WindowResizer.Utils
 
             return instance;
         }
+
+        public static bool IsWindows10Greater()
+        {
+            return Environment.OSVersion.Version >= new Version(10, 0, 17763);
+        }
     }
 }

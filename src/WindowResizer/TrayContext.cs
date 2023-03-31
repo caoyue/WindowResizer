@@ -54,13 +54,15 @@ namespace WindowResizer
             ProfilesEventsHandle();
             WindowsEventHandle();
 
-            Startup();
+            ToastRegister();
+
+            SystemStartup();
 
             if (!App.IsRunningAsUwp && ConfigFactory.Current.CheckUpdate && !ConfigFactory.PortableMode)
             {
                 _updater = new SquirrelUpdater(ConfirmUpdate, (message, tipIcon, seconds) =>
                 {
-                    ShowTooltips(message, (ToolTipIcon)tipIcon, seconds);
+                    Toast.ShowToast(message: message, actionLevel: (Toast.ActionLevel)(tipIcon), tray: _trayIcon, expired: seconds);
                 });
                 Update();
             }
@@ -94,6 +96,25 @@ namespace WindowResizer
         private static string BuildTrayToolTips()
         {
             return $"{nameof(WindowResizer)}\nv{Application.ProductVersion}\nProfile: {ConfigFactory.Current.ProfileName}";
+        }
+
+        private static void ToastRegister()
+        {
+            Toast.OnStart(action =>
+            {
+                switch (action)
+                {
+                    case Toast.ActionType.OpenProcessSetting:
+                    {
+                        _settingForm.Invoke((MethodInvoker)delegate
+                        {
+                            _settingForm.Show();
+                            _settingForm.SwitchTab("ProcessesPage");
+                        });
+                        break;
+                    }
+                }
+            });
         }
 
         private static readonly ContextMenuStrip ContextMenu = new ContextMenuStrip();
@@ -142,6 +163,7 @@ namespace WindowResizer
             _windowEventHandler?.Dispose();
             _trayIcon?.Dispose();
             _hook?.Dispose();
+            Toast.OnStop();
             Environment.Exit(0);
         }
 
@@ -202,7 +224,8 @@ namespace WindowResizer
         {
             _hook.UnRegisterHotKey();
             RegisterHotkeys();
-            ShowTooltips(message, ToolTipIcon.Info, 2000);
+
+            Toast.ShowToast(message: message, actionLevel: Toast.ActionLevel.Info, tray: _trayIcon, expired: 2000);
         }
 
         #endregion
@@ -225,16 +248,16 @@ namespace WindowResizer
 
         #region startup
 
-        private void Startup()
+        private void SystemStartup()
         {
             if (App.IsRunningAsUwp)
             {
                 return;
             }
 
-            if (Utils.Startup.StartupStatus())
+            if (Utils.SystemStartup.StartupStatus())
             {
-                Utils.Startup.AddToStartup();
+                Utils.SystemStartup.AddToStartup();
             }
         }
 
@@ -327,7 +350,7 @@ namespace WindowResizer
             catch (Exception exception)
             {
                 const string message = "An error occurred.\nCheck the log file for more details.";
-                ShowTooltips(message, ToolTipIcon.Error, 2000);
+                Toast.ShowToast(message: message, actionLevel: Toast.ActionLevel.Error, tray: _trayIcon, expired: 2000);
                 Log.Append($"Exception: {exception}");
             }
         }
@@ -336,20 +359,25 @@ namespace WindowResizer
 
         private void OnConfigNoMatch(string processName, string windowTitle)
         {
-            ShowTooltips($"No saved settings for <{processName} :: {windowTitle}>.", ToolTipIcon.Info, 2000);
+            Toast.ShowToast(message: $"No saved settings for <{processName} :: {windowTitle}>.",
+                actionLevel: Toast.ActionLevel.Info, tray: _trayIcon, expired: 2000);
         }
 
         private void OnGetProcessFailed(Process process, Exception e)
         {
             var message =
                 $"Unable to resize process <{process.ProcessName}>, elevated privileges may be required.";
-            ShowTooltips(message, ToolTipIcon.Warning, 1500);
+            Toast.ShowToast(message: message, actionLevel: Toast.ActionLevel.Warning, tray: _trayIcon, expired: 2000);
             Log.Append($"{message}\nException: {e}");
         }
 
         private void SettingWindowInit()
         {
             _settingForm = new SettingForm(_hook);
+
+            _settingForm.Show();
+            _settingForm.Hide();
+
             _settingForm.ConfigReload += ReloadConfig;
         }
 
@@ -358,8 +386,5 @@ namespace WindowResizer
             var darkMode = Core.Theme.ThemeDetect.IsDarkModeEnable();
             _trayIcon.Icon = darkMode ? Resources.AppIcon_light : Resources.AppIcon;
         }
-
-        private void ShowTooltips(string message, ToolTipIcon tipIcon, int mSeconds) =>
-            _trayIcon.ShowBalloonTip(mSeconds, nameof(WindowResizer), message, tipIcon);
     }
 }
