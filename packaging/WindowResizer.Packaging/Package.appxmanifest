@@ -1,11 +1,13 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
-  IgnorableNamespaces="uap rescap">
+  xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  IgnorableNamespaces="uap rescap com desktop">
 
     <Identity
       Name="9577ColdMoon.WindowResizer"
@@ -41,6 +43,20 @@
                 <uap:SplashScreen Image="Images\SplashScreen.png" />
             </uap:VisualElements>
             <Extensions>
+                <!--Specify which CLSID to activate when toast clicked-->
+                <desktop:Extension Category="windows.toastNotificationActivation">
+                    <desktop:ToastNotificationActivation ToastActivatorCLSID="b3e7eb82-3db1-4f1b-9c3c-d67643ae0b00" />
+                </desktop:Extension>
+
+                <!--Register COM CLSID LocalServer32 registry key-->
+                <com:Extension Category="windows.comServer">
+                    <com:ComServer>
+                        <com:ExeServer Executable="WindowResizer\WindowResizer.exe" Arguments="-ToastActivated" DisplayName="WindowResizer Toast Activator">
+                            <com:Class Id="b3e7eb82-3db1-4f1b-9c3c-d67643ae0b00" DisplayName="WindowResizer Toast Activator"/>
+                        </com:ExeServer>
+                    </com:ComServer>
+                </com:Extension>
+                
                 <uap5:Extension
                   Category="windows.startupTask"
                   Executable="WindowResizer\WindowResizer.exe"

@@ -18,7 +18,7 @@ namespace WindowResizer.Utils
             return font;
         }
 
-        public static void ShowMessageBox(string message, MessageBoxIcon icon = MessageBoxIcon.Error, string title = nameof(WindowResizer))
+        public static void ShowMessageBox(string message, MessageBoxIcon icon = MessageBoxIcon.Error, string title = App.Name)
         {
             MessageBox.Show(message, title, MessageBoxButtons.OK, icon);
         }

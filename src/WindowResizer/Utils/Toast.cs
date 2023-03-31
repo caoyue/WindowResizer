@@ -39,17 +39,21 @@ namespace WindowResizer.Utils
                     .AddText(title)
                     .AddText(content);
 
-            switch (actionType)
+            // TODO: Cannot trigger notification actions on Desktop Bridge, temporarily ignore it
+            if (!App.IsRunningAsUwp)
             {
-                case ActionType.OpenProcessSetting:
+                switch (actionType)
                 {
-                    builder.AddButton(new ToastButton()
-                                      .SetContent("Open Settings")
-                                      .AddArgument(ActionKey, actionType)
-                                      .SetBackgroundActivation());
-                    break;
+                    case ActionType.OpenProcessSetting:
+                        {
+                            builder.AddButton(new ToastButton()
+                                              .SetContent("Open Settings")
+                                              .AddArgument(ActionKey, actionType));
+                            break;
+                        }
                 }
             }
+
 
             string imageUri;
             switch (actionLevel)
@@ -69,6 +73,10 @@ namespace WindowResizer.Utils
                 }
             }
 
+            imageUri = App.IsRunningAsUwp
+                ? Path.Combine(App.StartupPath, imageUri)
+                : Path.GetFullPath(imageUri);
+
             builder
                 .AddAppLogoOverride(new Uri(imageUri), ToastGenericAppLogoCrop.Circle)
                 .Show(toast =>
@@ -78,7 +86,7 @@ namespace WindowResizer.Utils
         }
 
         private static string GetDialogImageUri(string name) =>
-            Path.GetFullPath($@"Resources\dialog\{name}.png");
+            $@"Resources\dialog\{name}.png";
 
         private static bool _toastRegistered;
 

@@ -34,7 +34,7 @@ namespace WindowResizer
             }
 
             var portable = ConfigFactory.PortableMode ? " (portable)" : string.Empty;
-            VersionLabel.Text = $"{nameof(WindowResizer)} {Application.ProductVersion}{portable}";
+            VersionLabel.Text = $"{App.Name} {Application.ProductVersion}{portable}";
 
             GithubLinkLabel.Text = ProjectLink;
             GithubLinkLabel.LinkClicked += LinkClicked;
@@ -68,7 +68,7 @@ namespace WindowResizer
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
-                Title = "Export Config", AddExtension = true, DefaultExt = "json", FileName = $"{nameof(WindowResizer)}.config.json"
+                Title = "Export Config", AddExtension = true, DefaultExt = "json", FileName = $"{App.Name}.config.json"
             };
             if (saveFileDialog.ShowDialog() != DialogResult.Cancel && saveFileDialog.FileName != "")
             {

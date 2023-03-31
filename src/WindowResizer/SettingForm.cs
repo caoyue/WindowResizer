@@ -49,7 +49,7 @@ namespace WindowResizer
 
         private void SetWindowTitle()
         {
-            Text = $"{nameof(WindowResizer)} - Setting  ::  {ConfigFactory.Current.ProfileName}";
+            Text = $"{App.Name} - Setting  ::  {ConfigFactory.Current.ProfileName}";
         }
 
         public delegate void ConfigReloadEvent(string message);

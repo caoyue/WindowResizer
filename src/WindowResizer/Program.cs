@@ -18,7 +18,7 @@ namespace WindowResizer
             {
                 if (!mutex.WaitOne(0, false))
                 {
-                    MessageBox.Show("WindowResizer already running.", nameof(WindowResizer), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show($"{App.Name} already running.", App.Name, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
 
@@ -47,7 +47,7 @@ namespace WindowResizer
         private static void ShowError(string error)
         {
             Log.Append(error);
-            MessageBox.Show("An error occurred, check the log file for more details.", nameof(WindowResizer), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("An error occurred, check the log file for more details.", App.Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }

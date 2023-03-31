@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Windows.Forms;
 using WindowResizer.Configuration;
 
 namespace WindowResizer
@@ -16,5 +17,9 @@ namespace WindowResizer
         public static Dictionary<HotkeysType, int> RegisteredHotKeys { get; } = new Dictionary<HotkeysType, int>();
 
         public static bool IsRunningAsUwp { get; }
+
+        public const string Name = nameof(WindowResizer);
+
+        public static readonly string StartupPath = Application.StartupPath;
     }
 }

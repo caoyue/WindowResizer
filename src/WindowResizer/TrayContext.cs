@@ -22,14 +22,14 @@ namespace WindowResizer
         private readonly KeyboardHook _hook = new KeyboardHook();
         private static WindowEventHandler _windowEventHandler;
 
-        private static readonly string ConfigFile = $"{nameof(WindowResizer)}.config.json";
+        private static readonly string ConfigFile = $"{App.Name}.config.json";
 
         public TrayContext()
         {
             try
             {
                 var roamingPath = Path.Combine(Helper.GeApplicationDataPath(), ConfigFile);
-                var portablePath = Path.Combine(Application.StartupPath, ConfigFile);
+                var portablePath = Path.Combine(App.StartupPath, ConfigFile);
                 ConfigFactory.SetPath(roamingPath, portablePath);
                 ConfigFactory.Load();
             }
@@ -65,7 +65,7 @@ namespace WindowResizer
                 _updater = new SquirrelUpdater(ConfirmUpdate, (message, tipsLevel, seconds) =>
                 {
                     Toast.ShowToast(
-                        title: $"{nameof(WindowResizer)} Update",
+                        title: $"{App.Name} Update",
                         message: message,
                         actionLevel: (Toast.ActionLevel)(tipsLevel),
                         tray: _trayIcon,
@@ -102,7 +102,7 @@ namespace WindowResizer
 
         private static string BuildTrayToolTips()
         {
-            return $"{nameof(WindowResizer)}\nv{Application.ProductVersion}\nProfile: {ConfigFactory.Current.ProfileName}";
+            return $"{App.Name}\nv{Application.ProductVersion}\nProfile: {ConfigFactory.Current.ProfileName}";
         }
 
         private static void ToastRegister()
@@ -251,7 +251,7 @@ namespace WindowResizer
 
         private static bool ConfirmUpdate(string message)
         {
-            var res = MessageBox.Show(message, $"{nameof(WindowResizer)} Update",
+            var res = MessageBox.Show(message, $"{App.Name} Update",
                 MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
             return res == DialogResult.OK;
         }
