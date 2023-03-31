@@ -28,11 +28,8 @@ namespace WindowResizer
         {
             try
             {
-                var roamingPath = Path.Combine(Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(WindowResizer)),
-                    ConfigFile);
-                var portablePath = Path.Combine(
-                    Application.StartupPath, ConfigFile);
+                var roamingPath = Path.Combine(Helper.GeApplicationDataPath(), ConfigFile);
+                var portablePath = Path.Combine(Application.StartupPath, ConfigFile);
                 ConfigFactory.SetPath(roamingPath, portablePath);
                 ConfigFactory.Load();
             }
@@ -45,6 +42,11 @@ namespace WindowResizer
                 ConfigFactory.UseDefault();
                 ConfigFactory.Save();
             }
+
+            Log.SetLogPath(
+                ConfigFactory.PortableMode
+                    ? Application.StartupPath
+                    : Helper.GeApplicationDataPath());
 
             RegisterHotkeys();
             _trayIcon = BuildTrayIcon();
@@ -231,7 +233,7 @@ namespace WindowResizer
             RegisterHotkeys();
 
             Toast.ShowToast(
-                title:"Config Reloaded",
+                title: "Config Reloaded",
                 message: message,
                 actionLevel: Toast.ActionLevel.Success,
                 tray: _trayIcon,
@@ -407,7 +409,7 @@ namespace WindowResizer
             var message =
                 $"Unable to resize process <{process.ProcessName}>, elevated privileges may be required.";
             Toast.ShowToast(
-                title:"Operation Failed",
+                title: "Operation Failed",
                 message: message,
                 actionLevel: Toast.ActionLevel.Warning,
                 tray: _trayIcon,

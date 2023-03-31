@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -54,5 +55,8 @@ namespace WindowResizer.Utils
         {
             return Environment.OSVersion.Version >= new Version(10, 0, 17763);
         }
+
+        public static string GeApplicationDataPath() =>
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(WindowResizer));
     }
 }
