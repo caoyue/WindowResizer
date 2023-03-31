@@ -63,6 +63,7 @@ namespace WindowResizer
             this.AboutGroup = new System.Windows.Forms.GroupBox();
             this.StartupCheckBox = new System.Windows.Forms.CheckBox();
             this.UpdateCheckBox = new System.Windows.Forms.CheckBox();
+            this.NotifyOnSavedCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.ProcessesGrid)).BeginInit();
             this.ConfigExportGroup.SuspendLayout();
             this.SettingTab.SuspendLayout();
@@ -192,6 +193,7 @@ namespace WindowResizer
             // 
             // settingGroupBox
             // 
+            this.settingGroupBox.Controls.Add(this.NotifyOnSavedCheckBox);
             this.settingGroupBox.Controls.Add(this.IncludeMinimizeCheckBox);
             this.settingGroupBox.Controls.Add(this.SaveAllKeyBtn);
             this.settingGroupBox.Controls.Add(this.SaveAllKeyLabel);
@@ -208,7 +210,7 @@ namespace WindowResizer
             this.settingGroupBox.Controls.Add(this.RestoreAllLabel);
             this.settingGroupBox.Location = new System.Drawing.Point(33, 24);
             this.settingGroupBox.Name = "settingGroupBox";
-            this.settingGroupBox.Size = new System.Drawing.Size(925, 408);
+            this.settingGroupBox.Size = new System.Drawing.Size(925, 453);
             this.settingGroupBox.TabIndex = 16;
             this.settingGroupBox.TabStop = false;
             this.settingGroupBox.Text = "Hotkeys ";
@@ -337,7 +339,7 @@ namespace WindowResizer
             this.DisableInFullScreenCheckBox.AutoSize = true;
             this.DisableInFullScreenCheckBox.BackColor = System.Drawing.SystemColors.Window;
             this.DisableInFullScreenCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.DisableInFullScreenCheckBox.Location = new System.Drawing.Point(33, 353);
+            this.DisableInFullScreenCheckBox.Location = new System.Drawing.Point(33, 391);
             this.DisableInFullScreenCheckBox.Margin = new System.Windows.Forms.Padding(2);
             this.DisableInFullScreenCheckBox.Name = "DisableInFullScreenCheckBox";
             this.DisableInFullScreenCheckBox.Size = new System.Drawing.Size(194, 20);
@@ -486,6 +488,20 @@ namespace WindowResizer
             this.UpdateCheckBox.Text = "Checking for updates at startup";
             this.UpdateCheckBox.UseVisualStyleBackColor = true;
             // 
+            // NotifyOnSavedCheckBox
+            // 
+            this.NotifyOnSavedCheckBox.AutoSize = true;
+            this.NotifyOnSavedCheckBox.BackColor = System.Drawing.SystemColors.Window;
+            this.NotifyOnSavedCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.NotifyOnSavedCheckBox.Location = new System.Drawing.Point(33, 332);
+            this.NotifyOnSavedCheckBox.Margin = new System.Windows.Forms.Padding(2);
+            this.NotifyOnSavedCheckBox.Name = "NotifyOnSavedCheckBox";
+            this.NotifyOnSavedCheckBox.Size = new System.Drawing.Size(124, 20);
+            this.NotifyOnSavedCheckBox.TabIndex = 20;
+            this.NotifyOnSavedCheckBox.TabStop = false;
+            this.NotifyOnSavedCheckBox.Text = "Notify on Saved";
+            this.NotifyOnSavedCheckBox.UseVisualStyleBackColor = false;
+            // 
             // SettingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
@@ -515,8 +531,9 @@ namespace WindowResizer
             this.AboutGroup.ResumeLayout(false);
             this.AboutGroup.PerformLayout();
             this.ResumeLayout(false);
-
         }
+
+        private System.Windows.Forms.CheckBox NotifyOnSavedCheckBox;
 
         private System.Windows.Forms.CheckBox StartupCheckBox;
 

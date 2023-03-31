@@ -68,10 +68,12 @@ public static class WindowUtils
     /// <param name="handle"></param>
     /// <param name="config"></param>
     /// <param name="onFailed"></param>
+    /// <param name="onSuccess"></param>
     public static void UpdateOrSaveWindowSize(
         IntPtr handle,
         Config config,
-        Action<Process, Exception>? onFailed)
+        Action<Process, Exception>? onFailed,
+        Action<string>? onSuccess = null)
     {
         if (!IsProcessAvailable(handle, out string processName, onFailed))
         {
@@ -83,6 +85,7 @@ public static class WindowUtils
 
         var place = Resizer.GetPlacement(handle);
         UpdateOrSaveConfig(match, processName, windowTitle, place);
+        onSuccess?.Invoke(processName);
     }
 
     public static bool IsProcessAvailable(IntPtr handle, out string processName, Action<Process, Exception>? onFailed)

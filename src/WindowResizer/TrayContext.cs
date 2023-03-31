@@ -60,9 +60,14 @@ namespace WindowResizer
 
             if (!App.IsRunningAsUwp && ConfigFactory.Current.CheckUpdate && !ConfigFactory.PortableMode)
             {
-                _updater = new SquirrelUpdater(ConfirmUpdate, (message, tipIcon, seconds) =>
+                _updater = new SquirrelUpdater(ConfirmUpdate, (message, tipsLevel, seconds) =>
                 {
-                    Toast.ShowToast(message: message, actionLevel: (Toast.ActionLevel)(tipIcon), tray: _trayIcon, expired: seconds);
+                    Toast.ShowToast(
+                        title: $"{nameof(WindowResizer)} Update",
+                        message: message,
+                        actionLevel: (Toast.ActionLevel)(tipsLevel),
+                        tray: _trayIcon,
+                        expired: seconds);
                 });
                 Update();
             }
@@ -108,7 +113,7 @@ namespace WindowResizer
                     {
                         _settingForm.Invoke((MethodInvoker)delegate
                         {
-                            _settingForm.Show();
+                            _settingForm.ShowFront();
                             _settingForm.SwitchTab("ProcessesPage");
                         });
                         break;
@@ -134,7 +139,7 @@ namespace WindowResizer
             }
 
             ContextMenu.Items.Add(new ToolStripSeparator());
-            var item = new ToolStripMenuItem("Setting", Resources.SettingIcon.ToBitmap(), OnSetting);
+            var item = new ToolStripMenuItem("Settings", Resources.SettingIcon.ToBitmap(), OnSetting);
             SetMenuStyle(item);
             ContextMenu.Items.Add(item);
             item = new ToolStripMenuItem("Exit", Resources.ExitIcon.ToBitmap(), OnExit);
@@ -176,7 +181,7 @@ namespace WindowResizer
 
             SetIconMode();
 
-            _settingForm?.Show();
+            _settingForm?.ShowFront();
         }
 
         #endregion
@@ -225,7 +230,12 @@ namespace WindowResizer
             _hook.UnRegisterHotKey();
             RegisterHotkeys();
 
-            Toast.ShowToast(message: message, actionLevel: Toast.ActionLevel.Info, tray: _trayIcon, expired: 2000);
+            Toast.ShowToast(
+                title:"Config Reloaded",
+                message: message,
+                actionLevel: Toast.ActionLevel.Success,
+                tray: _trayIcon,
+                expired: 2000);
         }
 
         #endregion
@@ -329,6 +339,16 @@ namespace WindowResizer
                         }
                     }
 
+                    if (ConfigFactory.Current.NotifyOnSaved)
+                    {
+                        Toast.ShowToast(
+                            title: "Config Saved",
+                            message: "Current processes saved.",
+                            tray: _trayIcon,
+                            actionLevel: Toast.ActionLevel.Success,
+                            actionType: Toast.ActionType.OpenProcessSetting);
+                    }
+
                     return;
                 }
 
@@ -336,7 +356,18 @@ namespace WindowResizer
                 if (keys.KeysEqual(e.Modifier, e.Key))
                 {
                     var window = Resizer.GetForegroundHandle();
-                    UpdateOrSaveWindowSize(window, ConfigFactory.Current, OnGetProcessFailed);
+                    UpdateOrSaveWindowSize(window, ConfigFactory.Current, OnGetProcessFailed, s =>
+                    {
+                        if (ConfigFactory.Current.NotifyOnSaved)
+                        {
+                            Toast.ShowToast(
+                                title: "Config Saved",
+                                message: $"Process <{s}> saved!", tray: _trayIcon,
+                                actionLevel: Toast.ActionLevel.Success,
+                                actionType: Toast.ActionType.OpenProcessSetting);
+                        }
+                    });
+
                     return;
                 }
 
@@ -350,7 +381,12 @@ namespace WindowResizer
             catch (Exception exception)
             {
                 const string message = "An error occurred.\nCheck the log file for more details.";
-                Toast.ShowToast(message: message, actionLevel: Toast.ActionLevel.Error, tray: _trayIcon, expired: 2000);
+                Toast.ShowToast(
+                    title: "An Error Occured",
+                    message: message,
+                    actionLevel: Toast.ActionLevel.Error,
+                    tray: _trayIcon,
+                    expired: 2000);
                 Log.Append($"Exception: {exception}");
             }
         }
@@ -359,15 +395,23 @@ namespace WindowResizer
 
         private void OnConfigNoMatch(string processName, string windowTitle)
         {
-            Toast.ShowToast(message: $"No saved settings for <{processName} :: {windowTitle}>.",
-                actionLevel: Toast.ActionLevel.Info, tray: _trayIcon, expired: 2000);
+            Toast.ShowToast(
+                title: "No Operations Available",
+                message: $"No saved settings for <{processName} :: {windowTitle}>.",
+                actionLevel: Toast.ActionLevel.Info, tray: _trayIcon,
+                expired: 2000);
         }
 
         private void OnGetProcessFailed(Process process, Exception e)
         {
             var message =
                 $"Unable to resize process <{process.ProcessName}>, elevated privileges may be required.";
-            Toast.ShowToast(message: message, actionLevel: Toast.ActionLevel.Warning, tray: _trayIcon, expired: 2000);
+            Toast.ShowToast(
+                title:"Operation Failed",
+                message: message,
+                actionLevel: Toast.ActionLevel.Warning,
+                tray: _trayIcon,
+                expired: 2000);
             Log.Append($"{message}\nException: {e}");
         }
 

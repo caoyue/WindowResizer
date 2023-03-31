@@ -21,7 +21,7 @@ namespace WindowResizer.Utils
         {
             if (Helper.IsWindows10Greater())
             {
-                Send(title, message, actionType, expired);
+                Send(title, message, actionLevel, actionType, expired);
             }
             else if (tray != null)
             {
@@ -30,12 +30,12 @@ namespace WindowResizer.Utils
             }
         }
 
-        public static void Send(string title, string content, ActionType actionType, int expired = 3000)
+        public static void Send(string title, string content, ActionLevel actionLevel, ActionType actionType, int expired = 3000)
         {
-            var imageUri = Path.GetFullPath(@"Resources\AppIcon.png");
-
             var builder =
                 new ToastContentBuilder()
+                    .SetToastDuration(ToastDuration.Short)
+                    .SetToastScenario(ToastScenario.Default)
                     .AddText(title)
                     .AddText(content);
 
@@ -44,23 +44,51 @@ namespace WindowResizer.Utils
                 case ActionType.OpenProcessSetting:
                 {
                     builder.AddButton(new ToastButton()
-                                      .SetContent("Open Setting")
+                                      .SetContent("Open Settings")
                                       .AddArgument(ActionKey, actionType)
                                       .SetBackgroundActivation());
                     break;
                 }
             }
 
+            string imageUri;
+            switch (actionLevel)
+            {
+                case ActionLevel.Info:
+                case ActionLevel.Warning:
+                case ActionLevel.Error:
+                {
+                    imageUri = GetDialogImageUri(actionLevel.ToString().ToLower());
+                    break;
+                }
+
+                default:
+                {
+                    imageUri = GetDialogImageUri("success");
+                    break;
+                }
+            }
+
             builder
-                .AddAppLogoOverride(new Uri(imageUri))
+                .AddAppLogoOverride(new Uri(imageUri), ToastGenericAppLogoCrop.Circle)
                 .Show(toast =>
                 {
                     toast.ExpirationTime = DateTime.Now.AddMilliseconds(expired);
                 });
         }
 
+        private static string GetDialogImageUri(string name) =>
+            Path.GetFullPath($@"Resources\dialog\{name}.png");
+
+        private static bool _toastRegistered;
+
         public static void OnStart(Action<ActionType> action)
         {
+            if (_toastRegistered)
+            {
+                return;
+            }
+
             ToastNotificationManagerCompat.OnActivated += toastArgs =>
             {
                 ToastArguments args = ToastArguments.Parse(toastArgs.Argument);
@@ -70,11 +98,17 @@ namespace WindowResizer.Utils
                     action?.Invoke((ActionType)int.Parse(a.Value));
                 }
             };
+            _toastRegistered = true;
         }
 
         public static void OnStop()
         {
             ToastNotificationManagerCompat.Uninstall();
+        }
+
+        public static void Clear()
+        {
+            ToastNotificationManagerCompat.History.Clear();
         }
 
         public enum ActionType
@@ -85,7 +119,7 @@ namespace WindowResizer.Utils
 
         public enum ActionLevel
         {
-            None,
+            Success,
             Info,
             Warning,
             Error,

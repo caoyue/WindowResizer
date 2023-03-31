@@ -43,7 +43,7 @@ namespace WindowResizer
                     var updateResult = await mgr.UpdateApp();
                     if (updateResult != null)
                     {
-                        _showTips?.Invoke($" Version {updateResult.Version} download complete. The app will restart to take effect.", 1, 2000);
+                        _showTips?.Invoke($" Version {updateResult.Version} download complete. The app will restart to take effect.", 0, 2000);
                         UpdateManager.RestartApp();
                     }
                 }

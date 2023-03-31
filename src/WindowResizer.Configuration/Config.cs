@@ -15,6 +15,8 @@ public class Config
 
     public bool RestoreAllIncludeMinimized  { get; set; } = false;
 
+    public bool NotifyOnSaved  { get; set; } = false;
+
     public bool CheckUpdate { get; set; } = true;
 
     public Dictionary<HotkeysType, Hotkeys> Keys { get; } = new();

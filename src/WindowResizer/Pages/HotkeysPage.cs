@@ -61,10 +61,15 @@ namespace WindowResizer
 
             DisableInFullScreenCheckBox.Checked = ConfigFactory.Current.DisableInFullScreen;
             DisableInFullScreenCheckBox.CheckedChanged += DisableInFullScreen_CheckedChanged;
+            Helper.SetToolTip(DisableInFullScreenCheckBox, "Disable when current window is in fullscreen.");
 
             IncludeMinimizeCheckBox.Checked = ConfigFactory.Current.RestoreAllIncludeMinimized;
             IncludeMinimizeCheckBox.CheckedChanged += IncludeMinimized_CheckedChanged;
             Helper.SetToolTip(IncludeMinimizeCheckBox, "Include minimized windows when restoring all.");
+
+            NotifyOnSavedCheckBox.Checked = ConfigFactory.Current.NotifyOnSaved;
+            NotifyOnSavedCheckBox.CheckedChanged += NotifyOnSaved_CheckedChanged;
+            Helper.SetToolTip(NotifyOnSavedCheckBox, "Show notification when save windows.");
         }
 
         private void HotkeysPageReload()
@@ -114,6 +119,12 @@ namespace WindowResizer
         private void IncludeMinimized_CheckedChanged(object sender, EventArgs e)
         {
             ConfigFactory.Current.RestoreAllIncludeMinimized = IncludeMinimizeCheckBox.Checked;
+            ConfigFactory.Save();
+        }
+
+        private void NotifyOnSaved_CheckedChanged(object sender, EventArgs e)
+        {
+            ConfigFactory.Current.NotifyOnSaved = NotifyOnSavedCheckBox.Checked;
             ConfigFactory.Save();
         }
 
