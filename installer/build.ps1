@@ -26,7 +26,7 @@ dotnet publish .\src\WindowResizer\ -c Release -o $publishFolder  /p:Version=$ve
 # nuget pack
 Write-Host '>> packing...' -ForegroundColor Green
 Copy-Item .\installer\AppIcon.png .\publish\WindowResizer\AppIcon.png
-dotnet nuget pack .\installer\WindowResizer.nuspec -Version $version -Properties Configuration=Release -BasePath .\publish\WindowResizer -OutputDirectory  .\pack
+nuget pack .\installer\WindowResizer.nuspec -Version $version -Properties Configuration=Release -BasePath .\publish\WindowResizer -OutputDirectory  .\pack
 
 # squirrel release
 Write-Host '>> releasing...' -ForegroundColor Green
