@@ -141,7 +141,15 @@ namespace WindowResizer
             }
 
             ContextMenu.Items.Add(new ToolStripSeparator());
-            var item = new ToolStripMenuItem("Settings", Resources.SettingIcon.ToBitmap(), OnSetting);
+            var item = new ToolStripMenuItem("Save All", Resources.SettingIcon.ToBitmap(), (o, e) => SaveAll());
+            SetMenuStyle(item);
+            ContextMenu.Items.Add(item);
+            item = new ToolStripMenuItem("Restore All", Resources.SettingIcon.ToBitmap(), (o, e) => RestoreAll());
+            SetMenuStyle(item);
+            ContextMenu.Items.Add(item);
+
+            ContextMenu.Items.Add(new ToolStripSeparator());
+            item = new ToolStripMenuItem("Settings", Resources.SettingIcon.ToBitmap(), OnSetting);
             SetMenuStyle(item);
             ContextMenu.Items.Add(item);
             item = new ToolStripMenuItem("Exit", Resources.ExitIcon.ToBitmap(), OnExit);
@@ -325,32 +333,14 @@ namespace WindowResizer
                 var keys = GetKeys(HotkeysType.RestoreAll);
                 if (keys.KeysEqual(e.Modifier, e.Key))
                 {
-                    ResizeAllWindow(ConfigFactory.Current, null);
+                    RestoreAll();
                     return;
                 }
 
                 keys = GetKeys(HotkeysType.SaveAll);
                 if (keys.KeysEqual(e.Modifier, e.Key))
                 {
-                    var windows = Resizer.GetOpenWindows();
-                    foreach (var window in windows)
-                    {
-                        if (Resizer.GetWindowState(window) != WindowState.Minimized)
-                        {
-                            UpdateOrSaveWindowSize(window, ConfigFactory.Current, null);
-                        }
-                    }
-
-                    if (ConfigFactory.Current.NotifyOnSaved)
-                    {
-                        Toast.ShowToast(
-                            title: "Config Saved",
-                            message: "Current processes saved.",
-                            tray: _trayIcon,
-                            actionLevel: Toast.ActionLevel.Success,
-                            actionType: Toast.ActionType.OpenProcessSetting);
-                    }
-
+                    SaveAll();
                     return;
                 }
 
@@ -391,6 +381,34 @@ namespace WindowResizer
                     expired: 2000);
                 Log.Append($"Exception: {exception}");
             }
+        }
+
+        private void SaveAll()
+        {
+            var windows = Resizer.GetOpenWindows();
+            foreach (var window in windows)
+            {
+                if (Resizer.GetWindowState(window) != WindowState.Minimized)
+                {
+                    UpdateOrSaveWindowSize(window, ConfigFactory.Current, null);
+                }
+            }
+
+            if (ConfigFactory.Current.NotifyOnSaved)
+            {
+                Toast.ShowToast(
+                    title: "Config Saved",
+                    message: "Current processes saved.",
+                    tray: _trayIcon,
+                    actionLevel: Toast.ActionLevel.Success,
+                    actionType: Toast.ActionType.OpenProcessSetting);
+            }
+        }
+
+
+        private void RestoreAll()
+        {
+            ResizeAllWindow(ConfigFactory.Current, null);
         }
 
         #endregion
