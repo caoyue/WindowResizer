@@ -141,10 +141,10 @@ namespace WindowResizer
             }
 
             ContextMenu.Items.Add(new ToolStripSeparator());
-            var item = new ToolStripMenuItem("Save All", Resources.SettingIcon.ToBitmap(), (o, e) => SaveAll());
+            var item = new ToolStripMenuItem("Save All", Resources.SaveIcon.ToBitmap(), (o, e) => SaveAll());
             SetMenuStyle(item);
             ContextMenu.Items.Add(item);
-            item = new ToolStripMenuItem("Restore All", Resources.SettingIcon.ToBitmap(), (o, e) => RestoreAll());
+            item = new ToolStripMenuItem("Restore All", Resources.RestoreIcon.ToBitmap(), (o, e) => RestoreAll());
             SetMenuStyle(item);
             ContextMenu.Items.Add(item);
 
