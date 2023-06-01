@@ -70,6 +70,10 @@ namespace WindowResizer
             NotifyOnSavedCheckBox.Checked = ConfigFactory.Current.NotifyOnSaved;
             NotifyOnSavedCheckBox.CheckedChanged += NotifyOnSaved_CheckedChanged;
             Helper.SetToolTip(NotifyOnSavedCheckBox, "Show notification when save windows.");
+
+            ResizeByTitleCheckbox.Checked = ConfigFactory.Current.EnableResizeByTitle;
+            ResizeByTitleCheckbox.CheckedChanged += ResizeByTitle_CheckedChanged;
+            Helper.SetToolTip(ResizeByTitleCheckbox, "Turn On/Off save/resize window according to the different titles of the same process.");
         }
 
         private void HotkeysPageReload()
@@ -126,6 +130,14 @@ namespace WindowResizer
         {
             ConfigFactory.Current.NotifyOnSaved = NotifyOnSavedCheckBox.Checked;
             ConfigFactory.Save();
+        }
+
+        private void ResizeByTitle_CheckedChanged(object sender, EventArgs e)
+        {
+            ConfigFactory.Current.EnableResizeByTitle = ResizeByTitleCheckbox.Checked;
+            ConfigFactory.Save();
+
+            ProcessesGrid_UpdateDataSource();
         }
 
         private void SetToolTips()

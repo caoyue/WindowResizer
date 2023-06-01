@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using WindowResizer.Common.Shortcuts;
 
 namespace WindowResizer.Configuration;
@@ -13,15 +14,24 @@ public class Config
 
     public bool DisableInFullScreen { get; set; } = true;
 
-    public bool RestoreAllIncludeMinimized  { get; set; } = false;
+    public bool RestoreAllIncludeMinimized { get; set; } = false;
 
-    public bool NotifyOnSaved  { get; set; } = false;
+    public bool NotifyOnSaved { get; set; } = false;
+
+    public bool EnableResizeByTitle { get; set; } = true;
 
     public bool CheckUpdate { get; set; } = true;
 
     public Dictionary<HotkeysType, Hotkeys> Keys { get; } = new();
 
     public BindingList<WindowSize> WindowSizes { get; set; } = new();
+
+    public BindingList<WindowSize> GetWindowSizes()
+    {
+        return EnableResizeByTitle
+            ? WindowSizes
+            : new BindingList<WindowSize>(WindowSizes.Where(w => w.Title.Equals("*")).ToList());
+    }
 
     [Obsolete]
     public Hotkeys? SaveKey { internal get; set; }
@@ -60,16 +70,14 @@ public class Config
     {
         var c = new Config
         {
-            ProfileId = GenerateConfigId(),
-            DisableInFullScreen = true,
-            CheckUpdate = true,
-            ProfileName = profileName,
+            ProfileId = GenerateConfigId(), DisableInFullScreen = true, CheckUpdate = true, ProfileName = profileName,
         };
 
         foreach (var key in DefaultKeys)
         {
             c.Keys.Add(key.Key, key.Value);
         }
+
         return c;
     }
 

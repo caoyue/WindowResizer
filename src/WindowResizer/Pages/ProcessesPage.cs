@@ -13,7 +13,7 @@ namespace WindowResizer
             ProcessesGridLayout();
 
             ProcessesGrid.AutoGenerateColumns = false;
-            ProcessesGrid.DataSource = ConfigFactory.Current.WindowSizes;
+            ProcessesGrid.DataSource = ConfigFactory.Current.GetWindowSizes();
 
             ProcessesGrid.ShowCellToolTips = true;
             ProcessesGrid.CellFormatting += ProcessesGrid_CellFormatting;
@@ -56,6 +56,7 @@ namespace WindowResizer
                 },
                 FillWeight = 35,
                 DisplayIndex = 1,
+                Visible = ConfigFactory.Current.EnableResizeByTitle
             });
             ProcessesGrid.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -206,6 +207,16 @@ namespace WindowResizer
             {
                 ConfigFactory.Current.WindowSizes.RemoveAt(e.RowIndex);
                 ConfigFactory.Save();
+            }
+        }
+
+        private void ProcessesGrid_UpdateDataSource()
+        {
+            ProcessesGrid.DataSource = ConfigFactory.Current.GetWindowSizes();
+
+            if (ProcessesGrid.Columns["Title"] != null)
+            {
+                ProcessesGrid.Columns["Title"].Visible = ConfigFactory.Current.EnableResizeByTitle;
             }
         }
     }

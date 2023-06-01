@@ -40,6 +40,9 @@ namespace WindowResizer
             this.SettingTab = new System.Windows.Forms.TabControl();
             this.HotkeysPage = new System.Windows.Forms.TabPage();
             this.settingGroupBox = new System.Windows.Forms.GroupBox();
+            this.ResizeByTitleCheckbox = new System.Windows.Forms.CheckBox();
+            this.NotifyOnSavedCheckBox = new System.Windows.Forms.CheckBox();
+            this.DisableInFullScreenCheckBox = new System.Windows.Forms.CheckBox();
             this.IncludeMinimizeCheckBox = new System.Windows.Forms.CheckBox();
             this.SaveAllKeyBtn = new System.Windows.Forms.Button();
             this.SaveAllKeyLabel = new System.Windows.Forms.Label();
@@ -51,7 +54,6 @@ namespace WindowResizer
             this.RestoreKeyBtn = new System.Windows.Forms.Button();
             this.SaveKeyLabel = new System.Windows.Forms.Label();
             this.SaveKeyBtn = new System.Windows.Forms.Button();
-            this.DisableInFullScreenCheckBox = new System.Windows.Forms.CheckBox();
             this.RestoreAllKeyBtn = new System.Windows.Forms.Button();
             this.RestoreAllLabel = new System.Windows.Forms.Label();
             this.ProcessesPage = new System.Windows.Forms.TabPage();
@@ -63,7 +65,6 @@ namespace WindowResizer
             this.AboutGroup = new System.Windows.Forms.GroupBox();
             this.StartupCheckBox = new System.Windows.Forms.CheckBox();
             this.UpdateCheckBox = new System.Windows.Forms.CheckBox();
-            this.NotifyOnSavedCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.ProcessesGrid)).BeginInit();
             this.ConfigExportGroup.SuspendLayout();
             this.SettingTab.SuspendLayout();
@@ -193,7 +194,9 @@ namespace WindowResizer
             // 
             // settingGroupBox
             // 
+            this.settingGroupBox.Controls.Add(this.ResizeByTitleCheckbox);
             this.settingGroupBox.Controls.Add(this.NotifyOnSavedCheckBox);
+            this.settingGroupBox.Controls.Add(this.DisableInFullScreenCheckBox);
             this.settingGroupBox.Controls.Add(this.IncludeMinimizeCheckBox);
             this.settingGroupBox.Controls.Add(this.SaveAllKeyBtn);
             this.settingGroupBox.Controls.Add(this.SaveAllKeyLabel);
@@ -205,15 +208,56 @@ namespace WindowResizer
             this.settingGroupBox.Controls.Add(this.RestoreKeyBtn);
             this.settingGroupBox.Controls.Add(this.SaveKeyLabel);
             this.settingGroupBox.Controls.Add(this.SaveKeyBtn);
-            this.settingGroupBox.Controls.Add(this.DisableInFullScreenCheckBox);
             this.settingGroupBox.Controls.Add(this.RestoreAllKeyBtn);
             this.settingGroupBox.Controls.Add(this.RestoreAllLabel);
             this.settingGroupBox.Location = new System.Drawing.Point(33, 24);
             this.settingGroupBox.Name = "settingGroupBox";
-            this.settingGroupBox.Size = new System.Drawing.Size(925, 453);
+            this.settingGroupBox.Size = new System.Drawing.Size(925, 462);
             this.settingGroupBox.TabIndex = 16;
             this.settingGroupBox.TabStop = false;
             this.settingGroupBox.Text = "Hotkeys ";
+            // 
+            // ResizeByTitleCheckbox
+            // 
+            this.ResizeByTitleCheckbox.AutoSize = true;
+            this.ResizeByTitleCheckbox.BackColor = System.Drawing.SystemColors.Window;
+            this.ResizeByTitleCheckbox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.ResizeByTitleCheckbox.Location = new System.Drawing.Point(326, 365);
+            this.ResizeByTitleCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            this.ResizeByTitleCheckbox.Name = "ResizeByTitleCheckbox";
+            this.ResizeByTitleCheckbox.Size = new System.Drawing.Size(118, 20);
+            this.ResizeByTitleCheckbox.TabIndex = 7;
+            this.ResizeByTitleCheckbox.TabStop = false;
+            this.ResizeByTitleCheckbox.Text = "Resize by Title";
+            this.ResizeByTitleCheckbox.UseVisualStyleBackColor = false;
+            // 
+            // NotifyOnSavedCheckBox
+            // 
+            this.NotifyOnSavedCheckBox.AutoSize = true;
+            this.NotifyOnSavedCheckBox.BackColor = System.Drawing.SystemColors.Window;
+            this.NotifyOnSavedCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.NotifyOnSavedCheckBox.Location = new System.Drawing.Point(694, 190);
+            this.NotifyOnSavedCheckBox.Margin = new System.Windows.Forms.Padding(2);
+            this.NotifyOnSavedCheckBox.Name = "NotifyOnSavedCheckBox";
+            this.NotifyOnSavedCheckBox.Size = new System.Drawing.Size(124, 20);
+            this.NotifyOnSavedCheckBox.TabIndex = 20;
+            this.NotifyOnSavedCheckBox.TabStop = false;
+            this.NotifyOnSavedCheckBox.Text = "Notify on Saved";
+            this.NotifyOnSavedCheckBox.UseVisualStyleBackColor = false;
+            // 
+            // DisableInFullScreenCheckBox
+            // 
+            this.DisableInFullScreenCheckBox.AutoSize = true;
+            this.DisableInFullScreenCheckBox.BackColor = System.Drawing.SystemColors.Window;
+            this.DisableInFullScreenCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.DisableInFullScreenCheckBox.Location = new System.Drawing.Point(35, 365);
+            this.DisableInFullScreenCheckBox.Margin = new System.Windows.Forms.Padding(2);
+            this.DisableInFullScreenCheckBox.Name = "DisableInFullScreenCheckBox";
+            this.DisableInFullScreenCheckBox.Size = new System.Drawing.Size(194, 20);
+            this.DisableInFullScreenCheckBox.TabIndex = 6;
+            this.DisableInFullScreenCheckBox.TabStop = false;
+            this.DisableInFullScreenCheckBox.Text = "Disable in FullScreen Mode";
+            this.DisableInFullScreenCheckBox.UseVisualStyleBackColor = false;
             // 
             // IncludeMinimizeCheckBox
             // 
@@ -333,20 +377,6 @@ namespace WindowResizer
             this.SaveKeyBtn.TabIndex = 10;
             this.SaveKeyBtn.Text = "Edit";
             this.SaveKeyBtn.UseVisualStyleBackColor = false;
-            // 
-            // DisableInFullScreenCheckBox
-            // 
-            this.DisableInFullScreenCheckBox.AutoSize = true;
-            this.DisableInFullScreenCheckBox.BackColor = System.Drawing.SystemColors.Window;
-            this.DisableInFullScreenCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.DisableInFullScreenCheckBox.Location = new System.Drawing.Point(33, 391);
-            this.DisableInFullScreenCheckBox.Margin = new System.Windows.Forms.Padding(2);
-            this.DisableInFullScreenCheckBox.Name = "DisableInFullScreenCheckBox";
-            this.DisableInFullScreenCheckBox.Size = new System.Drawing.Size(194, 20);
-            this.DisableInFullScreenCheckBox.TabIndex = 6;
-            this.DisableInFullScreenCheckBox.TabStop = false;
-            this.DisableInFullScreenCheckBox.Text = "Disable in FullScreen Mode";
-            this.DisableInFullScreenCheckBox.UseVisualStyleBackColor = false;
             // 
             // RestoreAllKeyBtn
             // 
@@ -488,20 +518,6 @@ namespace WindowResizer
             this.UpdateCheckBox.Text = "Checking for updates at startup";
             this.UpdateCheckBox.UseVisualStyleBackColor = true;
             // 
-            // NotifyOnSavedCheckBox
-            // 
-            this.NotifyOnSavedCheckBox.AutoSize = true;
-            this.NotifyOnSavedCheckBox.BackColor = System.Drawing.SystemColors.Window;
-            this.NotifyOnSavedCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.NotifyOnSavedCheckBox.Location = new System.Drawing.Point(33, 332);
-            this.NotifyOnSavedCheckBox.Margin = new System.Windows.Forms.Padding(2);
-            this.NotifyOnSavedCheckBox.Name = "NotifyOnSavedCheckBox";
-            this.NotifyOnSavedCheckBox.Size = new System.Drawing.Size(124, 20);
-            this.NotifyOnSavedCheckBox.TabIndex = 20;
-            this.NotifyOnSavedCheckBox.TabStop = false;
-            this.NotifyOnSavedCheckBox.Text = "Notify on Saved";
-            this.NotifyOnSavedCheckBox.UseVisualStyleBackColor = false;
-            // 
             // SettingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
@@ -577,5 +593,6 @@ namespace WindowResizer
         private System.Windows.Forms.Label RestoreAllKeyLabel;
         private System.Windows.Forms.TabPage ProfilesTab;
         private System.Windows.Forms.CheckBox IncludeMinimizeCheckBox;
+        private System.Windows.Forms.CheckBox ResizeByTitleCheckbox;
     }
 }

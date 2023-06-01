@@ -34,7 +34,7 @@ public static class WindowUtils
         if (string.IsNullOrWhiteSpace(processName)) return;
 
         var windowTitle = Resizer.GetWindowTitle(handle) ?? string.Empty;
-        var match = GetMatchWindowSize(config.WindowSizes, processName, windowTitle, onlyAuto);
+        var match = GetMatchWindowSize(config.WindowSizes, processName, windowTitle, config.EnableResizeByTitle, onlyAuto);
         if (!match.NoMatch)
         {
             MoveMatchWindow(match, handle);
@@ -81,10 +81,10 @@ public static class WindowUtils
         }
 
         var windowTitle = Resizer.GetWindowTitle(handle);
-        var match = GetMatchWindowSize(config.WindowSizes, processName, windowTitle);
+        var match = GetMatchWindowSize(config.WindowSizes, processName, windowTitle, config.EnableResizeByTitle);
 
         var place = Resizer.GetPlacement(handle);
-        UpdateOrSaveConfig(match, processName, windowTitle, place);
+        UpdateOrSaveConfig(match, processName, windowTitle, place, config.EnableResizeByTitle);
         onSuccess?.Invoke(processName);
     }
 
@@ -161,11 +161,27 @@ public static class WindowUtils
         IEnumerable<WindowSize> windowSizes,
         string processName,
         string? title,
+        bool enableResizeByTitle,
         bool onlyAuto = false)
     {
         var windows = windowSizes.Where(w =>
                                      w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase))
                                  .ToList();
+
+        if (!enableResizeByTitle)
+        {
+            windows = windows.Where(w => w.Title.Equals("*")).ToList();
+
+            if (onlyAuto)
+            {
+                windows = windows.Where(w => w.AutoResize).ToList();
+            }
+
+            return new MatchWindowSize
+            {
+                WildcardMatch = windows.FirstOrDefault()
+            };
+        }
 
         if (onlyAuto)
         {
@@ -189,9 +205,33 @@ public static class WindowUtils
     }
 
 
-    private static void UpdateOrSaveConfig(MatchWindowSize match, string processName, string? title, WindowPlacement placement)
+    private static void UpdateOrSaveConfig(MatchWindowSize match, string processName, string? title, WindowPlacement placement, bool enableResizeByTitle)
     {
         if (string.IsNullOrWhiteSpace(processName)) return;
+
+        if (!enableResizeByTitle)
+        {
+            if (match.NoMatch || match.WildcardMatch is null)
+            {
+                InsertOrder(new WindowSize
+                {
+                    Name = processName,
+                    Title = "*",
+                    Rect = placement.Rect,
+                    State = placement.WindowState,
+                    MaximizedPosition = placement.MaximizedPosition,
+                });
+            }
+            else
+            {
+                match.WildcardMatch.Rect = placement.Rect;
+                match.WildcardMatch.State = placement.WindowState;
+                match.WildcardMatch.MaximizedPosition = placement.MaximizedPosition;
+            }
+
+            ConfigFactory.Save();
+            return;
+        }
 
         if (match.NoMatch)
         {
@@ -204,6 +244,7 @@ public static class WindowUtils
                 State = placement.WindowState,
                 MaximizedPosition = placement.MaximizedPosition,
             });
+
             if (!string.IsNullOrWhiteSpace(title))
             {
                 InsertOrder(new WindowSize
