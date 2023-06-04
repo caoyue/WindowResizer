@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using WindowResizer.Common.Shortcuts;
 using WindowResizer.Common.Windows;
 using WindowResizer.Configuration;
@@ -32,6 +33,21 @@ public static class WindowUtils
         }
 
         if (string.IsNullOrWhiteSpace(processName)) return;
+
+        // add delay to get window title on auto resizing
+        if (config.EnableAutoResizeDelay && onlyAuto)
+        {
+            var autoWindow = config.WindowSizes.FirstOrDefault(w => w.Name.Equals(processName, StringComparison.OrdinalIgnoreCase));
+            if (autoWindow is null)
+            {
+                return;
+            }
+
+            if (autoWindow.AutoResizeDelay > 0)
+            {
+                Thread.Sleep(autoWindow.AutoResizeDelay);
+            }
+        }
 
         var windowTitle = Resizer.GetWindowTitle(handle) ?? string.Empty;
         var match = GetMatchWindowSize(config.WindowSizes, processName, windowTitle, config.EnableResizeByTitle, onlyAuto);
@@ -197,9 +213,9 @@ public static class WindowUtils
         {
             FullMatch = windows.FirstOrDefault(w => w.Title == title),
             PrefixMatch = windows.FirstOrDefault(w =>
-                w.Title.StartsWith("*") && w.Title.Length > 1 && title.EndsWith(w.Title.TrimStart('*'))),
+                w.Title.StartsWith("*") && w.Title.Length > 1 && title!.EndsWith(w.Title.TrimStart('*'))),
             SuffixMatch = windows.FirstOrDefault(w =>
-                w.Title.EndsWith("*") && w.Title.Length > 1 && title.StartsWith(w.Title.TrimEnd('*'))),
+                w.Title.EndsWith("*") && w.Title.Length > 1 && title!.StartsWith(w.Title.TrimEnd('*'))),
             WildcardMatch = windows.FirstOrDefault(w => w.Title.Equals("*"))
         };
     }
@@ -250,7 +266,7 @@ public static class WindowUtils
                 InsertOrder(new WindowSize
                 {
                     Name = processName,
-                    Title = title,
+                    Title = title!,
                     Rect = placement.Rect,
                     State = placement.WindowState,
                     MaximizedPosition = placement.MaximizedPosition,
@@ -269,13 +285,17 @@ public static class WindowUtils
         }
         else if (!string.IsNullOrWhiteSpace(title))
         {
+            // update auto resize delay for new entry
+            var delay = match.All.FirstOrDefault(i => i is { AutoResizeDelay: > 0 })?.AutoResizeDelay ?? 0;
+
             InsertOrder(new WindowSize
             {
                 Name = processName,
-                Title = title,
+                Title = title!,
                 Rect = placement.Rect,
                 State = placement.WindowState,
                 MaximizedPosition = placement.MaximizedPosition,
+                AutoResizeDelay = delay
             });
         }
 

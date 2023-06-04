@@ -20,6 +20,8 @@ public class Config
 
     public bool EnableResizeByTitle { get; set; } = true;
 
+    public bool EnableAutoResizeDelay { get; set; } = false;
+
     public bool CheckUpdate { get; set; } = true;
 
     public Dictionary<HotkeysType, Hotkeys> Keys { get; } = new();

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace WindowResizer.Configuration;
 
 public class MatchWindowSize
@@ -15,4 +17,9 @@ public class MatchWindowSize
         && PrefixMatch == null
         && SuffixMatch == null
         && WildcardMatch == null;
+
+    public List<WindowSize?> All => new()
+    {
+        FullMatch, PrefixMatch, SuffixMatch, WildcardMatch
+    };
 }

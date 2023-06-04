@@ -59,6 +59,13 @@ namespace WindowResizer
                 control.Label.Font = Helper.ChangeFontSize(SaveLabel.Font, 12F, FontStyle.Bold);
             }
 
+            CheckBoxesInit();
+        }
+
+        #region checkboxes
+
+        private void CheckBoxesInit()
+        {
             DisableInFullScreenCheckBox.Checked = ConfigFactory.Current.DisableInFullScreen;
             DisableInFullScreenCheckBox.CheckedChanged += DisableInFullScreen_CheckedChanged;
             Helper.SetToolTip(DisableInFullScreenCheckBox, "Disable when current window is in fullscreen.");
@@ -74,7 +81,48 @@ namespace WindowResizer
             ResizeByTitleCheckbox.Checked = ConfigFactory.Current.EnableResizeByTitle;
             ResizeByTitleCheckbox.CheckedChanged += ResizeByTitle_CheckedChanged;
             Helper.SetToolTip(ResizeByTitleCheckbox, "Turn On/Off save/resize window according to the different titles of the same process.");
+
+            AutoResizeDelayCheckbox.Checked = ConfigFactory.Current.EnableAutoResizeDelay;
+            AutoResizeDelayCheckbox.CheckedChanged += AutoResizeDelay_CheckedChanged;
+            Helper.SetToolTip(AutoResizeDelayCheckbox, "Turn On/Off auto resize delay.");
         }
+
+        private void DisableInFullScreen_CheckedChanged(object sender, EventArgs e)
+        {
+            ConfigFactory.Current.DisableInFullScreen = DisableInFullScreenCheckBox.Checked;
+            ConfigFactory.Save();
+        }
+
+        private void IncludeMinimized_CheckedChanged(object sender, EventArgs e)
+        {
+            ConfigFactory.Current.RestoreAllIncludeMinimized = IncludeMinimizeCheckBox.Checked;
+            ConfigFactory.Save();
+        }
+
+        private void NotifyOnSaved_CheckedChanged(object sender, EventArgs e)
+        {
+            ConfigFactory.Current.NotifyOnSaved = NotifyOnSavedCheckBox.Checked;
+            ConfigFactory.Save();
+        }
+
+        private void ResizeByTitle_CheckedChanged(object sender, EventArgs e)
+        {
+            ConfigFactory.Current.EnableResizeByTitle = ResizeByTitleCheckbox.Checked;
+            ConfigFactory.Save();
+
+            ProcessesGrid_UpdateDataSource();
+        }
+
+
+        private void AutoResizeDelay_CheckedChanged(object sender, EventArgs e)
+        {
+            ConfigFactory.Current.EnableAutoResizeDelay = AutoResizeDelayCheckbox.Checked;
+            ConfigFactory.Save();
+
+            ProcessesGrid_UpdateDataSource();
+        }
+
+        #endregion
 
         private void HotkeysPageReload()
         {
@@ -114,32 +162,6 @@ namespace WindowResizer
             OnKeyRecordButtonClick(sender, e);
         }
 
-        private void DisableInFullScreen_CheckedChanged(object sender, EventArgs e)
-        {
-            ConfigFactory.Current.DisableInFullScreen = DisableInFullScreenCheckBox.Checked;
-            ConfigFactory.Save();
-        }
-
-        private void IncludeMinimized_CheckedChanged(object sender, EventArgs e)
-        {
-            ConfigFactory.Current.RestoreAllIncludeMinimized = IncludeMinimizeCheckBox.Checked;
-            ConfigFactory.Save();
-        }
-
-        private void NotifyOnSaved_CheckedChanged(object sender, EventArgs e)
-        {
-            ConfigFactory.Current.NotifyOnSaved = NotifyOnSavedCheckBox.Checked;
-            ConfigFactory.Save();
-        }
-
-        private void ResizeByTitle_CheckedChanged(object sender, EventArgs e)
-        {
-            ConfigFactory.Current.EnableResizeByTitle = ResizeByTitleCheckbox.Checked;
-            ConfigFactory.Save();
-
-            ProcessesGrid_UpdateDataSource();
-        }
-
         private void SetToolTips()
         {
             Helper.SetToolTip(SaveLabel, "Save foreground window size and position.");
@@ -147,7 +169,6 @@ namespace WindowResizer
             Helper.SetToolTip(SaveAllLabel, "Save all window size and position.");
             Helper.SetToolTip(RestoreAllLabel, "Restore all saved windows size and position.");
         }
-
 
         private void HookOnKeyDown(object sender, KeyEventArgs args)
         {
@@ -215,7 +236,6 @@ namespace WindowResizer
 
             _globalHook.Hook();
         }
-
 
         private void OnKeyRecordEnd()
         {

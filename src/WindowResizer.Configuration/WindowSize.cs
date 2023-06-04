@@ -18,6 +18,9 @@ public class WindowSize : IComparable<WindowSize>
 
     public bool AutoResize { get; set; }
 
+    // AutoResize Delay Milliseconds
+    public int AutoResizeDelay { get; set; } = 0;
+
     public int CompareTo(WindowSize? other)
     {
         var c = string.Compare(other?.Name ?? String.Empty, Name, StringComparison.Ordinal);
