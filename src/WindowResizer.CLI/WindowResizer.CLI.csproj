@@ -13,6 +13,7 @@
         <RepositoryType>git</RepositoryType>
         <Description>Quickly reset window position and size using shortcut keys</Description>
         <ApplicationIcon>Resources\AppIcon.ico</ApplicationIcon>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
     </PropertyGroup>
 
     <ItemGroup>

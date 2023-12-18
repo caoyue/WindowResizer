@@ -14,8 +14,6 @@ namespace WindowResizer.CLI
     {
         static Task<int> Main(string[] args)
         {
-            Core.Dpi.Utils.SetDpiAwareness();
-
             System.Console.OutputEncoding = System.Text.Encoding.UTF8;
 
             var rootCommand = new RootCommand($"{nameof(WindowResizer)} CLI.");
