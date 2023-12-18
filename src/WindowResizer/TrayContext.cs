@@ -102,7 +102,10 @@ namespace WindowResizer
 
         private static string BuildTrayToolTips()
         {
-            return $"{App.Name}\nv{Application.ProductVersion}\nProfile: {ConfigFactory.Current.ProfileName}";
+            // NotifyIcon text check
+            const int TipsMaxLength = 60;
+            var tips =  $"{App.Name}\nv{Application.ProductVersion}\nProfile: {ConfigFactory.Current.ProfileName}";
+            return tips.Length > TipsMaxLength ? tips.Substring(0, TipsMaxLength) + "..." : tips;
         }
 
         private static void ToastRegister()
