@@ -114,5 +114,24 @@ namespace WindowResizer
                 MessageBox.Show("Import failed, config file is not valid json.");
             }
         }
+
+        private void OpenConfigButton_Click(object sender, EventArgs e)
+        {
+            var configFolder = ConfigFactory.PortableMode
+                ? Application.StartupPath
+                : Helper.GeApplicationDataPath();
+
+            if (!Directory.Exists(configFolder))
+            {
+                return;
+            }
+
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                Arguments = configFolder, FileName = "explorer.exe"
+            };
+
+            Process.Start(startInfo);
+        }
     }
 }

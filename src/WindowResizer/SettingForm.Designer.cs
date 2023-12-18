@@ -35,6 +35,7 @@ namespace WindowResizer
             this.ConfigExportBtn = new System.Windows.Forms.Button();
             this.ConfigImportBtn = new System.Windows.Forms.Button();
             this.ConfigExportGroup = new System.Windows.Forms.GroupBox();
+            this.OpenConfigButton = new System.Windows.Forms.Button();
             this.GithubLinkLabel = new System.Windows.Forms.LinkLabel();
             this.VersionLabel = new System.Windows.Forms.Label();
             this.SettingTab = new System.Windows.Forms.TabControl();
@@ -141,14 +142,26 @@ namespace WindowResizer
             // 
             // ConfigExportGroup
             // 
+            this.ConfigExportGroup.Controls.Add(this.OpenConfigButton);
             this.ConfigExportGroup.Controls.Add(this.ConfigImportBtn);
             this.ConfigExportGroup.Controls.Add(this.ConfigExportBtn);
             this.ConfigExportGroup.Location = new System.Drawing.Point(33, 346);
             this.ConfigExportGroup.Name = "ConfigExportGroup";
-            this.ConfigExportGroup.Size = new System.Drawing.Size(925, 113);
+            this.ConfigExportGroup.Size = new System.Drawing.Size(925, 119);
             this.ConfigExportGroup.TabIndex = 12;
             this.ConfigExportGroup.TabStop = false;
             this.ConfigExportGroup.Text = "Import/Export Config";
+            // 
+            // OpenConfigButton
+            // 
+            this.OpenConfigButton.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.OpenConfigButton.Location = new System.Drawing.Point(270, 46);
+            this.OpenConfigButton.Name = "OpenConfigButton";
+            this.OpenConfigButton.Size = new System.Drawing.Size(212, 40);
+            this.OpenConfigButton.TabIndex = 11;
+            this.OpenConfigButton.Text = "Open Config Directory";
+            this.OpenConfigButton.UseVisualStyleBackColor = false;
+            this.OpenConfigButton.Click += new System.EventHandler(this.OpenConfigButton_Click);
             // 
             // GithubLinkLabel
             // 
@@ -578,6 +591,8 @@ namespace WindowResizer
             this.AboutGroup.PerformLayout();
             this.ResumeLayout(false);
         }
+
+        private System.Windows.Forms.Button OpenConfigButton;
 
         private System.Windows.Forms.CheckBox NotifyOnSavedCheckBox;
 

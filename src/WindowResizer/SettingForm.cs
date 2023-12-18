@@ -1,8 +1,11 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 using WindowResizer.Configuration;
 using WindowResizer.Core.Shortcuts;
+using WindowResizer.Utils;
 
 namespace WindowResizer
 {
