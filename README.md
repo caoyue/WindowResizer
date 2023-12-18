@@ -58,17 +58,26 @@ Change hotkeys in setting window.
     The title is not required, by default use a wildcard `*` to match all the titles for a process name.
     And if you specify the title, it will be matched first.
 
--   restore window position automatically
+-  Option: Resize by title
+    Uncheck: Resize based on process
+    Checked: Resize based on Process and title
+
+-   `Auto resize`: restore window position automatically
 
     check the checkbox on `Auto` column.
     <details>
         <summary>demo</summary>
         <img src="https://i.imgur.com/LeNyJQu.gif" title="auto restore" loading="lazy" />
     </details>
+
+-  Option: Auto resize delay
+    This option is used with the `Auto Resize` feature.
+    When `Auto Resize` based on process titles, some titles are not immediately determined, such as Chrome web pages.
+    If this option is checked, you can set a delay(in millisecond) for the Chrome process, so when a new Chrome window is created, there will be a delay before resize takes effect.
+
 -   portable mode
     - download portable package
     - put `WindowResizer.config.json` in the same folder as the program file `WindowResizer.exe`
-
 ## CLI
 run ```WindowResizer.CLI.exe resize -h```   
 > The CLI can run standalone without WindowResizer App running.
