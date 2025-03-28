@@ -75,6 +75,48 @@ public static class WindowCmd
         return true;
     }
 
+    public static bool SaveAll(string? configPath, string? profileName,
+        Action<string>? onError = null,
+        Action<List<TargetWindow>>? onDebug = null)
+    {
+        var profile = LoadOrCreateConfig(configPath, profileName, onError);
+
+        if (profile == null)
+        {
+            return false;
+        }
+
+        profile.WindowSizes.Clear();
+
+        var windows = Resizer.GetOpenWindows();
+        var targets = new List<TargetWindow>();
+
+        foreach (var handle in windows)
+        {
+            if (!IsProcessAvailable(handle, out string processName, null))
+            {
+                continue;
+            }
+
+            var t = Resizer.GetWindowTitle(handle);
+
+            targets.Add(new TargetWindow(handle, processName, t));
+        }
+
+        foreach (var tp in targets)
+        {
+            UpdateOrSaveWindowSize(tp.Handle, profile, (p, e) =>
+            {
+                tp.Result = "Elevated privileges may be required.";
+                onError?.Invoke($"Unable to save position for process <{p}>, elevated privileges may be required.");
+            });
+        }
+
+        onDebug?.Invoke(targets);
+
+        return true;
+    }
+
     public class TargetWindow
     {
         public TargetWindow(IntPtr handle, string processName, string? title)
@@ -113,5 +155,15 @@ public static class WindowCmd
         }
 
         return p;
+    }
+
+    private static ProfileConfig? LoadOrCreateConfig(string? configPath, string? profileName, Action<string>? onError)
+    {
+        if (!ConfigUtils.LoadOrCreate(configPath, profileName, onError))
+        {
+            return null;
+        }
+
+        return ProfilesFactory.Current;
     }
 }

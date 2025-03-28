@@ -18,6 +18,7 @@ namespace WindowResizer.CLI
 
             var rootCommand = new RootCommand($"{nameof(WindowResizer)} CLI.");
             rootCommand.AddCommand(new ResizeCommand());
+            rootCommand.AddCommand(new SaveAllCommand());
 
             var parser = new CommandLineBuilder(rootCommand)
                          .UseDefaults()
