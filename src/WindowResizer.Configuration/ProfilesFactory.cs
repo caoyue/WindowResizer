@@ -13,6 +13,7 @@ public static class ProfilesFactory
     private static string _portableConfigPath = string.Empty;
 
     public static bool PortableMode;
+    public static bool PostponeSaving = false;
     public static string ConfigPath = string.Empty;
 
     public static void SetPath(string roamingPath, string portablePath)
@@ -78,7 +79,8 @@ public static class ProfilesFactory
     {
         var json = JsonConvert.SerializeObject(Profiles);
         new FileInfo(ConfigPath).Directory?.Create();
-        File.WriteAllText(ConfigPath, json);
+
+        if (!PostponeSaving) File.WriteAllText(ConfigPath, json);
 
         Profiles.Updated();
     }

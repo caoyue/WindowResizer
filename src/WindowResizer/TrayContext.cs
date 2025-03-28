@@ -389,6 +389,7 @@ namespace WindowResizer
         private void SaveAll()
         {
             var windows = Resizer.GetOpenWindows();
+            ProfilesFactory.PostponeSaving = true;
             foreach (var window in windows)
             {
                 if (Resizer.GetWindowState(window) != WindowState.Minimized)
@@ -396,6 +397,9 @@ namespace WindowResizer
                     UpdateOrSaveWindowSize(window, ProfilesFactory.Current, null);
                 }
             }
+
+            ProfilesFactory.PostponeSaving = false;
+            ProfilesFactory.Save();
 
             if (ProfilesFactory.Current.NotifyOnSaved)
             {
