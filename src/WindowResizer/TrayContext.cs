@@ -389,6 +389,7 @@ namespace WindowResizer
         private void SaveAll()
         {
             var windows = Resizer.GetOpenWindows();
+            ProfilesFactory.Current.WindowSizes.Clear();
             foreach (var window in windows)
             {
                 if (Resizer.GetWindowState(window) != WindowState.Minimized)
